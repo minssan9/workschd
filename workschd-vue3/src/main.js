@@ -1,30 +1,25 @@
 import './assets/main.css'
-import 'primeflex/primeflex.css';
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
 import App from './App.vue'
 import router from './router'
-import PrimeVue from "primevue/config";
-import Aura from '@primevue/themes/aura';
+
+import { Quasar } from 'quasar'
+// Import icon libraries
+import '@quasar/extras/material-icons/material-icons.css'
+// Import Quasar css
+import 'quasar/src/css/index.sass'
 
 
 const app = createApp(App)
 
-app.use(PrimeVue, {
-  theme: {
-    preset: Aura,
-    options: {
-      prefix: 'p',
-      darkModeSelector: 'dark-mode',
-      cssLayer: false
-    }
-  }
-  // unstyled: true
-})
 app.use(createPinia())
 app.use(router)
+
+app.use(Quasar, {
+    plugins: {}, // import Quasar plugins and add here
+})
 
 
 import vue3GoogleLogin from 'vue3-google-login'

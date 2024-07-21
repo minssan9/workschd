@@ -4,15 +4,17 @@
       <a id="custom-login-btn" @click="kakaoLogin()">
         <img
             src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg"
-            width="222"
+            width="190"
+            height="40"
             alt="카카오 로그인 버튼"
         />
       </a>
-      <div @click="kakaoLogout()">로그아웃</div>
     </div>
     <div class="row" >
       <GoogleLogin :callback="callback" prompt auto-login/>
     </div>
+
+    <div @click="kakaoLogout()">로그아웃</div>
   </div>
 </template>
 <script>

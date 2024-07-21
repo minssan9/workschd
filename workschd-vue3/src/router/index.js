@@ -7,7 +7,7 @@ const router = createRouter({
   /* eslint-disable */
   routes: [
     { path: '/',         name: 'home',      component: HomeView },
-    { path: '/login',         name: 'home',          component: () => import('@/views/auth/Login.vue')},
+    { path: '/login',         name: 'login',          component: () => import('@/views/auth/Login.vue')},
     {
       path: '/about',
       name: 'about',
