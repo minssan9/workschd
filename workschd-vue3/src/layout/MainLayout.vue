@@ -1,49 +1,45 @@
 <template>
   <div>
-    <q-layout view="hHh Lpr lff" container style="height: 100vh" class="shadow-2 rounded-borders">
+    <q-layout view="hHh LpR fFf" container
+              style="height: 100vh"
+              class="shadow-2 rounded-borders">
       <q-header elevated :class="$q.dark.isActive ? 'bg-secondary' : 'bg-black'">
         <q-toolbar>
-<!--          <q-btn flat @click="drawerLeft = !drawerLeft" round dense icon="menu" />-->
+          <q-btn flat @click="drawerLeft = !drawerLeft" round dense icon="menu" />
           <q-toolbar-title>Header</q-toolbar-title>
-
-
           <q-btn flat @click="drawerRight = !drawerRight" round dense icon="menu" />
         </q-toolbar>
       </q-header>
-
-<!--      <q-drawer-->
-<!--          v-model="drawerLeft"-->
-<!--          show-if-above-->
-<!--          :width="200"-->
-<!--          :breakpoint="700"-->
-<!--          elevated-->
-<!--          class="bg-primary text-white"-->
-<!--      >-->
-<!--        <q-scroll-area class="fit">-->
-<!--          <div class="q-pa-sm">-->
-<!--            <div v-for="n in 50" :key="n">Drawer {{ n }} / 50</div>-->
-<!--          </div>-->
-<!--        </q-scroll-area>-->
-<!--      </q-drawer>-->
-
+      <q-drawer
+          v-model="drawerLeft"
+          show-if-above
+          :width="200"
+          :breakpoint="700"
+          elevated
+          class="bg-primary text-white"
+      >
+        <q-scroll-area class="fit">
+          <div class="q-pa-sm">
+            <div v-for="n in 30" :key="n">Drawer {{ n }} / 50</div>
+          </div>
+        </q-scroll-area>
+      </q-drawer>
       <q-drawer
           side="right"
           v-model="drawerRight"
           show-if-above
-          bordered
+          elevated
           :width="200"
-          :breakpoint="500"
+          :breakpoint="700"
           :class="$q.dark.isActive ? 'bg-grey-3' : 'bg-grey-9'"
       >
-        <q-btn flat @click="toggleDarkMode" round dense icon="menu" />
+<!--        <q-btn flat @click="toggleDarkMode" round dense icon="menu" />-->
 
-        <q-scroll-area class="fit">
-          <div>
-            <div v-for="n in 50" :key="n">Drawer {{ n }} / 50</div>
-          </div>
-        </q-scroll-area>
+        <div class="q-pa-sm">
+          <div v-for="n in 20" :key="n">Drawer {{ n }} / 50</div>
+        </div>
+        abc
       </q-drawer>
-
 
       <q-page-container>
         <q-page padding>
