@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
+bootRun {
+    args = ["--spring.profiles.active=" + profile]
+}
+group = 'com.voyagess'
+
+repositories {
+    mavenCentral()
+}
+
+bootJar {
+    manifest {
+        attributes 'Start-Class': 'com.api.APIApplication'
+    }
+}
+jar { enabled=false }
+
+dependencies {
+    implementation project(':persist')
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}

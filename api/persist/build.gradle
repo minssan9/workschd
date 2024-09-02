@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+    id 'maven-publish' // maven-publish 플러그인 추가
+}
+
+repositories {
+    mavenCentral()
+}
+
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
