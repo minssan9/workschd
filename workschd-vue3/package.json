@@ -13,6 +13,8 @@
   "dependencies": {
     "@channel.io/channel-web-sdk-loader": "^1.1.7",
     "@quasar/extras": "^1.16.12",
+    "ag-grid-community": "^32.1.0",
+    "ag-grid-vue3": "^32.1.0",
     "pinia": "^2.1.7",
     "quasar": "^2.16.6",
     "vue": "^3.4.21",
