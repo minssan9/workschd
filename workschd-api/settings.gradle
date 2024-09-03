@@ -1,4 +1,4 @@
-rootProject.name = 'api'
+rootProject.name = 'workschd-api'
 include 'api-admin'
 include 'persist'
 
