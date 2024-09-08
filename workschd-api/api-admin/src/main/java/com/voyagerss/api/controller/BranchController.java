@@ -1,9 +1,8 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.BranchDTO;
-import com.voyagerss.persist.service.BranchService;
-import jakarta.persistence.NotNull;
-import jakarta.persistence.Valid;
+import com.voyagerss.persist.service.BranchService;import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,7 @@ public class BranchController {
     private BranchService branchService;
 
     @PostMapping
-    public String save(@Valid @RequestBody BranchVO vO) {
+    public String save(@Valid @RequestBody BranchDTO vO) {
         return branchService.save(vO).toString();
     }
 
@@ -29,7 +28,7 @@ public class BranchController {
 
     @PutMapping("/{id}")
     public void update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody BranchUpdateVO vO) {
+                       @Valid @RequestBody BranchDTO vO) {
         branchService.update(id, vO);
     }
 
@@ -39,7 +38,7 @@ public class BranchController {
     }
 
     @GetMapping
-    public Page<BranchDTO> query(@Valid BranchQueryVO vO) {
+    public Page<BranchDTO> query(@Valid BranchDTO vO) {
         return branchService.query(vO);
     }
 }

@@ -16,7 +16,7 @@ public class BranchService {
     @Autowired
     private BranchRepository branchRepository;
 
-    public Long save(BranchVO vO) {
+    public Long save(BranchDTO vO) {
         Branch bean = new Branch();
         BeanUtils.copyProperties(vO, bean);
         bean = branchRepository.save(bean);
@@ -27,7 +27,7 @@ public class BranchService {
         branchRepository.deleteById(id);
     }
 
-    public void update(Long id, BranchUpdateVO vO) {
+    public void update(Long id, BranchDTO vO) {
         Branch bean = requireOne(id);
         BeanUtils.copyProperties(vO, bean);
         branchRepository.save(bean);
@@ -38,7 +38,7 @@ public class BranchService {
         return toDTO(original);
     }
 
-    public Page<BranchDTO> query(BranchQueryVO vO) {
+    public Page<BranchDTO> query(BranchDTO vO) {
         throw new UnsupportedOperationException();
     }
 

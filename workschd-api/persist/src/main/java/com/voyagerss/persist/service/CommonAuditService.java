@@ -16,7 +16,7 @@ public class CommonAuditService {
     @Autowired
     private CommonAuditRepository commonAuditRepository;
 
-    public Long save(CommonAuditVO vO) {
+    public Long save(CommonAuditDTO vO) {
         CommonAudit bean = new CommonAudit();
         BeanUtils.copyProperties(vO, bean);
         bean = commonAuditRepository.save(bean);
@@ -27,7 +27,7 @@ public class CommonAuditService {
         commonAuditRepository.deleteById(id);
     }
 
-    public void update(Long id, CommonAuditUpdateVO vO) {
+    public void update(Long id, CommonAuditDTO vO) {
         CommonAudit bean = requireOne(id);
         BeanUtils.copyProperties(vO, bean);
         commonAuditRepository.save(bean);
@@ -38,7 +38,7 @@ public class CommonAuditService {
         return toDTO(original);
     }
 
-    public Page<CommonAuditDTO> query(CommonAuditQueryVO vO) {
+    public Page<CommonAuditDTO> query(CommonAuditDTO vO) {
         throw new UnsupportedOperationException();
     }
 

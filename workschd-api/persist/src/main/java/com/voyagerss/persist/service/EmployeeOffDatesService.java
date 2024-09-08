@@ -1,8 +1,8 @@
 package com.voyagerss.persist.service;
 
 import com.voyagerss.persist.dto.UnavailableDatesDTO;
-import com.voyagerss.persist.entity.UnavailableDates;
-import com.voyagerss.persist.repository.UnavailableDatesRepository;
+import com.voyagerss.persist.entity.EmployeeOffDates;
+import com.voyagerss.persist.repository.EmployeeOffDatesRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,45 +11,45 @@ import org.springframework.stereotype.Service;
 import java.util.NoSuchElementException;
 
 @Service
-public class UnavailableDatesService {
+public class EmployeeOffDatesService {
 
     @Autowired
-    private UnavailableDatesRepository unavailableDatesRepository;
+    private EmployeeOffDatesRepository employeeOffDatesRepository;
 
-    public Long save(UnavailableDatesVO vO) {
-        UnavailableDates bean = new UnavailableDates();
+    public Long save(UnavailableDatesDTO vO) {
+        EmployeeOffDates bean = new EmployeeOffDates();
         BeanUtils.copyProperties(vO, bean);
-        bean = unavailableDatesRepository.save(bean);
+        bean = employeeOffDatesRepository.save(bean);
         return bean.getId();
     }
 
     public void delete(Long id) {
-        unavailableDatesRepository.deleteById(id);
+        employeeOffDatesRepository.deleteById(id);
     }
 
-    public void update(Long id, UnavailableDatesUpdateVO vO) {
-        UnavailableDates bean = requireOne(id);
+    public void update(Long id, UnavailableDatesDTO vO) {
+        EmployeeOffDates bean = requireOne(id);
         BeanUtils.copyProperties(vO, bean);
-        unavailableDatesRepository.save(bean);
+        employeeOffDatesRepository.save(bean);
     }
 
     public UnavailableDatesDTO getById(Long id) {
-        UnavailableDates original = requireOne(id);
+        EmployeeOffDates original = requireOne(id);
         return toDTO(original);
     }
 
-    public Page<UnavailableDatesDTO> query(UnavailableDatesQueryVO vO) {
+    public Page<UnavailableDatesDTO> query(UnavailableDatesDTO vO) {
         throw new UnsupportedOperationException();
     }
 
-    private UnavailableDatesDTO toDTO(UnavailableDates original) {
+    private UnavailableDatesDTO toDTO(EmployeeOffDates original) {
         UnavailableDatesDTO bean = new UnavailableDatesDTO();
         BeanUtils.copyProperties(original, bean);
         return bean;
     }
 
-    private UnavailableDates requireOne(Long id) {
-        return unavailableDatesRepository.findById(id)
+    private EmployeeOffDates requireOne(Long id) {
+        return employeeOffDatesRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Resource not found: " + id));
     }
 }

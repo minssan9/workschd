@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "branch")
-public class Branch implements Serializable {
+public class Branch extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,19 +24,6 @@ public class Branch implements Serializable {
     @Column(name = "region", nullable = false)
     private String region;
 
-    @Column(name = "created_by", nullable = false)
-    private String createdBy;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "is_active")
-    private Boolean active;
-
-    @Column(name = "last_modified_by")
-    private String lastModifiedBy;
-
-    @Column(name = "last_modified_at")
-    private LocalDateTime lastModifiedAt;
+    private String scheduleType;  // Monthly, Weekly, Daily
 
 }

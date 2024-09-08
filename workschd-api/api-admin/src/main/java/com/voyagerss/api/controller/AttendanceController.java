@@ -1,24 +1,24 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.AttendanceDTO;
-import com.voyagerss.persist.service.AttendanceService;
-import jakarta.persistence.NotNull;
-import jakarta.persistence.Valid;
+import com.voyagerss.persist.service.AttendanceService;import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Validated
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/attendance")
 public class AttendanceController {
 
-    @Autowired
-    private AttendanceService attendanceService;
+    private final AttendanceService attendanceService;
 
     @PostMapping
-    public String save(@Valid @RequestBody AttendanceVO vO) {
+    public String save(@Valid @RequestBody AttendanceDTO vO) {
         return attendanceService.save(vO).toString();
     }
 
@@ -29,7 +29,7 @@ public class AttendanceController {
 
     @PutMapping("/{id}")
     public void update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody AttendanceUpdateVO vO) {
+                       @Valid @RequestBody AttendanceDTO vO) {
         attendanceService.update(id, vO);
     }
 
@@ -39,7 +39,7 @@ public class AttendanceController {
     }
 
     @GetMapping
-    public Page<AttendanceDTO> query(@Valid AttendanceQueryVO vO) {
+    public Page<AttendanceDTO> query(@Valid AttendanceDTO vO) {
         return attendanceService.query(vO);
     }
 }

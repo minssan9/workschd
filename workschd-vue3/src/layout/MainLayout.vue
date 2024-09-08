@@ -36,7 +36,14 @@
 <!--        <q-btn flat @click="toggleDarkMode" round dense icon="menu" />-->
 
         <div class="q-pa-sm">
-          <div v-for="n in 20" :key="n">Drawer {{ n }} / 50</div>
+
+          <h1>{{ $t('greeting') }}</h1>
+          <h2>{{ $t('farewell') }}</h2>
+          <q-btn @click="changeLanguage('en')">English</q-btn>
+          <q-btn @click="changeLanguage('ko')">Korean</q-btn>
+          <q-btn @click="changeLanguage('fr')">French</q-btn>
+          <q-btn @click="changeLanguage('es')">Spanish</q-btn>
+          <q-btn @click="changeLanguage('ja')">Japanese</q-btn>
         </div>
         abc
       </q-drawer>
@@ -121,6 +128,10 @@ export default {
     toggleDarkMode() {
       alert(`current mode : ${this.$q.dark.isActive} ->  ${!this.$q.dark.isActive}`)
       this.$q.dark.set(!this.$q.dark.isActive);
+    },
+
+    changeLanguage(lang) {
+      this.$i18n.locale = lang;
     }
   }
 }

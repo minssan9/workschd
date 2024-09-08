@@ -1,9 +1,8 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.TaskDTO;
-import com.voyagerss.persist.service.TaskService;
-import jakarta.persistence.NotNull;
-import jakarta.persistence.Valid;
+import com.voyagerss.persist.service.TaskService;import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,7 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping
-    public String save(@Valid @RequestBody TaskVO vO) {
+    public String save(@Valid @RequestBody TaskDTO vO) {
         return taskService.save(vO).toString();
     }
 
@@ -29,7 +28,7 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public void update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody TaskUpdateVO vO) {
+                       @Valid @RequestBody TaskDTO vO) {
         taskService.update(id, vO);
     }
 
@@ -39,7 +38,7 @@ public class TaskController {
     }
 
     @GetMapping
-    public Page<TaskDTO> query(@Valid TaskQueryVO vO) {
+    public Page<TaskDTO> query(@Valid TaskDTO vO) {
         return taskService.query(vO);
     }
 }

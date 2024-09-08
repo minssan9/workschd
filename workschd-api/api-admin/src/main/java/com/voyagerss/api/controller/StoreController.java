@@ -1,9 +1,8 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.StoreDTO;
-import com.voyagerss.persist.service.StoreService;
-import jakarta.persistence.NotNull;
-import jakarta.persistence.Valid;
+import com.voyagerss.persist.service.StoreService;import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,7 @@ public class StoreController {
     private StoreService storeService;
 
     @PostMapping
-    public String save(@Valid @RequestBody StoreVO vO) {
+    public String save(@Valid @RequestBody StoreDTO vO) {
         return storeService.save(vO).toString();
     }
 
@@ -29,7 +28,7 @@ public class StoreController {
 
     @PutMapping("/{id}")
     public void update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody StoreUpdateVO vO) {
+                       @Valid @RequestBody StoreDTO vO) {
         storeService.update(id, vO);
     }
 
@@ -39,7 +38,7 @@ public class StoreController {
     }
 
     @GetMapping
-    public Page<StoreDTO> query(@Valid StoreQueryVO vO) {
+    public Page<StoreDTO> query(@Valid StoreDTO vO) {
         return storeService.query(vO);
     }
 }

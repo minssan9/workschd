@@ -1,35 +1,52 @@
 package com.voyagerss.persist.dto;
 
 
+import jakarta.persistence.Column;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class AttendanceDTO implements Serializable {
+public class AttendanceDTO extends BaseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private Long id;
+
 
     private Long branchId;
 
+
     private Long taskId;
 
-    private LocalDateTime actualStartTime;
-
-    private LocalDateTime actualEndTime;
 
     private BigDecimal calculatedDailyWage;
 
-    private String createdBy;
 
-    private LocalDateTime createdAt;
 
-    private Boolean active;
+    private Long employeeId;
 
-    private String lastModifiedBy;
 
-    private LocalDateTime lastModifiedAt;
+    private LocalDate attendanceDate;
+
+
+    private String dayOfWeek;
+
+
+    private LocalTime startTime;
+
+
+    private LocalTime endTime;
+
+
+    private LocalDateTime actualStartTime;
+
+
+    private LocalDateTime actualEndTime;
 
 }

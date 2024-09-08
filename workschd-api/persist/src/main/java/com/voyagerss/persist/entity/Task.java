@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @Data
 @Entity
 @Table(name = "task")
-public class Task implements Serializable {
+public class Task  extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,19 +41,5 @@ public class Task implements Serializable {
     @Column(name = "daily_wage")
     private BigDecimal dailyWage;
 
-    @Column(name = "created_by", nullable = false)
-    private String createdBy;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "is_active")
-    private Boolean active;
-
-    @Column(name = "last_modified_by")
-    private String lastModifiedBy;
-
-    @Column(name = "last_modified_at")
-    private LocalDateTime lastModifiedAt;
 
 }

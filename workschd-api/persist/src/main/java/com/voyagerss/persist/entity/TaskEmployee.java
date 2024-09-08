@@ -1,9 +1,6 @@
 package com.voyagerss.persist.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,31 +9,21 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "task_employee")
-public class TaskEmployee implements Serializable {
+public class TaskEmployee extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "task_id", nullable = false)
-    private Long taskId;
+    private Long id;
 
-    @Id
-    @Column(name = "employee_id", nullable = false)
-    private Long employeeId;
+    @ManyToOne( fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false)
+    private Task taskId;
 
-    @Column(name = "created_by", nullable = false)
-    private String createdBy;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @ManyToOne( fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
-    @Column(name = "is_active")
-    private Boolean active;
-
-    @Column(name = "last_modified_by")
-    private String lastModifiedBy;
-
-    @Column(name = "last_modified_at")
-    private LocalDateTime lastModifiedAt;
 
 }
