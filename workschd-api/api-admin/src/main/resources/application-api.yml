@@ -43,20 +43,14 @@ logging:
 ---
 spring.config.activate.on-profile: local
 server:
-  port: 34000
+  port: 24000
 
 baseUrl: http://localhost:34000/api
 
----
-spring.config.activate.on-profile: local-workschd
-server:
-  port: 34000
-
-baseUrl: http://localhost:34000/api
 ---
 spring.config.activate.on-profile: develop
 server:
-  port: 34001
+  port: 24001
 
 app:
   web-address: https://dev.voyagerss.com
@@ -67,17 +61,7 @@ baseUrl: https://dev.voyagerss.com/api
 ---
 spring.config.activate.on-profile: release
 server:
-  port: 34001
-
-app:
-  web-address: https://voyagerss.com
-
-baseUrl: https://voyagerss.com/api
-
----
-spring.config.activate.on-profile: release-voyagerss
-server:
-  port: 34001
+  port: 24001
 
 app:
   web-address: https://voyagerss.com

@@ -1,0 +1,165 @@
+import apiAccount from '@/api/modules/api-account'
+import apiPublicAccount from '@/api/public-modules/api-account'
+
+import Cookies from 'vue-cookies/vue-cookies'
+export default {
+  state: {
+    token: null,
+    user: {
+      accountId: null,
+      accountRoles: null,
+      accountSnsId: null,
+      accountSnsList: [],
+      createdAt: null,
+      email: null,
+      englishName: null,
+      expired: null,
+      koreanName: null,
+      password: null,
+      phone: '',
+      providerType: null,
+      accessToken: null,
+      refreshToken: null,
+      role: null,
+      snsAccount: null,
+      status: null,
+      username: null,
+      profileImageUrl: '',
+      profileVideoUrl: '',
+    },
+    teacherList: [],
+    studentList: [],
+    teacher: {},
+    student: {},
+    isAuthPhone: false,
+  },
+  getters: {
+    user: state => state.user,
+    accountId: state => state.user.accountId,
+    accessToken: state => state.user.accessToken,
+
+    isStudent: state => state.user.accountRoles ? state.user.accountRoles.map(ar=>ar.roleType).includes('EN9DOOR_STUDENT') : false
+                      && state.user.accountRoles.length === 1,
+    isOwner: state => state.user.accountRoles ? state.user.accountRoles.map(ar=>ar.roleType).includes('EN9DOOR_OWNER') : false,
+    isTeacher: state => state.user.accountRoles ? state.user.accountRoles.map(ar=>ar.roleType).includes('EN9DOOR_TEACHER') : false,
+    isManager: state => state.user.accountRoles ? state.user.accountRoles.map(ar=>ar.roleType).includes('EN9DOOR_MANAGER') : false
+  },
+  mutations: {
+    SET_TOKEN: (state, token) => {
+      if (token){
+        Cookies.set('accessToken',token)
+      }else{
+        Cookies.remove('accessToken')
+        Cookies.remove('refreshToken')
+      }
+      state.token = token
+    },
+    SET_EMPTYUSER: (state) => {
+      state.user= {}
+    },
+    SET_USER: (state, user) => {
+      state.user= {...state.user, ...user}
+    },
+    SET_ACCOUNT_INFO: (state, accountInfo) => {
+      if ( accountInfo){
+        state.user= {...state.user, ...accountInfo}
+      }
+    },
+    SET_AUTH_PHONE: (state, isAuthPhone) => {
+      state.isAuthPhone= isAuthPhone
+    },
+    SET_TEACHER_LIST: (state, teacherList) => {
+      state.teacherList = teacherList
+    },
+    SET_TEACHER: (state, teacher) => {
+      state.teacher = teacher
+    },
+    SET_STUDENT_LIST: (state, studentList) => {
+      state.studentList = studentList
+    },
+    SET_STUDENT: (state, student) => {
+      state.student = student
+    },
+  },
+  actions: {
+    fetchUser ({state, commit}) {
+      if (!state.user.accountId){
+        return apiAccount.getUser()
+          .then(res => {
+            Cookies.set('refreshToken',res.refreshToken)
+            Cookies.set('accountId', res.accountId)
+            Cookies.set('username', res.username)
+            Cookies.set('email',res.email)
+            Cookies.set('role',res.accountRoles)
+            commit('SET_USER', res)
+            return res
+          })
+          .then(account => {
+            apiAccount.getAccountInfo(account.accountId)
+              .then(accountInfo => {
+                if (accountInfo.accountId) {
+                  commit('SET_ACCOUNT_INFO', accountInfo)
+                  return accountInfo
+                }
+              })
+          })
+      }
+    },
+    fetchTeacherList ({commit}) {
+      let fetchQuery = {}
+      return apiPublicAccount.getTeacherList(fetchQuery)
+              .then(res => {
+                commit('SET_TEACHER_LIST', res)
+                return res
+              })
+    },
+    fetchTeacher ({commit}, accountId) {
+      return apiPublicAccount.getTeacherById(accountId)
+            .then(res => commit('SET_TEACHER', res))
+    },
+    updateUser ({state, commit}) {
+      return new Promise((resolve, reject)=> {
+        apiAccount.putUser(state.user)
+          .then(res => {
+            commit('SET_USER', res)
+            resolve(res)
+          })
+            .catch(err => reject(err))
+      })
+    },
+    saveAccountInfo ({commit}, accountInfo) {
+      return new Promise((resolve, reject) => {
+        apiAccount.saveAccountInfo(accountInfo)
+          .then(res => {
+            commit('SET_ACCOUNT_INFO', res)
+            resolve(res)
+          })
+            .catch(err => reject(err))
+      })
+    },
+    saveAccountProfileImage ({commit}, {accountId, accountProfileImage}) {
+      return new Promise((resolve, reject) => {
+        apiAccount.saveProfileImg(accountId, accountProfileImage)
+          .then(res => resolve(res))
+          .catch(err => reject(err))
+      })
+    },
+    // user logout
+    logout({commit}) {
+      return new Promise((resolve)=> {
+        Cookies.keys().forEach(cookie => Cookies.remove(cookie));
+        let emptyUser = {
+          accountId: '',
+          username: '',
+          email: '',
+          role: '',
+          token: ''
+        }
+        commit('SET_USER', emptyUser)
+        commit('SET_REGISTER', [])
+        commit('SET_TOKEN', '')
+        resolve()
+      })
+    }
+  }
+}
