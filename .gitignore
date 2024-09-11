@@ -1,2 +1,3 @@
 *node_modules
 workschd-api/api-admin/src/main/resources/application-secret.yml
+workschd-api/docker/dc-release-en9door.yml
