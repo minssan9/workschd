@@ -1,16 +1,58 @@
-import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig, loadEnv } from 'vite'
+import path from 'path'
 import vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite';
+import { VitePWA } from 'vite-plugin-pwa'
 import { visualizer } from 'rollup-plugin-visualizer';
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
+import { defineConfig, loadEnv } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue({
       template: { transformAssetUrls }
+    }),
+    VitePWA({
+      srcDir: "/",
+      filename: "service-worker.js",
+      registerType: 'autoUpdate',
+      devOptions: {
+        enabled: false,
+        type: 'module',
+        navigateFallback: 'index.html',
+      },
+      workbox: {
+        globPatterns: ['**/*.{ts,js,css,html,ico,png,svg}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 ** 2,
+        disableDevLogs: false,
+        sourcemap: true,
+      },
+      includeAssets: ['logo.svg'],
+      manifest: {
+        name: 'Hyundai Autoever PHM',
+        short_name: 'PHM',
+        description: 'Hyundai Autoever PHM',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: 'icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
+      }
     }),
     // @quasar/plugin-vite options list:
     // https://github.com/quasarframework/quasar/blob/dev/vite-plugin/index.d.ts
@@ -44,7 +86,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': path.resolve(__dirname, 'src'),
     }
+    // alias: {
+    //   '@': fileURLToPath(new URL('./src', import.meta.url))
+    // }
   },
 })
