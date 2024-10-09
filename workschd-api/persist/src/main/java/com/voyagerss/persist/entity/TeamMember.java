@@ -5,11 +5,12 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "branch")
-public class Branch extends BaseEntity implements Serializable {
+@Table(name = "team_member")
+public class TeamMember extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -18,12 +19,12 @@ public class Branch extends BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
 
-    @Column(name = "region", nullable = false)
-    private String region;
-
-    private String scheduleType;  // Monthly, Weekly, Daily
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
 
 }

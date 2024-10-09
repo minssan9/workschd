@@ -59,6 +59,8 @@ public class Account extends BaseEntity implements Serializable {
     @Column(name = "firebase_token")
     private String firebaseToken;
 
+    @OneToMany(mappedBy = "account")
+    private List<TeamMember> teamMembers;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
@@ -71,6 +73,8 @@ public class Account extends BaseEntity implements Serializable {
     @JsonManagedReference
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private AccountInfo accountInfo;
+
+
 
     public Account(AccountDTO accountDto) {
         BeanUtils.copyProperties(accountDto, this);

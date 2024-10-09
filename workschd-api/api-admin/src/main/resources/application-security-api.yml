@@ -6,17 +6,19 @@ spring:
       client:
         registration:
           google:
-            clientId: ${oauth2_google_clientId}
-            clientSecret: ${oauth2_google_clientSecret}
+            client-id: ${oauth2_google_clientId}
+            client-secret: ${oauth2_google_clientSecret}
+            authorization-grant-type: authorization_code
             redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
             scope:
               - email
               - profile
           kakao:
-            clientId: ${oauth2_kakao_clientId}
-            clientSecret: ${oauth2_kakao_clientSecret}
+            client-id: ${oauth2_kakao_clientId}
+            client-secret: ${oauth2_kakao_clientSecret}
+            authorization-grant-type: authorization_code
+
             clientAuthenticationMethod: post
-            authorizationGrantType: authorization_code
             redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
             scope:
               - plusfriends
@@ -25,10 +27,10 @@ spring:
               - phone_number
             clientName: Kakao
           naver:
-            clientId: ${oauth2_naver_clientId}
-            clientSecret: ${oauth2_naver_clientSecret}
+            client-id: ${oauth2_naver_clientId}
+            client-secret: ${oauth2_naver_clientSecret}
+            authorization-grant-type: authorization_code
             clientAuthenticationMethod: post
-            authorizationGrantType: authorization_code
             redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
             scope:
               - name

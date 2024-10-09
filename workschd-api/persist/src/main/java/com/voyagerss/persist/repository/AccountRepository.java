@@ -8,5 +8,7 @@ import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, Integer>, JpaSpecificationExecutor<Account> {
 
-    Optional<Account> findByEmail(String englishName);
+    Optional<Account> findByEmail(String email);
+
+    boolean existsByRefreshToken(String refreshToken);
 }
