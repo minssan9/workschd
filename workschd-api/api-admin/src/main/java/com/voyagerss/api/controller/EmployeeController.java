@@ -1,9 +1,8 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.EmployeeDTO;
-import com.voyagerss.persist.service.EmployeeService;
-import jakarta.persistence.NotNull;
-import jakarta.persistence.Valid;
+import com.voyagerss.persist.service.EmployeeService;import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,7 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping
-    public String save(@Valid @RequestBody EmployeeVO vO) {
+    public String save(@Valid @RequestBody EmployeeDTO vO) {
         return employeeService.save(vO).toString();
     }
 
@@ -29,7 +28,7 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     public void update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody EmployeeUpdateVO vO) {
+                       @Valid @RequestBody EmployeeDTO vO) {
         employeeService.update(id, vO);
     }
 
@@ -39,7 +38,7 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public Page<EmployeeDTO> query(@Valid EmployeeQueryVO vO) {
+    public Page<EmployeeDTO> query(@Valid EmployeeDTO vO) {
         return employeeService.query(vO);
     }
 }

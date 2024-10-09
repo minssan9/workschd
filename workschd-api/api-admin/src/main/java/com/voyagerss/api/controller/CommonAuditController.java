@@ -1,9 +1,8 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.CommonAuditDTO;
-import com.voyagerss.persist.service.CommonAuditService;
-import jakarta.persistence.NotNull;
-import jakarta.persistence.Valid;
+import com.voyagerss.persist.service.CommonAuditService;import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,7 @@ public class CommonAuditController {
     private CommonAuditService commonAuditService;
 
     @PostMapping
-    public String save(@Valid @RequestBody CommonAuditVO vO) {
+    public String save(@Valid @RequestBody CommonAuditDTO vO) {
         return commonAuditService.save(vO).toString();
     }
 
@@ -29,7 +28,7 @@ public class CommonAuditController {
 
     @PutMapping("/{id}")
     public void update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody CommonAuditUpdateVO vO) {
+                       @Valid @RequestBody CommonAuditDTO vO) {
         commonAuditService.update(id, vO);
     }
 
@@ -39,7 +38,7 @@ public class CommonAuditController {
     }
 
     @GetMapping
-    public Page<CommonAuditDTO> query(@Valid CommonAuditQueryVO vO) {
+    public Page<CommonAuditDTO> query(@Valid CommonAuditDTO vO) {
         return commonAuditService.query(vO);
     }
 }

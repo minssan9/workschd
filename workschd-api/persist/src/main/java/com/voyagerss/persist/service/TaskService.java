@@ -16,7 +16,7 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    public Long save(TaskVO vO) {
+    public Long save(TaskDTO vO) {
         Task bean = new Task();
         BeanUtils.copyProperties(vO, bean);
         bean = taskRepository.save(bean);
@@ -27,7 +27,7 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    public void update(Long id, TaskUpdateVO vO) {
+    public void update(Long id, TaskDTO vO) {
         Task bean = requireOne(id);
         BeanUtils.copyProperties(vO, bean);
         taskRepository.save(bean);
@@ -38,7 +38,7 @@ public class TaskService {
         return toDTO(original);
     }
 
-    public Page<TaskDTO> query(TaskQueryVO vO) {
+    public Page<TaskDTO> query(TaskDTO vO) {
         throw new UnsupportedOperationException();
     }
 

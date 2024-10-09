@@ -1,9 +1,8 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.TaskEmployeeDTO;
-import com.voyagerss.persist.service.TaskEmployeeService;
-import jakarta.persistence.NotNull;
-import jakarta.persistence.Valid;
+import com.voyagerss.persist.service.TaskEmployeeService;import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,7 @@ public class TaskEmployeeController {
     private TaskEmployeeService taskEmployeeService;
 
     @PostMapping
-    public String save(@Valid @RequestBody TaskEmployeeVO vO) {
+    public String save(@Valid @RequestBody TaskEmployeeDTO vO) {
         return taskEmployeeService.save(vO).toString();
     }
 
@@ -29,7 +28,7 @@ public class TaskEmployeeController {
 
     @PutMapping("/{id}")
     public void update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody TaskEmployeeUpdateVO vO) {
+                       @Valid @RequestBody TaskEmployeeDTO vO) {
         taskEmployeeService.update(id, vO);
     }
 
@@ -39,7 +38,7 @@ public class TaskEmployeeController {
     }
 
     @GetMapping
-    public Page<TaskEmployeeDTO> query(@Valid TaskEmployeeQueryVO vO) {
+    public Page<TaskEmployeeDTO> query(@Valid TaskEmployeeDTO vO) {
         return taskEmployeeService.query(vO);
     }
 }

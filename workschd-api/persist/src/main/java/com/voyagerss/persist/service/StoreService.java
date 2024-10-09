@@ -16,7 +16,7 @@ public class StoreService {
     @Autowired
     private StoreRepository storeRepository;
 
-    public Long save(StoreVO vO) {
+    public Long save(StoreDTO vO) {
         Store bean = new Store();
         BeanUtils.copyProperties(vO, bean);
         bean = storeRepository.save(bean);
@@ -27,7 +27,7 @@ public class StoreService {
         storeRepository.deleteById(id);
     }
 
-    public void update(Long id, StoreUpdateVO vO) {
+    public void update(Long id, StoreDTO vO) {
         Store bean = requireOne(id);
         BeanUtils.copyProperties(vO, bean);
         storeRepository.save(bean);
@@ -38,7 +38,7 @@ public class StoreService {
         return toDTO(original);
     }
 
-    public Page<StoreDTO> query(StoreQueryVO vO) {
+    public Page<StoreDTO> query(StoreDTO vO) {
         throw new UnsupportedOperationException();
     }
 

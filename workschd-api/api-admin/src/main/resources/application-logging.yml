@@ -1,0 +1,87 @@
+##################################################################################################################
+# LOG4JDBC 관련
+##################################################################################################################
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+
+logging:
+  pattern:
+    console: "[%d{HH:mm:ss.SSS}][%-5level][%class{1}] - %msg%n"
+    #    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+    file: "[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-5level][%class{1}] - %msg%n"
+    level:
+      error: "%clr(%5p){bold,red}"
+      warn: "%clr(%5p){bold,yellow}"
+      info: "%clr(%5p){green}"
+      debug: "%clr(%5p){blue}"
+      trace: "%clr(%5p){faint}"
+  level:
+    root: info
+    org.hibernate.SQL: warn
+    com.hae.sf.iphm: debug
+  file:
+    name: /var/log/iphm-collector.log
+  logback:
+    rollingpolicy:
+      max-file-size: 20MB
+      max-history: 10
+      file-name-pattern: /var/log/iphm-collector.%d{yyyy-MM-dd}.%i.log
+
+---
+spring.config.activate.on-profile: local
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+#error / warn / debug / info / trace
+logging:
+  level:
+#    hibernate.SQL: info
+#    sql: info
+    p6psy: info
+    root: info
+    org.hibernate.SQL: info
+    sql: info
+#    org.hibernate.type.descriptor.sql.BasicBinder: error
+#    org.hibernate: error
+#    sql: error
+    p6psy.p6spy: info
+#    root: warn
+
+
+---
+spring.config.activate.on-profile: develop
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+#error / warn / debug / info / trace
+logging:
+  level:
+    sql: warn
+    p6psy: warn
+    root: warn
+
+
+
+---
+spring.config.activate.on-profile: release
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+#error / warn / debug / info / trace
+logging:
+  level:
+    org.hibernate.SQL: error
+    sql: error
+    p6psy.p6spy: error
+    root: warn
+
+

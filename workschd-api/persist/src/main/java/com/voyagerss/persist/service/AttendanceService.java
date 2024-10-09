@@ -3,20 +3,20 @@ package com.voyagerss.persist.service;
 import com.voyagerss.persist.dto.AttendanceDTO;
 import com.voyagerss.persist.entity.Attendance;
 import com.voyagerss.persist.repository.AttendanceRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
+@RequiredArgsConstructor
 @Service
 public class AttendanceService {
 
-    @Autowired
-    private AttendanceRepository attendanceRepository;
+    private final AttendanceRepository attendanceRepository;
 
-    public Long save(AttendanceVO vO) {
+    public Long save(AttendanceDTO vO) {
         Attendance bean = new Attendance();
         BeanUtils.copyProperties(vO, bean);
         bean = attendanceRepository.save(bean);
@@ -27,7 +27,7 @@ public class AttendanceService {
         attendanceRepository.deleteById(id);
     }
 
-    public void update(Long id, AttendanceUpdateVO vO) {
+    public void update(Long id, AttendanceDTO vO) {
         Attendance bean = requireOne(id);
         BeanUtils.copyProperties(vO, bean);
         attendanceRepository.save(bean);
@@ -38,7 +38,7 @@ public class AttendanceService {
         return toDTO(original);
     }
 
-    public Page<AttendanceDTO> query(AttendanceQueryVO vO) {
+    public Page<AttendanceDTO> query(AttendanceDTO vO) {
         throw new UnsupportedOperationException();
     }
 
@@ -52,4 +52,5 @@ public class AttendanceService {
         return attendanceRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Resource not found: " + id));
     }
+
 }

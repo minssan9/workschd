@@ -1,6 +1,7 @@
 package com.voyagerss.persist.service;
 
 import com.voyagerss.persist.dto.TaskEmployeeDTO;
+import com.voyagerss.persist.entity.Task;
 import com.voyagerss.persist.entity.TaskEmployee;
 import com.voyagerss.persist.repository.TaskEmployeeRepository;
 import org.springframework.beans.BeanUtils;
@@ -16,7 +17,7 @@ public class TaskEmployeeService {
     @Autowired
     private TaskEmployeeRepository taskEmployeeRepository;
 
-    public Long save(TaskEmployeeVO vO) {
+    public Task save(TaskEmployeeDTO vO) {
         TaskEmployee bean = new TaskEmployee();
         BeanUtils.copyProperties(vO, bean);
         bean = taskEmployeeRepository.save(bean);
@@ -27,7 +28,7 @@ public class TaskEmployeeService {
         taskEmployeeRepository.deleteById(id);
     }
 
-    public void update(Long id, TaskEmployeeUpdateVO vO) {
+    public void update(Long id, TaskEmployeeDTO vO) {
         TaskEmployee bean = requireOne(id);
         BeanUtils.copyProperties(vO, bean);
         taskEmployeeRepository.save(bean);
@@ -38,7 +39,7 @@ public class TaskEmployeeService {
         return toDTO(original);
     }
 
-    public Page<TaskEmployeeDTO> query(TaskEmployeeQueryVO vO) {
+    public Page<TaskEmployeeDTO> query(TaskEmployeeDTO vO) {
         throw new UnsupportedOperationException();
     }
 

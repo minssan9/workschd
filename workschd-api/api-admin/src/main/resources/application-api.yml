@@ -1,0 +1,85 @@
+## Spring boot actuator
+spring:
+  application.name: workschd-api-service
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
+  messages:
+    basename: message/messages
+    cache-duration: 10
+    fallback-to-system-locale: false
+    use-code-as-default-message: true
+    encoding: UTF-8
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+server:
+  forward-headers-strategy: native
+  servlet:
+    context-path: /api
+  tomcat:
+    max-http-form-post-size: 5MB
+
+jwt_secret: workschdJwtTokenSecretKeyUsedInJWTProvider
+
+logging:
+  file:
+    path: /var/log/containers/${spring.application.name}
+    name: ${logging.file.path}/${spring.application.name}.log
+
+---
+spring.config.activate.on-profile: local
+server:
+  port: 34000
+
+baseUrl: http://localhost:34000/api
+
+---
+spring.config.activate.on-profile: local-workschd
+server:
+  port: 34000
+
+baseUrl: http://localhost:34000/api
+---
+spring.config.activate.on-profile: develop
+server:
+  port: 34001
+
+app:
+  web-address: https://dev.voyagerss.com
+
+baseUrl: https://dev.voyagerss.com/api
+
+
+---
+spring.config.activate.on-profile: release
+server:
+  port: 34001
+
+app:
+  web-address: https://voyagerss.com
+
+baseUrl: https://voyagerss.com/api
+
+---
+spring.config.activate.on-profile: release-voyagerss
+server:
+  port: 34001
+
+app:
+  web-address: https://voyagerss.com
+
+baseUrl: https://voyagerss.com/api

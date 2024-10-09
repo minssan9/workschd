@@ -1,0 +1,74 @@
+spring:
+  datasource:
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 20
+      max-lifetime: 160000
+      connection-timeout: 10000
+      validation-timeout: 10000
+#      connection-init-sql: set wait_timeout = 180
+#      data-source-properties:
+#        cachePrepStmts: false
+#        useServerPrepStmts: false
+  jpa: #JPA 설정
+    open-in-view: false
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+#        dialect: org.hibernate.dialect.MySQLDialect
+        default_batch_fetch_size: 30
+        highlight_sql: true
+        show_sql: false          #하이버네이트가 실행하는 모든 SQL문을 콘솔로 출력해 준다.
+        format_sql: true        #콘솔에 출력되는 JPA 실행 쿼리를 가독성있게 표현한다.
+        use_sql_comments: true        #디버깅이 용이하도록 SQL문 이외에 추가적인 정보를 출력해 준다.
+        jdbc:
+          batch_size: 100
+          time_zone: Asia/Seoul
+#        query:
+#          plan_cache_max_size: 2048
+#          plan_parameter_metadata_max_size: 128
+#        id:
+#          new_generator_mappings: true
+#          uuid_generator: org.hibernate.id.UUIDGenerator
+  data:
+    web:
+      pageable:
+        size-parameter: size
+        page-parameter: page
+        default-page-size: 20
+        one-indexed-parameters: false
+        max-page-size: 1000
+
+  output:
+    ansi:
+      enabled: always
+
+# spring.datasource.hikari.data-source-properties.cachePrepStmts=false
+decorator:
+  datasource:
+    p6spy:
+      logging: slf4j
+      enable-logging: false
+
+---
+spring.config.activate.on-profile: local
+
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        show_sql: false          #하이버네이트가 실행하는 모든 SQL문을 콘솔로 출력해 준다.
+
+---
+spring.config.activate.on-profile: develop
+
+---
+spring.config.activate.on-profile: release
+

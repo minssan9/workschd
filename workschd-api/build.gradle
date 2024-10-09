@@ -55,9 +55,17 @@ allprojects {
         implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
         runtimeOnly 'com.mysql:mysql-connector-j'
+
+        implementation 'com.paypal.sdk:rest-api-sdk:1.14.0'
+
+        implementation "io.jsonwebtoken:jjwt-api:0.11.2"
+        runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.2"
+        runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.11.2"
+
+        implementation "org.apache.poi:poi:5.2.0"
 
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testImplementation 'org.springframework.security:spring-security-test'

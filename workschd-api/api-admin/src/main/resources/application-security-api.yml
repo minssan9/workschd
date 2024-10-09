@@ -1,0 +1,118 @@
+# Security OAuth
+spring:
+  # Security OAuth
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${oauth2_google_clientId}
+            client-secret: ${oauth2_google_clientSecret}
+            authorization-grant-type: authorization_code
+            redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: ${oauth2_kakao_clientId}
+            client-secret: ${oauth2_kakao_clientSecret}
+            authorization-grant-type: authorization_code
+
+            clientAuthenticationMethod: post
+            redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
+            scope:
+              - plusfriends
+              - profile
+              - account_email
+              - phone_number
+            clientName: Kakao
+          naver:
+            client-id: ${oauth2_naver_clientId}
+            client-secret: ${oauth2_naver_clientSecret}
+            authorization-grant-type: authorization_code
+            clientAuthenticationMethod: post
+            redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
+            scope:
+              - name
+              - nickname
+              - email
+              - mobile
+              - profile_image
+            clientName: Naver
+        # Provider 설정
+        provider:
+          kakao:
+            authorizationUri: https://kauth.kakao.com/oauth/authorize
+            tokenUri: https://kauth.kakao.com/oauth/token
+            userInfoUri: https://kapi.kakao.com/v2/user/me
+            userNameAttribute: id
+          naver:
+            authorizationUri: https://nid.naver.com/oauth2.0/authorize
+            tokenUri: https://nid.naver.com/oauth2.0/token
+            userInfoUri: https://openapi.naver.com/v1/nid/me
+            userNameAttribute: response
+
+# 토큰 관련 secret Key 및 RedirectUri 설정
+app:
+  oauth2:
+    authorizedRedirectUris:
+      - http://localhost:9090/oauth/redirect
+      - https://dev.voyagerss.com/oauth/redirect
+      - https://voyagerss.com/oauth/redirect
+      - https://voyagerss.com/oauth/redirect
+      - https://dev.voyagerss.com:9090/oauth/redirect
+      - http://local.voyagerss.com:9090/oauth/redirect
+  oauth:
+    kakao:
+      authorizationUri: https://kauth.kakao.com/oauth/authorize
+      tokenUri: https://kauth.kakao.com/oauth/token
+      userInfoUri: https://kapi.kakao.com/v2/user/me
+      userNameAttribute: id
+    naver:
+      authorizationUri: https://nid.naver.com/oauth2.0/authorize
+      tokenUri: https://nid.naver.com/oauth2.0/token
+      userInfoUri: https://openapi.naver.com/v1/nid/me
+      userNameAttribute: response
+
+  # cors 설정
+  cors:
+    allowed-origins: 'https://voyagerss.com,https://voyagerss.com,https://dev.voyagerss.com,https://dev.voyagerss.com:9090,http://localhost:9090'
+    allowed-methods: GET,POST,PUT,OPTIONS,DELETE
+    allowed-headers: '*'
+    max-age: 3600
+  auth:
+    tokenExpiry: 600  # minutes
+    refreshTokenExpiry: 1380  # minutes
+
+---
+spring.config.activate.on-profile: release
+
+#Security OAuth
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
+          kakao:
+            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
+          naver:
+            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
+
+
+---
+spring.config.activate.on-profile: release-voyagerss
+
+#Security OAuth
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
+          kakao:
+            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
+          naver:
+            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
