@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-
+import  prisma  from '@/config/configPrisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { method } = req
@@ -10,6 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const schedules = await prisma.schedule.findMany()
           res.status(200).json(schedules)
         } catch (error) {
+            console.log(error)
           res.status(500).json({ error: 'Failed to fetch schedules' })
         }
         break
@@ -26,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
           res.status(201).json(newSchedule)
         } catch (error) {
+            console.log(error)
           res.status(500).json({ error: 'Failed to create schedule' })
         }
         break
