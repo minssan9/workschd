@@ -8,12 +8,6 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  },
   plugins: [
     vue({
       template: { transformAssetUrls }
@@ -42,10 +36,15 @@ export default defineConfig({
     proxy: {
       // API 프록시 설정
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:24000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
-  }
+  },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
 })

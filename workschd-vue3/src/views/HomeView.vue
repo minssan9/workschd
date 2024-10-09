@@ -52,7 +52,7 @@
 
 <script>
 import {defineComponent, computed} from 'vue';
-import {useCounterStore} from '../stores/counter.js';
+import {useCounterStore} from '@/stores/modules/counter.js';
 
 export default defineComponent({
   name: 'CounterComponent',
