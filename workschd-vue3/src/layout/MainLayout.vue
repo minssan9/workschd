@@ -87,7 +87,7 @@
 <script>
 import { ref } from 'vue'
 import router from "@/router/index.js";
-import {useCounterStore} from "@/stores/counter.js";
+import {useCounterStore} from "@/stores/modules/counter.js";
 import * as ChannelService from '@channel.io/channel-web-sdk-loader';
 
 
