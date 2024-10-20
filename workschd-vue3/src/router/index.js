@@ -12,6 +12,10 @@ const router = createRouter({
     { path: '/job/today',         name: 'JobToday',     component: () => import('@/views/job/JobToday.vue') },
     { path: '/team/register',     name: 'TeamRegister', component: () => import('@/views/team/TeamRegistration.vue') },
     { path: '/team/manage',       name: 'TeamManage',   component: () => import('@/views/team/TeamManage.vue') },
+
+    { path: '/create-team',        name: 'CreateTeam',     component: () => import('@/views/team/TeamRegistration.vue') },
+    { path: '/join-team-request',  name: 'JoinTeamRequest', component: () => import('@/views/team/TeamRegistration.vue') },
+    { path: '/register-workplace', name: 'RegisterWorkplace', component: () => import('@/views/team/TeamRegistration.vue') },
   ]
   /* eslint-enable */
 })

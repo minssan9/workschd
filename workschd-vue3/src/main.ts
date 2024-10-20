@@ -41,6 +41,13 @@ app.use(Quasar, {
 
 import vue3GoogleLogin from 'vue3-google-login'
 app.use(vue3GoogleLogin, {clientId: 'YOUR_GOOGLE_CLIENT_ID'})
+
+declare global {
+  interface Window {
+    Kakao: any;
+  }
+}
+
 window.Kakao.init("d23378ff6b70109a54449af376d2c66c");
 
 app.mount('#app')

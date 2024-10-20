@@ -16,9 +16,9 @@
         <div class="drawer-header">Left Menu</div>
         <q-scroll-area class="fit">
           <q-list>
-            <q-item v-for="n in 15" :key="`left-${n}`" clickable v-ripple>
-              <q-item-section>Menu Item {{ n }}</q-item-section>
-            </q-item>
+          <q-item v-for="route in routes" :key="route.name" :to="{ name: route.name }" clickable v-ripple>
+            <q-item-section>{{ route.name }}</q-item-section>
+          </q-item>
           </q-list>
         </q-scroll-area>
         <div class="drawer-footer">Left Drawer Footer</div>
@@ -26,7 +26,7 @@
 
       <q-drawer side="right" v-model="drawerRight" show-if-above :width="200" :breakpoint="700" bordered >
         <div class="drawer-header">Right Menu</div>
-        <q-scroll-area style="height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd">
+        <q-scroll-area style="height: calc(100% - 150px); margin-top: 40px; border-right: 1px solid #ddd">
           <div class="q-pa-sm">
             <h5>{{ $t('greeting') }}</h5>
             <h6>{{ $t('farewell') }}</h6>
@@ -39,7 +39,10 @@
             </div>
           </div>
         </q-scroll-area>
-        <div class="drawer-footer">Right Drawer Footer</div>
+        <div class="drawer-footer">
+          <q-btn flat dense :to="{ name: 'login' }">Login</q-btn>
+          <q-btn flat dense @click="logout()">Logout</q-btn>
+        </div>
       </q-drawer>
 
       <q-page-container>
@@ -66,9 +69,12 @@ export default {
     ChannelService.loadScript()
     const counterStore = useCounterStore();
 
+    const routes = router.options.routes.filter(route => route.name !== 'login');
+
     return {
       drawerLeft: ref(false),
       drawerRight: ref(false),
+      routes,
       count: counterStore.count,
       increment: counterStore.increment,
       decrement: counterStore.doubleCount

@@ -3,3 +3,6 @@ workschd-api/api-admin/src/main/resources/application-secret.yml
 workschd-nextjs/.env
 workschd-api/docker/dc-release-en9door.yml
 workschd-nextjs/.env.local
+workschd-vue3/dist
+workschd-vue3/dev-dist
+
