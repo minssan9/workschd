@@ -36,9 +36,9 @@ export default defineConfig({
       },
       includeAssets: ['logo.svg'],
       manifest: {
-          name: 'Hyundai Autoever PHM',
-          short_name: 'PHM',
-          description: 'Hyundai Autoever PHM',
+          name: 'Voyagerss',
+          short_name: 'Voyagerss',
+          description: 'Voyagerss',
           theme_color: '#ffffff',
           icons: [
               {
@@ -63,7 +63,7 @@ export default defineConfig({
     // @quasar/plugin-vite options list:
     // https://github.com/quasarframework/quasar/blob/dev/vite-plugin/index.d.ts
     quasar({
-      sassVariables: 'src/assets/sass/quasar-variables.sass'
+      sassVariables: '@/assets/sass/quasar-variables.sass'
     }),
     Components({
       resolvers: []
