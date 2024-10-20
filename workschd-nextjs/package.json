@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "server": "node server.js",
-    "server:dev": "nodemon server.js"
+    "server:dev": "nvm use 18.20.0 && nodemon server.js"
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",

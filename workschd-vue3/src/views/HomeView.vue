@@ -2,6 +2,7 @@
 </script>
 
 <template>
+  <div class="background-pattern"></div>
   <div class="header">
     <h1>근무 스케줄표 자동 생성 서비스</h1>
     <p>효율적인 근무 관리를 위한 스케줄 자동화 솔루션</p>
@@ -71,50 +72,124 @@ export default defineComponent({
   }
 });
 </script>
-<style scoped>
+<style lang="scss">
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2980b9;
+$background-color: #f9f9f9;
+$text-color: #333;
+$font-family: 'Roboto', Arial, sans-serif;
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: $font-family;
   line-height: 1.6;
+  background-color: $background-color;
+  color: $text-color;
 }
 
 .container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: auto;
+  padding: 0 20px;
 }
 
 .header {
-  background: #f0f0f0;
-  padding: 20px;
+  background: linear-gradient(135deg, $primary-color, $secondary-color);
+  padding: 60px 0;
   text-align: center;
+  color: white;
+
+  h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+  }
 }
 
 .content {
-  margin-top: 20px;
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .section {
-  margin-bottom: 20px;
-}
+  flex-basis: calc(33.333% - 20px);
+  margin-bottom: 40px;
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
-.section h2 {
-  color: #333;
+  h2 {
+    color: $primary-color;
+    margin-bottom: 20px;
+  }
+
+  ul, ol {
+    padding-left: 20px;
+  }
 }
 
 .footer {
   text-align: center;
-  margin-top: 30px;
+  margin-top: 60px;
+  padding: 40px 0;
+  background-color: #f0f0f0;
 }
 
 .button {
-  background-color: #4CAF50;
+  background-color: $primary-color;
   border: none;
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
   margin: 4px 2px;
   cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: $secondary-color;
+  }
+}
+
+// Add a subtle background pattern
+.background-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  z-index: -1;
+  opacity: 0.6;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .section {
+    flex-basis: 100%;
+  }
+
+  .header {
+    padding: 40px 0;
+
+    h1 {
+      font-size: 2em;
+    }
+
+    p {
+      font-size: 1em;
+    }
+  }
 }
 </style>
