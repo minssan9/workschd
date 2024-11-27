@@ -6,3 +6,4 @@ workschd-nextjs/.env.local
 workschd-vue3/dist
 workschd-vue3/dev-dist
 
+actions-runner

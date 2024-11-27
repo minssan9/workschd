@@ -23,7 +23,7 @@ file:
 ---
 spring.config.activate.on-profile: local
 core:
-  web-address: https://localhost:9090
+  web-address: https://localhost:3000
 
 spring:
   devtools:

@@ -1,5 +1,5 @@
 --- #local 환경
 spring.profiles.group:
-  "local"   : "default, api, swagger, security-api, database, logging, redis, secret"
-  "develop" : "default, api, swagger, security-api, database, logging, redis, secret"
-  "release" : "default, api, swagger, security-api, database, logging, redis, secret"
+  "local"   : "default, api, swagger, security-api, database, logging, redis, google, secret"
+  "develop" : "default, api, swagger, security-api, database, logging, redis, google, secret"
+  "release" : "default, api, swagger, security-api, database, logging, redis, google, secret"

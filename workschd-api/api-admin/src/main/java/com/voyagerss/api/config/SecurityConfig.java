@@ -106,10 +106,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService() {
-        return new CustomOAuth2UserService();
-    }
+//    @Bean
+//    public OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService() {
+//        return new CustomOAuth2UserService();
+//    }
     /*
     * auth 매니저 설정
     * */

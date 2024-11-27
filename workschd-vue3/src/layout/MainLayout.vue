@@ -1,6 +1,14 @@
 <template>
   <div>
     <div class="background-pattern"></div>
+    <div>
+
+      <ul>
+        <li v-for="(notification, index) in notifications" :key="index">
+          {{ notification }}
+        </li>
+      </ul>
+    </div>
     <q-layout view="hHh LpR fFf" container
               style="height: 100vh"
               class="shadow-2 rounded-borders">
@@ -72,6 +80,7 @@ export default {
     const routes = router.options.routes.filter(route => route.name !== 'login');
 
     return {
+      notifications: [],
       drawerLeft: ref(false),
       drawerRight: ref(false),
       routes,
@@ -86,6 +95,10 @@ export default {
       "pluginKey": import.meta.env.VITE_CHANNEL_TALK_PLUGIN_KEY
     });
 
+    const eventSource = new EventSource("/api/notifications");
+    eventSource.onmessage = (event) => {
+      this.notifications.push(event.data);
+    };
     // if (this.user.id) {
     //   ChannelService.boot({
     //     "pluginKey": "YOUR_PLUGIN_KEY", // fill your plugin key

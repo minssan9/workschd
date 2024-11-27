@@ -1,0 +1,5 @@
+spring:
+  api-key:
+    google:
+      google-calendar-api:
+        key: AIzaSyB0zXocWh9B3j04RDRpsMQsixnlyxFpfWQ

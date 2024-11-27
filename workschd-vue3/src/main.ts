@@ -40,7 +40,7 @@ app.use(Quasar, {
 
 
 import vue3GoogleLogin from 'vue3-google-login'
-app.use(vue3GoogleLogin, {clientId: 'YOUR_GOOGLE_CLIENT_ID'})
+app.use(vue3GoogleLogin, {clientId: '719570060554-aniqm2fhocnl6nmi8kopnao91g3g1ngl.apps.googleusercontent.com'})
 
 declare global {
   interface Window {

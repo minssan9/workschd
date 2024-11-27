@@ -1,7 +1,7 @@
 package com.voyagerss.persist.component.exception;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.text.MessageFormat;
 
@@ -32,7 +32,9 @@ public abstract class CommonExceptionUtils {
 		sb.append("]}");
 
 		//StringBuffer -> JSON 변경
-    	JSONObject jsonObject = JSONObject.fromObject(JSONSerializer.toJSON(sb.toString()));
+		String jsonString = sb.toString();
+		JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+
     	return jsonObject.toString();
     }
 
