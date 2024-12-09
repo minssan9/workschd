@@ -2,7 +2,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import store from '@/store/userStore'
 import router from "@/router";
-import Cookies from 'vue-cookies/vue-cookies'
+import Cookies from 'js-cookie'
 
 
 // create an axios instance

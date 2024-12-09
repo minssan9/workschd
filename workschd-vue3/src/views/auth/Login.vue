@@ -10,19 +10,44 @@
         />
       </a>
     </div>
-    <div class="row" >
-      <GoogleLogin :callback="callback" prompt auto-login/>
+
+    <div class="row g-2" justify="center">
+      <a type="button" style="width: 200px;"
+          :href="getSocialLoginUrl('kakao')">
+        <img :src="`${app.cdnUrl}/website/button/kakao-signin-korean.png`"
+                type="button" width="200" height="40"
+              alt="kakaoLogin"
+        />
+      </a>
+    </div>
+    <div class="row g-2" justify="center">
+      <a type="button" style="width: 200px"
+          :href="getSocialLoginUrl('google')">
+        <img :src="`${app.cdnUrl}/website/button/google-signin-korean.png`"
+                type="button" width="200" height="40"
+          alt="googleLogin"/>
+      </a>
+    </div>
+    <div class="row g-2" justify="center">
+      <a type="button" style="width: 200px"
+          :href="getSocialLoginUrl('naver')">
+        <img :src="`${app.cdnUrl}/website/button/naver-signin-korean.png`"
+                type="button" width="200" height="40"
+              style="border-radius: 5px"
+              alt="naverLogin"
+        />
+      </a>
     </div>
 
     <div @click="kakaoLogout()">로그아웃</div>
   </div>
 </template>
 <script>
-import {GoogleLogin} from "vue3-google-login";
+import apiAccount from "@/api/public-modules/api-account";
 
 export default {
   name: 'Login',
-  components: { GoogleLogin },
+  components: { },
   data: () => ({
   }),
   methods: {
@@ -56,6 +81,13 @@ export default {
         console.log(res);
       });
     },
+
+
+    getSocialLoginUrl(socialType) {
+      this.$cookies.keys().forEach(cookie => this.$cookies.remove(cookie));
+
+      return apiAccount.getSocialLoginUrl(socialType, this.redirect)
+    }
   },
 };
 </script>

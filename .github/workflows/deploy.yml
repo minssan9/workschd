@@ -1,0 +1,27 @@
+name: Deploy to Docker Local Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build and Deploy to Local Server
+    runs-on: self-hosted
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Docker Compose 빌드 및 재배포
+      - name: Deploy with Docker Compose
+        run: |
+          echo Stopping existing containers...
+          docker-compose -f docker-compose.yml down
+          
+          echo Building new images...
+          docker-compose -f docker-compose.yml build
+          
+          echo Starting containers...
+          docker-compose -f docker-compose.yml up -d

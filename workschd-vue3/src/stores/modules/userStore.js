@@ -1,6 +1,6 @@
 import apiAccount from '@/api/modules/api-account'
 import apiPublicAccount from '@/api/public-modules/api-account'
-import Cookies from 'vue-cookies'
+import Cookies from 'js-cookie'
 import { defineStore } from 'pinia';
 
 export const useUserStore = defineStore('user', {
@@ -60,11 +60,11 @@ export const useUserStore = defineStore('user', {
         if (!state.user.accountId){
           return apiAccount.getUser()
             .then(res => {
-              Cookies.set('refreshToken',res.refreshToken)
-              Cookies.set('accountId', res.accountId)
-              Cookies.set('username', res.username)
-              Cookies.set('email',res.email)
-              Cookies.set('role',res.accountRoles)
+              Cookies.set('refreshToken',res.refreshToken, { expires: 7 })
+              Cookies.set('accountId', res.accountId, { expires: 7 })
+              Cookies.set('username', res.username, { expires: 7 })
+              Cookies.set('email',res.email, { expires: 7 })
+              Cookies.set('role',res.accountRoles, { expires: 7 })
               commit('SET_USER', res)
               return res
             })
