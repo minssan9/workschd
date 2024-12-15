@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -74,7 +75,8 @@ public class Account extends BaseEntity implements Serializable {
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private AccountInfo accountInfo;
 
-
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     public Account(AccountDTO accountDto) {
         BeanUtils.copyProperties(accountDto, this);

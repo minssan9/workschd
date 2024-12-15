@@ -3,6 +3,7 @@ plugins {
     id 'java-library'
     id 'org.springframework.boot' version '3.3.3'
     id 'io.spring.dependency-management' version '1.1.6'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'idea'
     id 'jacoco'
     id 'maven-publish'
@@ -57,7 +58,7 @@ allprojects {
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
         implementation 'org.springframework.boot:spring-boot-starter-validation'
         implementation 'org.springframework.boot:spring-boot-starter-security'
-        runtimeOnly 'com.mysql:mysql-connector-j'
+        runtimeOnly 'com.mysql:mysql-connector-j:8.0.33'
 
         implementation 'com.paypal.sdk:rest-api-sdk:1.14.0'
 
@@ -72,7 +73,6 @@ allprojects {
 
         implementation 'org.projectlombok:lombok:1.18.30'
         annotationProcessor 'org.projectlombok:lombok:1.18.30'
-
 
         implementation 'com.google.api-client:google-api-client:2.2.0'
         // google api
@@ -173,6 +173,7 @@ codeCoverageReport.dependsOn {
 //        executionData subproject.tasks.withType(Test)
 //    }
 //}
+
 
 
 //  ./gradlew clean :api:test sonarqube

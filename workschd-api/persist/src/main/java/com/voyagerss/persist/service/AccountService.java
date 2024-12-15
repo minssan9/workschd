@@ -2,9 +2,11 @@ package com.voyagerss.persist.service;
 
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountDTO;
+import com.voyagerss.persist.dto.QueryDTO;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.entity.AccountRole;
 import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.querydsl.AccountRepositorySupport;
 import com.voyagerss.persist.repository.AccountInfoRepository;
 import com.voyagerss.persist.repository.AccountRepository;
 import com.voyagerss.persist.repository.AccountRoleRepository;
@@ -31,9 +33,7 @@ public class AccountService {
     private final AccountRoleRepository accountRoleRepository;
     private final AccountSnsRepository accountSnsRepository;
     private final AccountInfoRepository accountInfoRepository;
-//    private final AccountRepositorySupport accountRepositorySupport;
-//    private final MessageService messageServiceKakaoImpl;
-//    private final MessageService messageServiceEmailImpl;
+    private final AccountRepositorySupport accountRepositorySupport;
 
     public Account signin(AccountDTO vO) {
         Account account = new Account(vO);
@@ -66,14 +66,6 @@ public class AccountService {
             HashMap<String, String> kakaoVariables = new HashMap<>();
             kakaoVariables.put("#{username}",       account.getUsername());
 
-//            MessageDTO studentMessageDTO = MessageDTO.builder()
-//                    .templateCode(STUDENT_USER_REGISTERED)
-//                    .content("")
-//                    .kakaoVariables(kakaoVariables)
-//                    .receiverDTO(account.toDto())
-//                    .build();
-//            messageServiceKakaoImpl.sendMessageToOne(studentMessageDTO);
-//            messageServiceEmailImpl.sendMessageToOne(studentMessageDTO);
         }
         return account;
     }
@@ -88,22 +80,6 @@ public class AccountService {
 
         return toDTO(account);
     }
-
-
-
-//    public AccountDTO updateImage(Integer accountId, MultipartFile profileImage)  {
-//        Account account = requireOne(accountId);
-//
-//        String storedFileName = s3Service.uploadFile(
-//                profileImage,
-//                account.getAccountId().toString() + "_" + account.getEnglishName(),
-//                EnumMaster.FileFolder.TEACHER_PROFILE_IMAGES
-//        );
-//        account.setProfileImageUrl(storedFileName);
-//
-//        accountRepository.save(account);
-//        return toDTO(account);
-//    }
 
 
     public AccountDTO addRoleByAccountId(Integer accountId, AccountDTO vO) {
@@ -165,19 +141,14 @@ public class AccountService {
     }
 
 
-//    public Page<AccountDTO> getAccountPage(QueryDTO queryDTO) {
-//        return accountRepositorySupport.getAccountPage(queryDTO).map(this::toDTO);
-//    }
-//
-//    public List<Account> getAccountList(QueryDTO queryDTO) {
-//        return new ArrayList<>(accountRepositorySupport.getAccountList(queryDTO));
-//    }
-//
-//    public List<AccountDTO> getAccountDtoList(QueryDTO queryDTO) {
-//        return accountRepositorySupport.getAccountList(queryDTO).stream()
-//                .map(AccountDTO::new)
-//                .distinct()
-//                .collect(Collectors.toList());
-//    }
+    public Page<AccountDTO> getAccountDtoPage(QueryDTO queryDTO) {
+        return accountRepositorySupport.getAccountDtoPage(queryDTO) ;
+    }
+
+    public List<AccountDTO> getAccountDtoList(QueryDTO queryDTO) {
+        return accountRepositorySupport.getAccountDtoList(queryDTO).stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
 
 }
