@@ -1,4 +1,4 @@
-import {methods} from '@/api/axios-en9door'
+import {methods} from '@/api/axios-voyagess.js'
 
 const REDIRECT_URI = `${process.env.VUE_APP_REDIRECT_URL}/oauth/redirect`
 const baesURL = `account`

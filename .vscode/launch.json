@@ -1,6 +1,20 @@
 {
     "configurations": [
         {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Local Vue3",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "local"
+            ],
+            "cwd": "${workspaceFolder}/workschd-vue3",
+            "env": {
+                "NODE_ENV": "local"
+            }
+        },
+        {
             "type": "java",
             "name": "Spring Boot-ApiApplication<api-admin>",
             "request": "launch",

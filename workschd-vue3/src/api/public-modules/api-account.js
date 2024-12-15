@@ -1,14 +1,14 @@
-import api from "@/api/axios-voyagess.js";
+import { service } from "@/api/axios-voyagess.js";
 
 const baesURL = `common/account`
 
 const apiPublicAccount = {
     getTeacherList(fetchQuery) {
         fetchQuery.role = 'EN9DOOR_TEACHER'
-        return api.get(`${baesURL}/teacher`, fetchQuery)
+        return service.get(`${baesURL}/teacher`, fetchQuery)
     },
     getTeacherById(acconutId) {
-        return api.get(`${baesURL}/teacher/${acconutId}`)
+        return service.get(`${baesURL}/teacher/${acconutId}`)
     }
 }
 
