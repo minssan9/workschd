@@ -1,17 +1,14 @@
-import Vue from "vue";
-import VueI18n from "vue-i18n";
-import useLanguageStore from '@/stores/language.js'
+import { createI18n } from "vue-i18n";
 import axios from "axios";
-import apiSys from "@/api/public-modules/api-sys";
+import api from "@/api/axios-voyagerss";
+import { getCookie, setCookie, removeCookie } from '@/utils/cookies';
 
-Vue.use(VueI18n);
-
-const languageStore = useLanguageStore()
 const userLocale = navigator.languages ? navigator.languages[0] : navigator.language || navigator.userLanguage;
 
-export const i18n = new VueI18n({
-  locale: languageStore.langType,
-
+export const i18n = createI18n ({
+  // locale: layoutStore.langType,
+  legacy: false,
+  locale: 'en',
   fallbackLocale: userLocale,
   messages: {},
 });
@@ -19,9 +16,12 @@ export const i18n = new VueI18n({
 const loadedLanguages = [];
 
 export function loadLanaguageAsync(lang) {
+  if(!lang) lang = 'en'
+
   function setI18nLanguage (lang) {
     axios.defaults.headers.common['Accept-Language'] = lang
     document.querySelector('html').setAttribute('lang', lang)
+    i18n.global.locale.value = lang
     return lang
   }
 
@@ -30,19 +30,11 @@ export function loadLanaguageAsync(lang) {
     return Promise.resolve()
   }
 
-  return apiSys.getSysI18n(lang)
+  return api.get('/system/lang', { params: { lang } })
       .then(response => {
-        let msgs = response.ko
+        i18n.global.setLocaleMessage(lang, response.data)
         loadedLanguages.push(lang)
-        i18n.setLocaleMessage(lang, msgs)
         setI18nLanguage(lang)
       })
 
-  if (i18n.locale === lang) {
-    return Promise.resolve(lang);
-  }
-
-  if (loadedLanguages.includes(lang)) {
-    return Promise.resolve();
-  }
 }

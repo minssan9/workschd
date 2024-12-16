@@ -1,4 +1,4 @@
-import {methods} from '@/api/axios-voyagess.js'
+import {methods} from '@/api/axios-voyagerss.js'
 
 // let fetchQuery = {role: '', username: '', size: 0, page: 1, sort: 'createdAt'}
 const baseUrl = `ed/common/review`

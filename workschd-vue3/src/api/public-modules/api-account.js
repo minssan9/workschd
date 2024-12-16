@@ -1,4 +1,4 @@
-import { service } from "@/api/axios-voyagess.js";
+import { service } from "@/api/axios-voyagerss.js";
 
 const baesURL = `common/account`
 

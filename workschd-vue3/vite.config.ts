@@ -1,10 +1,8 @@
-import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig, loadEnv } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import viteCompression from 'vite-plugin-compression';
 import vue from '@vitejs/plugin-vue'
-import Components from 'unplugin-vue-components/vite';
+import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer';
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 
@@ -65,9 +63,6 @@ export default defineConfig({
     quasar({
       sassVariables: '@/assets/sass/quasar-variables.sass'
     }),
-    Components({
-      resolvers: []
-    }),
     visualizer({
       open: true, // Automatically open the browser with the report
       filename: 'dist/bundle-analyzer-report.html', // Output file name
@@ -106,7 +101,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': path.resolve(__dirname, 'src'),
     }
+  },
+  css: {
+    preprocessorOptions: {
+    },
   },
 })

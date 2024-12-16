@@ -1,4 +1,4 @@
-import {methods} from '@/api/axios-voyagess.js'
+import {methods} from '@/api/axios-voyagerss.js'
 
 const apiCommon = {
   getContent () {
