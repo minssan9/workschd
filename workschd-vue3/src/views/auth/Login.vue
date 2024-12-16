@@ -14,7 +14,7 @@
     <div class="row g-2" justify="center">
       <a type="button" style="width: 200px;"
           :href="getSocialLoginUrl('kakao')">
-        <img :src="`${app.cdnUrl}/website/button/kakao-signin-korean.png`"
+        <img :src="`${VITE_CDN_URL}/website/button/kakao-signin-korean.png`"
                 type="button" width="200" height="40"
               alt="kakaoLogin"
         />
@@ -23,7 +23,7 @@
     <div class="row g-2" justify="center">
       <a type="button" style="width: 200px"
           :href="getSocialLoginUrl('google')">
-        <img :src="`${app.cdnUrl}/website/button/google-signin-korean.png`"
+        <img :src="`${VITE_CDN_URL}/website/button/google-signin-korean.png`"
                 type="button" width="200" height="40"
           alt="googleLogin"/>
       </a>
@@ -31,7 +31,7 @@
     <div class="row g-2" justify="center">
       <a type="button" style="width: 200px"
           :href="getSocialLoginUrl('naver')">
-        <img :src="`${app.cdnUrl}/website/button/naver-signin-korean.png`"
+        <img :src="`${VITE_CDN_URL}/website/button/naver-signin-korean.png`"
                 type="button" width="200" height="40"
               style="border-radius: 5px"
               alt="naverLogin"
@@ -42,60 +42,55 @@
     <div @click="kakaoLogout()">로그아웃</div>
   </div>
 </template>
-<script>
-import apiAccount from "@/api/public-modules/api-account";
-
-export default {
-  name: 'Login',
-  components: { },
-  data: () => ({
-  }),
-  methods: {
-    kakaoLogin() {
-      window.Kakao.Auth.login({
-        scope: "profile_image, account_email",
-        success: this.getKakaoAccount,
-      });
-    },
-    getKakaoAccount() {
-      window.Kakao.API.request({
-        url: "/v2/user/me",
-        success: (res) => {
-          const kakao_account = res.kakao_account;
-          const ninkname = kakao_account.profile.ninkname;
-          const email = kakao_account.email;
-          console.log("ninkname", ninkname);
-          console.log("email", email);
-
-          //로그인처리구현
-
-          alert("로그인 성공!");
-        },
-        fail: (error) => {
-          console.log(error);
-        },
-      });
-    },
-    kakaoLogout() {
-      window.Kakao.Auth.logout((res) => {
-        console.log(res);
-      });
-    },
-
-
-    getSocialLoginUrl(socialType) {
-      this.$cookies.keys().forEach(cookie => this.$cookies.remove(cookie));
-
-      return apiAccount.getSocialLoginUrl(socialType, this.redirect)
-    }
-  },
-};
-</script>
-
 <script setup>
+import { ref } from 'vue'
+import apiAccount from "@/api/modules/api-account"
+import { removeAllCookies } from '@/utils/cookieUtils'
+
+const VITE_CDN_URL = import.meta.env.VITE_CDN_URL
+
+const kakaoLogin = () => {
+  window.Kakao.Auth.login({
+    scope: "profile_image, account_email",
+    success: getKakaoAccount,
+  })
+}
+
+const getKakaoAccount = () => {
+  window.Kakao.API.request({
+    url: "/v2/user/me",
+    success: (res) => {
+      const kakao_account = res.kakao_account
+      const ninkname = kakao_account.profile.ninkname
+      const email = kakao_account.email
+      console.log("ninkname", ninkname)
+      console.log("email", email)
+
+      //로그인처리구현
+
+      alert("로그인 성공!")
+    },
+    fail: (error) => {
+      console.log(error)
+    },
+  })
+}
+
+const kakaoLogout = () => {
+  window.Kakao.Auth.logout((res) => {
+    console.log(res)
+  })
+}
+
+const getSocialLoginUrl = (socialType) => {
+  removeAllCookies()
+  return apiAccount.getSocialLoginUrl(socialType, redirect.value)
+}
+
+const redirect = ref(null) // Add this if you need the redirect property
+
+// Google callback
 const callback = (response) => {
-  // This callback will be triggered when the user selects or login to
-  // his Google account from the popup
   console.log("Handle the response", response)
 }
 </script>

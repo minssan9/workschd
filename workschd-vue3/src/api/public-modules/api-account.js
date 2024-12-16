@@ -1,4 +1,4 @@
-import { service } from "@/api/axios-voyagess.js";
+import service from "@/api/axios-voyagerss.js";
 
 const baesURL = `common/account`
 
@@ -9,7 +9,7 @@ const apiPublicAccount = {
     },
     getTeacherById(acconutId) {
         return service.get(`${baesURL}/teacher/${acconutId}`)
-    }
+    } 
 }
 
 export default apiPublicAccount

@@ -1,4 +1,4 @@
-import api from '@/api/axios-voyagess.js'
+import api from '@/api/axios-voyagerss.js'
 
 const apiSys = {
   getSysConfLike (code) {

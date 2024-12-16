@@ -123,4 +123,7 @@ const apiError = {
   },
 }
 
-export default service
+// Make sure to export service
+export { service }  // Named export
+// or
+export default service  // Default export

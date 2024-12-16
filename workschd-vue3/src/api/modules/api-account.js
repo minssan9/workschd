@@ -1,43 +1,43 @@
-import {methods} from '@/api/axios-voyagess.js'
+import service from "@/api/axios-voyagerss.js";
 
-const REDIRECT_URI = `${process.env.VUE_APP_REDIRECT_URL}/oauth/redirect`
+const REDIRECT_URI = `${import.meta.env.$VITE_API_REDIRECT_URL}/oauth/redirect`
 const baesURL = `account`
 
 const apiAccount = {
   getUser () {
-    return methods.get(`${baesURL}`)
+    return service.get(`${baesURL}`)
   },
   getUserById (acconutId) {
-    return methods.get(`${baesURL}/${acconutId}`)
+    return service.get(`${baesURL}/${acconutId}`)
   },
   putUser(account) {
-    return methods.put(`${baesURL}`, account)
+    return service.put(`${baesURL}`, account)
   },
   putUserById(account) {
-    return methods.put(`${baesURL}/${account.accountId}`, account)
+    return service.put(`${baesURL}/${account.accountId}`, account)
   },
 
 
 
   getSocialLoginUrl (socialType) {
-    return `${process.env.VUE_APP_API}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`
+    return `${import.meta.env.VITE_API_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`
   },
   getSocialConnect(socialType){
-    return `${process.env.VUE_APP_API}/oauth2/auth-url/${socialType}`
+    return `${import.meta.env.VITE_API_URL}/oauth2/auth-url/${socialType}`
   },
   saveAccountSns (providerType, oauth2Info) {
-    return methods.post(`/oauth2/save/${providerType}`, oauth2Info)
+    return service.post(`/oauth2/save/${providerType}`, oauth2Info)
   },
 
   saveAccountInfo(account) {
-    return methods.post(`${baesURL}/info`, account)
+    return service.post(`${baesURL}/info`, account)
   },
   getAccountInfo(accountId) {
-    return methods.get(`${baesURL}/${accountId}/info`)
+    return service.get(`${baesURL}/${accountId}/info`)
   },
 
   saveProfileImg(accountId, profileImage) {
-    return methods.postFile(`${baesURL}/${accountId}/image`, profileImage)
+    return service.postFile(`${baesURL}/${accountId}/image`, profileImage)
   }
 }
 
