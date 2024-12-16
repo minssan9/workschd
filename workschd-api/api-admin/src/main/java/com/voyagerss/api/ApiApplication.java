@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.util.TimeZone;
 
 @SpringBootApplication(scanBasePackages = "com.voyagerss")
-@EnableJpaRepositories(basePackages = "com.voyagerss.persist")
-@EntityScan(basePackages = "com.voyagerss.persist")
+@EnableJpaRepositories(basePackages = "com.voyagerss.persist.repository")
+@EntityScan(basePackages = "com.voyagerss.persist.entity")
 @ConfigurationPropertiesScan
 public class ApiApplication {
 

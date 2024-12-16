@@ -66,11 +66,11 @@ spring:
         highlight_sql: true
         show_sql: false          #하이버네이트가 실행하는 모든 SQL문을 콘솔로 출력해 준다.
 
-db-en9door:
+db-voyager:
   driver-class-name: com.mysql.cj.jdbc.Driver
   url: ${db_url}
   username: ${db_username}
-  password: ${db_passwd}
+  password: ${db_password}
 ---
 spring.config.activate.on-profile: develop
 

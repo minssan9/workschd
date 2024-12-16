@@ -6,8 +6,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -15,7 +16,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "account")
 public class Account extends BaseEntity implements Serializable {
@@ -30,23 +32,14 @@ public class Account extends BaseEntity implements Serializable {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "english_name")
-    private String englishName;
-
     @Column(name = "email")
     private String email;
 
     @Column(name = "phone")
-    private String phone;
-
-    @Column(name = "incentive_percent", nullable = false)
-    private Double incentivePercent;
+    private String phone; 
 
     @Column(name = "password")
     private String password;
-
-    @Column(name = "profile_image_url", nullable = false)
-    private String profileImageUrl;
 
     @Column(name = "access_token")
     private String accessToken;
@@ -54,11 +47,11 @@ public class Account extends BaseEntity implements Serializable {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "profile_video_url")
-    private String profileVideoUrl;
+    @Column(name = "profile_image_url", nullable = false)
+    private String profileImageUrl;
 
-    @Column(name = "firebase_token")
-    private String firebaseToken;
+    @Column(name = "profile_video_url")
+    private String profileVideoUrl; 
 
     @OneToMany(mappedBy = "account")
     private List<TeamMember> teamMembers;
@@ -75,17 +68,13 @@ public class Account extends BaseEntity implements Serializable {
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private AccountInfo accountInfo;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
 
     public Account(AccountDTO accountDto) {
         BeanUtils.copyProperties(accountDto, this);
         this.username = accountDto.getUsername();
         this.password = accountDto.getPassword();
-        this.email = accountDto.getEmail();
-        this.englishName = accountDto.getEnglishName();
-        this.phone = accountDto.getPhone();
-        this.incentivePercent = accountDto.getIncentivePercent();
+        this.email = accountDto.getEmail(); 
+        this.phone = accountDto.getPhone(); 
         this.profileVideoUrl = accountDto.getProfileVideoUrl() != null ? accountDto.getProfileVideoUrl() : "";
     }
 
@@ -102,9 +91,7 @@ public class Account extends BaseEntity implements Serializable {
         this.phone = phone;
         this.email = email != null ? email : "NO_EMAIL";
         this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
-        this.profileVideoUrl = "";
-        this.englishName = username;
-        this.incentivePercent = 1.0;
+        this.profileVideoUrl = ""; 
     }
 
     public Account(Integer id) {

@@ -74,8 +74,7 @@ public class AccountService {
         Account account = requireOne(accountId);
 
         account.setEmail(accountDTO.getEmail());
-        account.setUsername(accountDTO.getUsername());
-        account.setEnglishName(accountDTO.getEnglishName());
+        account.setUsername(accountDTO.getUsername()); 
         account.setPhone(accountDTO.getPhone());
 
         return toDTO(account);

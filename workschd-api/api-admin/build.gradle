@@ -21,7 +21,6 @@ bootJar {
 jar { enabled=false }
 
 dependencies {
-
     implementation project(':persist')
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

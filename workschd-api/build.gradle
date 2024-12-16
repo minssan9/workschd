@@ -175,5 +175,3 @@ codeCoverageReport.dependsOn {
 //}
 
 
-
-//  ./gradlew clean :api:test sonarqube
