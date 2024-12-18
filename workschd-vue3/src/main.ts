@@ -44,6 +44,6 @@ declare global {
   }
 }
 
-window.Kakao.init(import.meta.env.VITE_KAKAO_CLIENT_ID);
+// window.Kakao.init(import.meta.env.VITE_KAKAO_CLIENT_ID);
 
 app.mount('#app')

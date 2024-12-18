@@ -1,8 +1,6 @@
 *node_modules
 application-secret.yml
-workschd-nextjs/.env
 workschd-api/docker/dc-release-en9door.yml
-workschd-nextjs/.env.local
 workschd-vue3/dist
 workschd-vue3/dev-dist
 
@@ -10,4 +8,3 @@ actions-runner
 workschd-vue3/package-lock.json
 .DS_Store
 workschd-api/persist/src/main/resources/credentials.json
-workschd-vue3/.env

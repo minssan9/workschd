@@ -5,5 +5,28 @@
     "dart.previewFlutterUiGuides": true,
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "automatic",
-
+    "workbench.colorCustomizations": {
+        // vscdoe 전체 전경 색
+        "editor.background": "#ffffff00",
+        // 맨 왼쪽 activityBar
+        "activityBar.background": "#edf4ff",
+        // 사이드바(파일,폴더) 배경 색
+        "sideBar.background": "#eff2f7", 
+        // 선택된 탭 배경색
+        "tab.activeBackground": "#ffffff",
+        // 비활성인 탭 배경색
+        "tab.inactiveBackground": "#ebebeb", 
+        // 상단 타이틀 글자색
+        "titleBar.activeForeground": "#000000",
+        // 하단 상태 배경색
+        "statusBar.background": "#acacac",
+        // Editor font weight
+        "editor.fontWeight": "500",
+        // Editor font family
+        "editor.fontFamily": "'JetBrains Mono', Consolas, 'Courier New', monospace",
+        // Editor font size
+        "editor.fontSize": 13,
+        // Editor line height
+        "editor.lineHeight": 12,
+    },
 }
