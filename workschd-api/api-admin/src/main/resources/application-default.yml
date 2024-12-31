@@ -13,7 +13,7 @@ mail:
     auth: true
   username: ${mail_username}
   password: ${mail_password}
-  email-en9door: en9door@gmail.com
+  email-voyagerss: voyagerss@gmail.com
   email-manager: abigailmaureen1993@gmail.com
 
 file:
@@ -36,14 +36,12 @@ spring.config.activate.on-profile: develop
 core:
   web-address: https://dev.en9doors.com
 
-
-
 ---
 spring.config.activate.on-profile: release
 core:
   web-address: https://en9doors.com
 
 ---
-spring.config.activate.on-profile: release-en9door
+spring.config.activate.on-profile: release-voyagerss
 core:
-  web-address: https://en9door.com
+  web-address: https://voyagerss.com

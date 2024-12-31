@@ -1,8 +1,8 @@
-name: api-en9door CI/CD
+name: api-voyagerss CI/CD
 
 on:
   push:
-    branches: [ release-en9door ] # release  push될 때 CD가 일어나도록 핸들링
+    branches: [ release-voyagerss ] # release  push될 때 CD가 일어나도록 핸들링
 
 env:
   VERSION: ${{ github.sha }}
@@ -56,7 +56,7 @@ jobs:
   build-image:
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref_name == 'release-en9door'
+    if: github.ref_name == 'release-voyagerss'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -95,7 +95,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-image
-    if: github.ref_name == 'release-en9door'
+    if: github.ref_name == 'release-voyagerss'
 
     steps:
       - name: Deploy to DigitalOcean Droplet@Image
@@ -149,6 +149,6 @@ jobs:
 #sudo docker run -it -d --name=en9door_api --restart=always --privileged \
 #  -p 34001:34001 -m 1900m \
 #  -v /var/log:/var/log \
-#  -e SPRING_PROFILES_ACTIVE=release-en9door \
+#  -e SPRING_PROFILES_ACTIVE=release-voyagerss \
 #  --env-file /home/root/release.env \
-#  ghcr.io/minssan9/en9door_api_release-en9door:latest
+#  ghcr.io/minssan9/en9door_api_release-voyagerss:latest

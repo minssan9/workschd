@@ -81,26 +81,26 @@ public class En9doorDatabaseConfig extends HikariConfig {
     }
 
 
-    //    mybatis config ----------------------------------------------------
-    @Bean(name = "sqlSessionFactory")
-    public SqlSessionFactory sqlSessionFactory(
-        ApplicationContext applicationContext
-    ) throws Exception {
-        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(en9doorDataSource());
-        sqlSessionFactoryBean.setTypeAliasesPackage("com.voyagerss.persist.entity");
-        sqlSessionFactoryBean.setMapperLocations(
-                applicationContext.getResources("classpath*:/mapper/**/**.xml")
-        );
-        sqlSessionFactoryBean.getObject().getConfiguration().setMapUnderscoreToCamelCase(true);
-        return sqlSessionFactoryBean.getObject();
-    }
-
-    @Bean(name = "en9doorSessionTemplate")
-    public SqlSessionTemplate en9doorSqlSessionTemplate(
-        @Qualifier("sqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
-        return new SqlSessionTemplate(sqlSessionFactory);
-    }
+//    //    mybatis config ----------------------------------------------------
+//    @Bean(name = "sqlSessionFactory")
+//    public SqlSessionFactory sqlSessionFactory(
+//        ApplicationContext applicationContext
+//    ) throws Exception {
+//        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+//        sqlSessionFactoryBean.setDataSource(en9doorDataSource());
+//        sqlSessionFactoryBean.setTypeAliasesPackage("com.voyagerss.persist.entity");
+//        sqlSessionFactoryBean.setMapperLocations(
+//                applicationContext.getResources("classpath*:/mapper/**/**.xml")
+//        );
+//        sqlSessionFactoryBean.getObject().getConfiguration().setMapUnderscoreToCamelCase(true);
+//        return sqlSessionFactoryBean.getObject();
+//    }
+//
+//    @Bean(name = "en9doorSessionTemplate")
+//    public SqlSessionTemplate en9doorSqlSessionTemplate(
+//        @Qualifier("sqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+//        return new SqlSessionTemplate(sqlSessionFactory);
+//    }
 
     @Bean
     public JPAQueryFactory jpaQueryFactory(

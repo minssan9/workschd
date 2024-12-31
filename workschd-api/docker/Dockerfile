@@ -1,4 +1,4 @@
-# docker build -f ./docker/api-Dockerfile -t en9door-api-dev
+# docker build -f ./docker/api-Dockerfile -t voyagerss-api-dev
 
 FROM docker.io/openjdk:17
 LABEL maintainer="minssan9@gmail.com"

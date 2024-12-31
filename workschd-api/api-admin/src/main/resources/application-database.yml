@@ -51,6 +51,8 @@ decorator:
       logging: slf4j
       enable-logging: false
 
+
+
 ---
 spring.config.activate.on-profile: local
 

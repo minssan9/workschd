@@ -82,6 +82,11 @@ app:
     tokenExpiry: 600  # minutes
     refreshTokenExpiry: 1380  # minutes
 
+paypal:
+  clientId: ${paypal_clientId:paypal}
+  clientSecret: ${paypal_clientSecret:paypal}
+  mode: ${paypal_mode:paypal}
+
 ---
 spring.config.activate.on-profile: release
 
