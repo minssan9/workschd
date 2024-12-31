@@ -1,14 +1,16 @@
 package com.voyagerss.persist.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "translations")
-public class Translations implements Serializable {
+public class Translations extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

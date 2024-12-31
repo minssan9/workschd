@@ -21,6 +21,7 @@ import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import javax.sql.DataSource;
 import java.util.Objects;
@@ -99,6 +100,12 @@ public class En9doorDatabaseConfig extends HikariConfig {
     public SqlSessionTemplate en9doorSqlSessionTemplate(
         @Qualifier("sqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
+    }
+
+    @Bean
+    public JPAQueryFactory jpaQueryFactory(
+        @Qualifier("entityManagerFactory") LocalContainerEntityManagerFactoryBean factory) {
+        return new JPAQueryFactory(Objects.requireNonNull(factory.getObject()).createEntityManager());
     }
 }
 

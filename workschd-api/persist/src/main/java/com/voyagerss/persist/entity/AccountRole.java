@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountRoleDTO;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
-import javax.management.relation.Role;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "account_role")
-public class AccountRole implements Serializable {
+public class AccountRole extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,19 +25,13 @@ public class AccountRole implements Serializable {
     @Column(name = "account_role_id", nullable = false)
     private Integer accountRoleId;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
     @Column(name = "role_type", nullable = false)
     private EnumMaster.RoleType roleType;
-
-
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id")
     private Account account;
-
 
     public AccountRole(EnumMaster.RoleType roleType, Account account) {
         this.roleType = roleType;

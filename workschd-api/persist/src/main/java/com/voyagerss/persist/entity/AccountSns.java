@@ -6,18 +6,20 @@ import com.voyagerss.persist.dto.AccountSnsDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "account_sns")
-public class AccountSns  extends BaseEntity implements Serializable {
+public class AccountSns extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

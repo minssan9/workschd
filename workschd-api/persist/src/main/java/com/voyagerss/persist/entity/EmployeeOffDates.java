@@ -1,12 +1,14 @@
 package com.voyagerss.persist.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "unavailable_dates")
 public class EmployeeOffDates extends BaseEntity implements Serializable {

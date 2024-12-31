@@ -1,15 +1,16 @@
 package com.voyagerss.persist.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "store")
-public class Store implements Serializable {
+public class Store extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,20 +30,5 @@ public class Store implements Serializable {
 
     @Column(name = "branch_id")
     private Long branchId;
-
-    @Column(name = "created_by", nullable = false)
-    private String createdBy;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "is_active")
-    private Boolean active;
-
-    @Column(name = "last_modified_by")
-    private String lastModifiedBy;
-
-    @Column(name = "last_modified_at")
-    private LocalDateTime lastModifiedAt;
 
 }

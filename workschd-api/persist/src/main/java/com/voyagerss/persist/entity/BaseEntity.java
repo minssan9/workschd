@@ -1,17 +1,19 @@
 package com.voyagerss.persist.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
+@EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 @Getter
 @Setter
@@ -35,4 +37,7 @@ public abstract class BaseEntity {
     @UpdateTimestamp
     @Column(name = "last_modified_at")
     private LocalDateTime lastModifiedAt;
+
+
+
 }

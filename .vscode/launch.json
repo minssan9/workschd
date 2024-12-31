@@ -19,7 +19,7 @@
             "type": "java",
             "name": "Spring Boot-ApiApplication<api-admin>",
             "request": "launch",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}workschd-api",
             "mainClass": "com.voyagerss.api.ApiApplication",
             "projectName": "api-admin",
             "args": "",

@@ -1,13 +1,10 @@
 plugins {
     id 'org.springframework.boot'
     id 'maven-publish' // maven-publish 플러그인 추가
-    id 'com.ewerk.gradle.plugins.querydsl'
     id 'org.sonarqube' version '3.0'
 }
 
-repositories {
-    mavenCentral()
-}
+repositories { }
 
 bootJar { enabled = false }
 jar { enabled = true }
@@ -22,11 +19,6 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.3'
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.6.2'
 
-    // QueryDSL dependencies
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
     //    Excel
     implementation "org.apache.poi:poi:5.2.0"
@@ -46,20 +38,4 @@ sonarqube {
         property "sonar.sources", "src/main"
         property "sonar.tests", "src/test"
     }
-}
-
-def querydslGenratedSrc = "$buildDir/generated/queryDsl"
-querydsl {
-    library = "com.querydsl:querydsl-apt"
-    jpa = true
-    querydslSourcesDir = querydslGenratedSrc
-}
-compileQuerydsl {
-    options.annotationProcessorPath = configurations.querydsl
-}
-configurations {
-    querydsl.extendsFrom compileClasspath
-}
-sourceSets {
-    main.java.srcDirs querydslGenratedSrc
 }

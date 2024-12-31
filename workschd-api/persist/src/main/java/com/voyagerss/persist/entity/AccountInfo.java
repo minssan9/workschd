@@ -5,7 +5,8 @@ import com.voyagerss.persist.component.converter.IntegerArrayConverter;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.AccountInfoDTO;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -13,7 +14,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "account_info")
 public class AccountInfo extends BaseEntity implements Serializable {
