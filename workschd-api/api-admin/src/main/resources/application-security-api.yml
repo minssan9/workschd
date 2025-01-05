@@ -9,7 +9,8 @@ spring:
             client-id: ${oauth2_google_clientId}
             client-secret: ${oauth2_google_clientSecret}
             authorization-grant-type: authorization_code
-            redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
+            redirectUri: "${baseUrl}/{action}/oauth2/code/google"
+            client-authentication-method: client_secret_post
             scope:
               - email
               - profile
@@ -17,21 +18,22 @@ spring:
             client-id: ${oauth2_kakao_clientId}
             client-secret: ${oauth2_kakao_clientSecret}
             authorization-grant-type: authorization_code
-
-            clientAuthenticationMethod: post
-            redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
+            redirectUri: "${baseUrl}/{action}/oauth2/code/kakao"
+            client-authentication-method: client_secret_post
             scope:
-              - plusfriends
-              - profile
+              - profile_nickname
+              - friends
+#              - plusfriends
+              - profile_image
               - account_email
-              - phone_number
+#              - phone_number
             clientName: Kakao
           naver:
             client-id: ${oauth2_naver_clientId}
             client-secret: ${oauth2_naver_clientSecret}
             authorization-grant-type: authorization_code
-            clientAuthenticationMethod: post
-            redirectUri: "${baseUrl}/{action}/oauth2/code/{registrationId}"
+            clientAuthenticationMethod: client_secret_post
+            redirectUri: "${baseUrl}/{action}/oauth2/code/naver"
             scope:
               - name
               - nickname
@@ -42,10 +44,10 @@ spring:
         # Provider 설정
         provider:
           kakao:
-            authorizationUri: https://kauth.kakao.com/oauth/authorize
-            tokenUri: https://kauth.kakao.com/oauth/token
-            userInfoUri: https://kapi.kakao.com/v2/user/me
-            userNameAttribute: id
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
           naver:
             authorizationUri: https://nid.naver.com/oauth2.0/authorize
             tokenUri: https://nid.naver.com/oauth2.0/token

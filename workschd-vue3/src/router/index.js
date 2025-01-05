@@ -7,6 +7,7 @@ const router = createRouter({
   routes: [
     { path: '/',                  name: 'home',         component: () => import('@/views/HomeView.vue') },
     { path: '/login',             name: 'login',        component: () => import('@/views/auth/Login.vue') },
+    { path: '/oauth/redirect',                          component: () => import('@/views/auth/redirect.vue'), hidden: true},
     { path: '/about',             name: 'about',        component: () => import('@/views/AboutView.vue') },
     { path: '/job/list',          name: 'JobList',      component: () => import('@/views/job/JobList.vue') },
     { path: '/job/today',         name: 'JobToday',     component: () => import('@/views/job/JobToday.vue') },

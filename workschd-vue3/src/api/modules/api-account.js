@@ -1,6 +1,5 @@
 import service from "@/api/axios-voyagerss.js";
-
-const REDIRECT_URI = `${import.meta.env.$VITE_API_REDIRECT_URL}/oauth/redirect`
+ 
 const baesURL = `account`
 
 const apiAccount = {
@@ -20,7 +19,7 @@ const apiAccount = {
 
 
   getSocialLoginUrl (socialType) {
-    return `${import.meta.env.VITE_API_URL}/oauth2/authorization/${socialType}?redirect_uri=${REDIRECT_URI}`
+    return `${import.meta.env.VITE_API_URL}/oauth2/authorization/${socialType}?redirect_uri=${import.meta.env.VITE_API_REDIRECT_URL}/oauth/redirect`
   },
   getSocialConnect(socialType){
     return `${import.meta.env.VITE_API_URL}/oauth2/auth-url/${socialType}`

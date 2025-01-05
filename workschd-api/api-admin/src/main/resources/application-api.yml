@@ -29,7 +29,7 @@ spring:
 server:
   forward-headers-strategy: native
   servlet:
-    context-path: /api
+    context-path: /
   tomcat:
     max-http-form-post-size: 5MB
 
@@ -45,7 +45,7 @@ spring.config.activate.on-profile: local
 server:
   port: 24000
 
-baseUrl: http://localhost:34000/api
+baseUrl: http://localhost:24000
 
 ---
 spring.config.activate.on-profile: develop

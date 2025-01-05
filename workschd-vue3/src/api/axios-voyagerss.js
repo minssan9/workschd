@@ -1,11 +1,11 @@
-import { useUserStore } from '@/stores/modules/userStore'
+import { useUserStore } from '@/stores/modules/store_user.js'
 import axios from 'axios'
 import router from "@/router"
 import Cookies from 'js-cookie'
 
 // create an axios instance
 const service = axios.create({
-  baseURL: import.meta.env.$VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
     'Access-Control-Allow-Credentials': true,

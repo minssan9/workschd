@@ -14,7 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Configuration
 public class LogInterceptor implements HandlerInterceptor {
     @Autowired    private Environment environment;
-//    @Autowired    private LogUserActionService logUserActionService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

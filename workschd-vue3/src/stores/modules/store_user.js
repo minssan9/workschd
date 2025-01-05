@@ -1,5 +1,4 @@
 import apiAccount from '@/api/modules/api-account'
-import apiPublicAccount from '@/api/public-modules/api-account'
 import Cookies from 'js-cookie'
 import { defineStore } from 'pinia'
 
@@ -36,21 +35,17 @@ export const useUserStore = defineStore('user', {
             profileImageUrl: '',
             profileVideoUrl: '',
         },
-        teacherList: [],
-        studentList: [],
-        teacher: {},
-        student: {},
+        accountInfo: [],
         isAuthPhone: false,
     }),
     getters: {
         accountId: state => state.user.accountId,
         accessToken: state => state.user.accessToken,
         refreshToken: state => state.user.refreshToken,
-        isStudent: state => state.user.accountRoles?.map(ar => ar.roleType).includes('EN9DOOR_STUDENT') && 
+        isWorker: state => state.user.accountRoles?.map(ar => ar.roleType).includes('WORKER') && 
                           state.user.accountRoles?.length === 1,
-        isOwner: state => state.user.accountRoles?.map(ar => ar.roleType).includes('EN9DOOR_OWNER'),
-        isTeacher: state => state.user.accountRoles?.map(ar => ar.roleType).includes('EN9DOOR_TEACHER'),
-        isManager: state => state.user.accountRoles?.map(ar => ar.roleType).includes('EN9DOOR_MANAGER'),
+        isOwner: state => state.user.accountRoles?.map(ar => ar.roleType).includes('OWNER'), 
+        isManager: state => state.user.accountRoles?.map(ar => ar.roleType).includes('MANAGER'),
     },
     actions: {
         async fetchUser() {
@@ -73,26 +68,6 @@ export const useUserStore = defineStore('user', {
                     console.error('Error fetching user:', error)
                     throw error
                 }
-            }
-        },
-        async fetchTeacherList() {
-            try {
-                const res = await apiPublicAccount.getTeacherList({})
-                this.teacherList = res
-                return res
-            } catch (error) {
-                console.error('Error fetching teacher list:', error)
-                throw error
-            }
-        },
-        async fetchTeacher(accountId) {
-            try {
-                const res = await apiPublicAccount.getTeacherById(accountId)
-                this.teacher = res
-                return res
-            } catch (error) {
-                console.error('Error fetching teacher:', error)
-                throw error
             }
         },
         async updateUser() {
@@ -122,6 +97,36 @@ export const useUserStore = defineStore('user', {
             } catch (error) {
                 console.error('Error saving profile image:', error)
                 throw error
+            }
+        },
+        login(token) {
+            if (token) {
+                Cookies.set('accessToken', token)
+
+                if (!this.user.accountId){
+                    return apiAccount.getUser()
+                      .then(res => {
+                          Cookies.set('refreshToken',res.refreshToken)
+                          Cookies.set('accountId', res.accountId)
+                          Cookies.set('username', res.username)
+                          Cookies.set('email',res.email)
+                          Cookies.set('role',res.accountRoles)
+                          this.user = res
+                          return res
+                      })
+                      .then(account => {
+                          apiAccount.getAccountInfo(account.accountId)
+                            .then(accountInfo => {
+                                if (accountInfo.accountId) {
+                                    this.user.accountInfo = accountInfo
+                                    return accountInfo
+                                }
+                            })
+                      })
+                }
+            } else {
+                Cookies.remove('accessToken')
+                Cookies.remove('refreshToken')
             }
         },
         async logout() {

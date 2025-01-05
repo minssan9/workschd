@@ -12,7 +12,7 @@ public class Task extends BaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "task_id")
+    @Column(name = "id")
     private Long id;
     
     @Column(name = "title", nullable = false)

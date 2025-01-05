@@ -16,8 +16,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,6 +68,8 @@ public class AccountService {
             HashMap<String, String> kakaoVariables = new HashMap<>();
             kakaoVariables.put("#{username}",       account.getUsername());
 
+            account.setAccountRoles(List.of(accountRole));
+            account.setAccountSnsList(List.of(accountSns));
         }
         return account;
     }
@@ -79,6 +83,21 @@ public class AccountService {
 
         return toDTO(account);
     }
+
+
+//    public AccountDTO updateImage(Integer accountId, MultipartFile profileImage)  {
+//        Account account = requireOne(accountId);
+//
+//        String storedFileName = s3Service.uploadFile(
+//                profileImage,
+//                account.getAccountId().toString() + "_" + account.getEnglishName(),
+//                EnumMaster.FileFolder.TEACHER_PROFILE_IMAGES
+//        );
+//        account.setProfileImageUrl(storedFileName);
+//
+//        accountRepository.save(account);
+//        return toDTO(account);
+//    }
 
 
     public AccountDTO addRoleByAccountId(Integer accountId, AccountDTO vO) {

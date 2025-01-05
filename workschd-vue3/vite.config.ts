@@ -98,7 +98,7 @@ export default defineConfig({
     proxy: {
       // API 프록시 설정
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:24000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

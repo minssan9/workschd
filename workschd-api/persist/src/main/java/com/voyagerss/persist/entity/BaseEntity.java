@@ -23,11 +23,11 @@ public abstract class BaseEntity {
     private Boolean active = true;
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false)
+    @Column(name = "created_by", columnDefinition = "varchar(255) default 'SYSTEM'")
     private String createdBy;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
     @LastModifiedBy
@@ -35,7 +35,7 @@ public abstract class BaseEntity {
     private String lastModifiedBy;
 
     @UpdateTimestamp
-    @Column(name = "last_modified_at")
+    @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime lastModifiedAt;
 
 

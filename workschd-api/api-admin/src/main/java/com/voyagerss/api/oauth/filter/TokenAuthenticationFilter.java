@@ -31,9 +31,15 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
-    ) throws ServletException, IOException, ServletException {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String token = httpRequest.getHeader("Authorization");
+    ) throws ServletException, IOException {
+        // Skip authentication for static resources
+        String path = request.getRequestURI();
+        if (shouldSkipAuthentication(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String token = request.getHeader("Authorization");
 
         // 헤더에서 JWT 를 받아옵니다.
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
@@ -89,6 +95,17 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean shouldSkipAuthentication(String path) {
+        return path.contains("/static/") || 
+               path.contains("/assets/") ||
+               path.contains(".ico") ||
+               path.contains(".js") ||
+               path.contains(".css") ||
+               path.contains(".png") ||
+               path.contains(".jpg") ||
+               path.contains(".gif");
     }
 
     // SecurityContext 에 Authentication 객체를 저장합니다.

@@ -62,47 +62,51 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // 세션을 사용하지 않음
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .csrf(AbstractHttpConfigurer::disable)  // CSRF 보호 비활성화
-                .formLogin(AbstractHttpConfigurer::disable)  // Form-based 로그인 비활성화
-                .httpBasic(AbstractHttpConfigurer::disable)  // HTTP Basic 인증 비활성화
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()  // CORS Pre-flight 요청 허용
-                        .requestMatchers("/v3/api-docs",
-                                "/configuration/ui",
+                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
                                 "/swagger-resources/**",
-                                "/configuration/security",
-                                "/swagger-ui.html").permitAll()
-                        .requestMatchers("/health").permitAll()  // 특정 경로 허용
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
-                        .requestMatchers("/oauth2/**").permitAll()
-                        .requestMatchers("/common/**").permitAll()
-                        .requestMatchers("/ed/common/**").permitAll()
-                        .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
+                                "/configuration/**",
+                                "/webjars/**",
+                                "/health",
+                                "/login/**",
+                                "/oauth2/**",  // Allow OAuth2 endpoints
+                                "/common/**",
+                                "/ed/common/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorization -> authorization
-                                .baseUri("/oauth2/authorization")  // OAuth2 인증 엔드포인트 설정
-                                .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository())  // Authorization 요청 저장소 설정
+                                .baseUri("/oauth2/authorization")
+                                .authorizationRequestRepository(oAuth2AuthorizationRequestBasedOnCookieRepository())
                         )
                         .redirectionEndpoint(redirection -> redirection
-                                .baseUri("/*/oauth2/code/*")  // 리다이렉션 엔드포인트 설정
+                                .baseUri("/*/oauth2/code/*")
                         )
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(oAuth2UserService)  // 사용자 서비스 설정
+                                .userService(oAuth2UserService)
                         )
-                        .successHandler(oAuth2AuthenticationSuccessHandler())  // 성공 핸들러 설정
-                        .failureHandler(oAuth2AuthenticationFailureHandler())  // 실패 핸들러 설정
+                        .successHandler(oAuth2AuthenticationSuccessHandler())
+                        .failureHandler(oAuth2AuthenticationFailureHandler())
                 )
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.accessDeniedHandler(tokenAccessDeniedHandler)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                        .accessDeniedHandler(tokenAccessDeniedHandler)
                 );
 
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(customTokenFilter, TokenAuthenticationFilter.class);
+        
         return http.build();
     }
 

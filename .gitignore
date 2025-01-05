@@ -8,3 +8,5 @@ actions-runner
 workschd-vue3/package-lock.json
 .DS_Store
 workschd-api/persist/src/main/resources/credentials.json
+workschd-api/**/src/main/generated
+workschd-nextjs/.env

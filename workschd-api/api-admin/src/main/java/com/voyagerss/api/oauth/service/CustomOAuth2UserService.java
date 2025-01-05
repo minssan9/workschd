@@ -27,7 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -40,38 +42,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final AccountRepository accountRepository;
 
 
-//    @Override
-//    public OAuth2User loadUser(OAuth2UserRequest userRequest) {
-//        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-//        OAuth2User oAuth2User = delegate.loadUser(userRequest);
-//
-//        String registrationId = userRequest.getClientRegistration().getRegistrationId();
-//        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-//        String oauth2Id = oAuth2User.getAttribute(userNameAttributeName);
-//        String email = oAuth2User.getAttribute("email");
-//
-//        Account account = userRepository.findByOauth2IdAndOauth2Provider(oauth2Id, registrationId);
-//        if (account == null) {
-//            account = new Account();
-//            account.setUsername(email);
-//            account.setEmail(email);
-//            account.setOauth2Id(oauth2Id);
-//            account.setOauth2Provider(registrationId);
-//            accountRepository.save(account);
-//        }
-//
-//        return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-//                oAuth2User.getAttributes(), userNameAttributeName);
-//    }
-
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
-        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-        String oauth2Id = oAuth2User.getAttribute(userNameAttributeName);
-        String email = oAuth2User.getAttribute("email");
-
+//        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+//        HashMap<String, String> attributes = new HashMap<>(oAuth2User.getAttribute(userNameAttributeName));
+//         String oauth2Id = attributes.get("id");
+//         String email = attributes.get("email");
 //        OAuth2User user = super.loadUser(userRequest);
 
         try {

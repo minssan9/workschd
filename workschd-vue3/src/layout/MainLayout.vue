@@ -95,10 +95,11 @@ export default {
       "pluginKey": import.meta.env.VITE_CHANNEL_TALK_PLUGIN_KEY
     });
 
-    const eventSource = new EventSource("/api/notifications");
-    eventSource.onmessage = (event) => {
-      this.notifications.push(event.data);
-    };
+    // const eventSource = new EventSource("/api/notifications");
+    // eventSource.onmessage = (event) => {
+    //   this.notifications.push(event.data);
+    // }
+
     // if (this.user.id) {
     //   ChannelService.boot({
     //     "pluginKey": "YOUR_PLUGIN_KEY", // fill your plugin key

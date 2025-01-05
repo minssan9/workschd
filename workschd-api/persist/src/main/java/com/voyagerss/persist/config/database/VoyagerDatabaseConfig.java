@@ -4,15 +4,11 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.batch.BatchDataSource;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -37,7 +33,7 @@ import java.util.Properties;
 @MapperScan(basePackages = "com.voyagerss.persist",
         annotationClass = Mapper.class,
         sqlSessionFactoryRef = "sqlSessionFactory")
-public class En9doorDatabaseConfig extends HikariConfig {
+public class VoyagerDatabaseConfig extends HikariConfig {
 
     private final Environment env;
     private final VoyagerDatabaseProperties voyagerDatabaseProperties;
@@ -45,7 +41,7 @@ public class En9doorDatabaseConfig extends HikariConfig {
     private final JpaProperties jpaProperties;
 
     @Bean
-    public Properties en9doorDBProperties() {
+    public Properties voyagerDBProperties() {
         Properties en9doorProperties = new Properties();
         en9doorProperties.put("jdbcUrl", this.voyagerDatabaseProperties.getUrl());
         en9doorProperties.put("username", this.voyagerDatabaseProperties.getUsername());
@@ -56,8 +52,8 @@ public class En9doorDatabaseConfig extends HikariConfig {
 
     @Bean
     @BatchDataSource
-    public DataSource en9doorDataSource() {
-        HikariConfig config = new HikariConfig(en9doorDBProperties());
+    public DataSource voyagerDataSource() {
+        HikariConfig config = new HikariConfig(voyagerDBProperties());
         return new LazyConnectionDataSourceProxy(new HikariDataSource(config));
     }
 
@@ -66,7 +62,7 @@ public class En9doorDatabaseConfig extends HikariConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
         EntityManagerFactoryBuilder builder) {
 
-        return builder.dataSource(en9doorDataSource())
+        return builder.dataSource(voyagerDataSource())
             .properties(jpaProperties.getProperties())
             .packages(new String[]{"com.voyagerss.persist.entity"})
             .persistenceUnit("en9doorEntityManager")
@@ -80,27 +76,6 @@ public class En9doorDatabaseConfig extends HikariConfig {
             Objects.requireNonNull(entityManagerFactory(builder).getObject()));
     }
 
-
-//    //    mybatis config ----------------------------------------------------
-//    @Bean(name = "sqlSessionFactory")
-//    public SqlSessionFactory sqlSessionFactory(
-//        ApplicationContext applicationContext
-//    ) throws Exception {
-//        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-//        sqlSessionFactoryBean.setDataSource(en9doorDataSource());
-//        sqlSessionFactoryBean.setTypeAliasesPackage("com.voyagerss.persist.entity");
-//        sqlSessionFactoryBean.setMapperLocations(
-//                applicationContext.getResources("classpath*:/mapper/**/**.xml")
-//        );
-//        sqlSessionFactoryBean.getObject().getConfiguration().setMapUnderscoreToCamelCase(true);
-//        return sqlSessionFactoryBean.getObject();
-//    }
-//
-//    @Bean(name = "en9doorSessionTemplate")
-//    public SqlSessionTemplate en9doorSqlSessionTemplate(
-//        @Qualifier("sqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
-//        return new SqlSessionTemplate(sqlSessionFactory);
-//    }
 
     @Bean
     public JPAQueryFactory jpaQueryFactory(
