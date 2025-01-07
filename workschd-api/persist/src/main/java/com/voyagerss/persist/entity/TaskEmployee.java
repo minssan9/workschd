@@ -14,6 +14,7 @@ public class TaskEmployee extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
 

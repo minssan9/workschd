@@ -81,7 +81,8 @@ public class SecurityConfig {
                                 "/login/**",
                                 "/oauth2/**",  // Allow OAuth2 endpoints
                                 "/common/**",
-                                "/ed/common/**"
+                                "/ed/common/**",
+                                "/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
