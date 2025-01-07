@@ -92,131 +92,38 @@
   </q-page>
 </template>
 
-<script>
-// job list of today
-// - job list registering form
-//
-// manager
-// - register jobs
-// 1. place
-// 2. slots
-// 3. start time
-// 4. end time
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { apiTask } from '@/api/modules/api-task';
+import { apiSchedule } from '@/api/modules/api-schedule';
 
-import { ref } from 'vue'
-import { AgGridVue } from 'ag-grid-vue3'
+const tasks = ref([]);
+const loading = ref(false);
 
-
-export default {
-  name: 'JobList',
-  setup() {
-    const jobs = ref([
-      { id: 1, place: 'Office A', slots: 5, startTime: '09:00', endTime: '17:00' },
-      { id: 2, place: 'Store B', slots: 3, startTime: '10:00', endTime: '18:00' },
-    ])
-
-    const newJob = ref({
-      place: '',
-      slots: null,
-      startTime: '',
-      endTime: ''
-    })
-
-    const onSubmit = () => {
-      jobs.value.push({
-        id: jobs.value.length + 1,
-        ...newJob.value
-      })
-      // Reset form
-      newJob.value = {
-        place: '',
-        slots: null,
-        startTime: '',
-        endTime: ''
-      }
-    }
-
-    const task = ref({
-      branch_id: null,
-      store_id: null,
-      additional_info: '',
-      task_datetime: '',
-      start_time: '',
-      end_time: '',
-      daily_wage: 0
-    });
-
-    const branches = ref([
-      { id: 1, name: 'Branch 1' },
-      { id: 2, name: 'Branch 2' }
-      // 추가 지점 데이터를 여기에 추가하세요.
-    ]);
-
-    const stores = ref([
-      { id: 1, name: 'Store 1' },
-      { id: 2, name: 'Store 2' }
-      // 추가 매장 데이터를 여기에 추가하세요.
-    ]);
-
-    const rowData = ref([]);
-    const columnDefs = ref([
-      { headerName: 'Branch', field: 'branch_id' },
-      { headerName: 'Store', field: 'store_id' },
-      { headerName: 'Additional Info', field: 'additional_info' },
-      { headerName: 'Task DateTime', field: 'task_datetime' },
-      { headerName: 'Start Time', field: 'start_time' },
-      { headerName: 'End Time', field: 'end_time' },
-      { headerName: 'Daily Wage', field: 'daily_wage' }
-    ]);
-
-    const onGridReady = async () => {
-      const response = await fetch('/api/tasks');
-      const data = await response.json();
-      rowData.value = data;
-    };
-
-    const handleSubmit = async () => {
-      await fetch('/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(task.value)
-      });
-
-      await onGridReady();
-      handleReset();
-    };
-
-    const handleReset = () => {
-      task.value = {
-        branch_id: null,
-        store_id: null,
-        additional_info: '',
-        task_datetime: '',
-        start_time: '',
-        end_time: '',
-        daily_wage: 0
-      };
-    };
-
-    return {
-      jobs,
-      newJob,
-      onSubmit
-    }
-    return {
-      task,
-      branches,
-      stores,
-      rowData,
-      columnDefs,
-      onGridReady,
-      handleSubmit,
-      handleReset
-    };
+const fetchTasks = async () => {
+  try {
+    loading.value = true;
+    const response = await apiTask.queryTasks({});
+    tasks.value = response.data;
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+  } finally {
+    loading.value = false;
   }
-}
+};
+
+const createTask = async (taskData: any) => {
+  try {
+    await apiTask.createTask(taskData);
+    await fetchTasks(); // Refresh the list
+  } catch (error) {
+    console.error('Error creating task:', error);
+  }
+};
+
+onMounted(() => {
+  fetchTasks();
+});
 </script>
 
 

@@ -1,113 +1,129 @@
 <template>
   <q-page class="q-pa-md">
-    <h1>Team Registration</h1>
+    <h1>Create New Team</h1>
+    
     <q-card class="q-mt-md">
       <q-card-section>
-        <q-form @submit="onSubmit" class="q-gutter-md">
+        <q-form @submit.prevent="handleCreateTeam" class="q-gutter-md">
           <q-input
-              v-model="teamId"
-              label="Team ID"
-              required
-              :rules="[val => !!val || 'Team ID is required']"
+            v-model="teamForm.name"
+            label="Team Name"
+            :rules="[val => !!val || 'Team name is required']"
           />
+          
           <q-input
-              v-model="name"
-              label="Your Name"
-              required
-              :rules="[val => !!val || 'Name is required']"
+            v-model="teamForm.region"
+            label="Region"
+            :rules="[val => !!val || 'Region is required']"
           />
-          <q-input
-              v-model="location"
-              label="Your Location"
-              required
-              :rules="[val => !!val || 'Location is required']"
-          />
+          
           <q-select
-              v-model="preferredPlaces"
-              label="Preferred Places (1-3)"
-              multiple
-              :options="placeOptions"
-              use-chips
-              stack-label
-              :rules="[
-              val => val.length > 0 || 'Select at least one place',
-              val => val.length <= 3 || 'Select no more than 3 places'
-            ]"
+            v-model="teamForm.scheduleType"
+            label="Schedule Type"
+            :options="scheduleTypes"
+            :rules="[val => !!val || 'Schedule type is required']"
           />
-          <q-btn label="Register" type="submit" color="primary" />
+          
+          <q-btn 
+            label="Create Team" 
+            type="submit" 
+            color="primary"
+            :loading="loading"
+          />
         </q-form>
+      </q-card-section>
+    </q-card>
+
+    <q-card v-if="inviteHash" class="q-mt-md">
+      <q-card-section>
+        <h2>Team Invitation Link</h2>
+        <p>Share this link with team members:</p>
+        <q-input
+          v-model="inviteUrl"
+          readonly
+          stack-label
+        >
+          <template v-slot:append>
+            <q-btn
+              flat
+              round
+              icon="content_copy"
+              @click="copyInviteUrl"
+            />
+          </template>
+        </q-input>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
 
-<script>
-// register into team
-// - worker
-// - input
-// team id
-// my name
-// my location
-// my prefer place (1~3)
-// request
-import { ref } from 'vue'
-import { useQuasar } from 'quasar'
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { apiTeam } from '@/api/modules/api-team';
+import { useQuasar } from 'quasar';
 
-export default {
-  name: 'TeamRegistration',
-  setup() {
-    const $q = useQuasar()
+const $q = useQuasar();
+const loading = ref(false);
+const inviteHash = ref('');
 
-    const teamId = ref('')
-    const name = ref('')
-    const location = ref('')
-    const preferredPlaces = ref([])
-    const placeOptions = [
-      'Office A', 'Office B', 'Office C',
-      'Remote', 'Hybrid', 'Flexible'
-    ]
+const teamForm = ref({
+  name: '',
+  region: '',
+  scheduleType: null
+});
 
-    const onSubmit = () => {
-      if (preferredPlaces.value.length < 1 || preferredPlaces.value.length > 3) {
-        $q.notify({
-          color: 'negative',
-          message: 'Please select 1 to 3 preferred places'
-        })
-        return
-      }
+const scheduleTypes = [
+  'WEEKLY',
+  'BI_WEEKLY',
+  'MONTHLY'
+];
 
-      // Here you would typically send this data to your backend
-      const registrationData = {
-        teamId: teamId.value,
-        name: name.value,
-        location: location.value,
-        preferredPlaces: preferredPlaces.value
-      }
+const inviteUrl = computed(() => {
+  if (!inviteHash.value) return '';
+  return `${window.location.origin}/team/join/${inviteHash.value}`;
+});
 
-      console.log('Registration submitted:', registrationData)
-
-      // Simulating an API call
-      setTimeout(() => {
-        $q.notify({
-          color: 'positive',
-          message: 'Registration successful!'
-        })
-        // Reset form after successful submission
-        teamId.value = ''
-        name.value = ''
-        location.value = ''
-        preferredPlaces.value = []
-      }, 1000)
-    }
-
-    return {
-      teamId,
-      name,
-      location,
-      preferredPlaces,
-      placeOptions,
-      onSubmit
-    }
+const handleCreateTeam = async () => {
+  try {
+    loading.value = true;
+    const response = await apiTeam.createTeam(teamForm.value);
+    inviteHash.value = response.data.invitationHash;
+    
+    $q.notify({
+      type: 'positive',
+      message: 'Team created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating team:', error);
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to create team'
+    });
+  } finally {
+    loading.value = false;
   }
-}
+};
+
+const copyInviteUrl = () => {
+  navigator.clipboard.writeText(inviteUrl.value)
+    .then(() => {
+      $q.notify({
+        type: 'positive',
+        message: 'Invitation link copied to clipboard'
+      });
+    })
+    .catch(() => {
+      $q.notify({
+        type: 'negative',
+        message: 'Failed to copy invitation link'
+      });
+    });
+};
 </script>
+
+<style scoped>
+.q-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+</style>
