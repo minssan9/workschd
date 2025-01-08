@@ -37,6 +37,10 @@ const apiAccount = {
 
   saveProfileImg(accountId, profileImage) {
     return service.postFile(`${baesURL}/${accountId}/image`, profileImage)
+  },
+
+  login: (loginData) => {
+    return service.post('/api/auth/login', loginData)
   }
 }
 

@@ -20,6 +20,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtTokenProvider;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +44,9 @@ import java.io.IOException;
 public class AccountController {
     private final AccountService accountService;
     private final AccountInfoService accountInfoService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider tokenProvider;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity getUserByAuth(HttpServletRequest request) {
@@ -104,4 +117,43 @@ public class AccountController {
 //        throw new CommonException();
         return ResponseEntity.ok(accountInfoService.save(vO));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.getUsername(),
+                    loginRequest.getPassword()
+                )
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = tokenProvider.createToken(authentication);
+
+            return ResponseEntity.ok(new AuthResponse(token));
+        } catch (AuthenticationException e) {
+            return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Invalid username or password"));
+        }
+    }
+}
+
+@Data
+class LoginRequest {
+    private String username;
+    private String password;
+}
+
+@Data
+@AllArgsConstructor
+class AuthResponse {
+    private String token;
+}
+
+@Data
+@AllArgsConstructor
+class ErrorResponse {
+    private String message;
 }
