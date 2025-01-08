@@ -5,6 +5,7 @@ import apiSys from "@/api/public-modules/api-sys";
 const userLocale = navigator.languages ? navigator.languages[0] : navigator.language || navigator.userLanguage;
 
 export const i18n = new createI18n ({
+  legacy: false,
   locale: import.meta.env.VITE_I18N_LOCALE || 'ko',
   fallbackLocale: userLocale,
   messages: {},
