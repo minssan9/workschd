@@ -79,7 +79,8 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/health",
                                 "/login/**",
-                                "/oauth2/**",  // Allow OAuth2 endpoints
+                                "/api/auth/**",
+                                "/oauth2/**",
                                 "/common/**",
                                 "/ed/common/**"
                         ).permitAll()
@@ -108,6 +109,12 @@ public class SecurityConfig {
         http.addFilterBefore(customTokenFilter, TokenAuthenticationFilter.class);
         
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
 //    @Bean

@@ -58,10 +58,10 @@ spring:
 app:
   oauth2:
     authorizedRedirectUris:
-      - http://localhost:3000/oauth/redirect
+      - http://localhost:3003/oauth/redirect
       - https://dev.voyagerss.com/oauth/redirect
       - https://voyagerss.com/oauth/redirect
-      - http://local.voyagerss.com:3000/oauth/redirect
+      - http://local.voyagerss.com:3003/oauth/redirect
   oauth:
     kakao:
       authorizationUri: https://kauth.kakao.com/oauth/authorize
@@ -76,7 +76,7 @@ app:
 
   # cors 설정
   cors:
-    allowed-origins: 'https://voyagerss.com,https://voyagerss.com,https://dev.voyagerss.com,https://dev.voyagerss.com:3000,http://localhost:3000'
+    allowed-origins: 'https://voyagerss.com,https://voyagerss.com,https://dev.voyagerss.com,https://dev.voyagerss.com:3003,http://localhost:3003'
     allowed-methods: GET,POST,PUT,OPTIONS,DELETE
     allowed-headers: '*'
     max-age: 3600
