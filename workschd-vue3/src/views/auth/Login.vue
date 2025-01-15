@@ -1,5 +1,34 @@
 <template>
   <div class="col">
+
+    <div class="row g-2" justify="center">
+      <div class="login-form" style="width: 300px; margin-bottom: 20px;">
+        <div class="mb-3">
+          <input
+              type="text"
+              class="form-control"
+              v-model="loginForm.username"
+              placeholder="아이디를 입력하세요"
+          >
+        </div>
+        <div class="mb-3">
+          <input
+              type="password"
+              class="form-control"
+              v-model="loginForm.password"
+              placeholder="비밀번호를 입력하세요"
+          >
+        </div>
+        <button
+            class="btn btn-primary w-100 mb-3"
+            @click="handleLogin"
+        >
+          로그인
+        </button>
+      </div>
+    </div>
+
+
     <div class="row">
       <a id="custom-login-btn" @click="kakaoLogin()">
         <img
@@ -41,32 +70,6 @@
 
     <div @click="kakaoLogout()">로그아웃</div>
 
-    <div class="row g-2" justify="center">
-      <div class="login-form" style="width: 300px; margin-bottom: 20px;">
-        <div class="mb-3">
-          <input
-              type="text"
-              class="form-control"
-              v-model="loginForm.username"
-              placeholder="아이디를 입력하세요"
-          >
-        </div>
-        <div class="mb-3">
-          <input
-              type="password"
-              class="form-control"
-              v-model="loginForm.password"
-              placeholder="비밀번호를 입력하세요"
-          >
-        </div>
-        <button
-            class="btn btn-primary w-100 mb-3"
-            @click="handleLogin"
-        >
-          로그인
-        </button>
-      </div>
-    </div>
   </div>
 </template>
 <script setup>

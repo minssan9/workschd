@@ -1,11 +1,13 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.api.oauth.entity.UserPrincipal;
+import com.voyagerss.api.oauth.token.JwtTokenProvider;
 import com.voyagerss.persist.component.exception.CommonException;
 import com.voyagerss.persist.component.exception.CommonExceptionType;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.AccountInfoDTO;
 import com.voyagerss.persist.dto.QueryDTO;
+import com.voyagerss.persist.dto.auth.LoginRequest;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.service.AccountInfoService;
 import com.voyagerss.persist.service.AccountService;
@@ -27,10 +29,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtTokenProvider;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,7 +46,6 @@ public class AccountController {
     private final AccountInfoService accountInfoService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
-    private final UserService userService;
 
     @GetMapping
     public ResponseEntity getUserByAuth(HttpServletRequest request) {
@@ -131,29 +130,9 @@ public class AccountController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = tokenProvider.createToken(authentication);
 
-            return ResponseEntity.ok(new AuthResponse(token));
+            return ResponseEntity.ok(token);
         } catch (AuthenticationException e) {
-            return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Invalid username or password"));
+            throw new CommonException(CommonExceptionType.SIGNIN_EXCEPTION_MSG);
         }
     }
-}
-
-@Data
-class LoginRequest {
-    private String username;
-    private String password;
-}
-
-@Data
-@AllArgsConstructor
-class AuthResponse {
-    private String token;
-}
-
-@Data
-@AllArgsConstructor
-class ErrorResponse {
-    private String message;
 }

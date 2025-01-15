@@ -40,7 +40,7 @@ const apiAccount = {
   },
 
   login: (loginData) => {
-    return service.post('/api/auth/login', loginData)
+    return service.post(`${baesURL}//login`, loginData)
   }
 }
 

@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -33,9 +34,6 @@ public class AccountInfo extends BaseEntity implements Serializable {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "preferred_day")
-    private String preferredDay; // 선호 요일
-
     @Column(name = "branch_id")
     private Long branchId;
 
@@ -48,14 +46,15 @@ public class AccountInfo extends BaseEntity implements Serializable {
     @Column(name = "preferred_branch_id", nullable = false)
     private int preferredBranchId; // 선호하는 지점 ID
 
+    @Column(name = "employee_type")
+    @Enumerated(EnumType.STRING)
+    private EmployeeType employeeType; // FULL_TIME, PART_TIME, TEMPORARY
 
-    @Column(name = "unavailable_days_of_week")
-    @Convert(converter = IntegerArrayConverter.class)
-    private Set<Integer> offDaysOfWeek; // 직원이 근무할 수 없는 요일들 (예: "SATURDAY", "SUNDAY")
+    @OneToMany(mappedBy = "accountInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PreferredWorkDay> preferredWorkDays;
 
     @OneToMany(mappedBy = "accountInfo", fetch = FetchType.LAZY)
     private List<EmployeeOffDates> offDates; // 휴무 일자로 지정된 날들
-
 
     @JsonBackReference
     @OneToOne(fetch = FetchType.EAGER)
@@ -82,7 +81,6 @@ public class AccountInfo extends BaseEntity implements Serializable {
         offDaysOfWeek.add(dayOfWeek);
     }
 
-
     // 직원의 근무 가능 여부를 확인하는 메서드
     public boolean isAvailable(LocalDate date) {
         // 지정된 휴무일이거나, 근무할 수 없는 요일인 경우 false
@@ -93,18 +91,9 @@ public class AccountInfo extends BaseEntity implements Serializable {
         return true;
     }
 
-
-//
-//    private int totalWorkDays; // 근무 일수 추적
-//    private int totalOffDays;  // 휴무 일수
-//    // 휴무일 초과 여부 확인
-//    public boolean hasExceededOffDays(int maxOffDays) {
-//        return totalOffDays >= maxOffDays;
-//    }
-//
-//    // 직원이 근무한 총 일수 반환
-//    public int getTotalWorkDays() {
-//        return totalWorkDays;
-//    }
-
+    public enum EmployeeType {
+        FULL_TIME,
+        PART_TIME,
+        TEMPORARY
+    }
 }

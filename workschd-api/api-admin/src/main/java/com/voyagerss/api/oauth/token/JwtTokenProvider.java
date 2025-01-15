@@ -77,6 +77,26 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+
+    // Create token
+    public String createToken(Authentication authentication) {
+        log.info(authentication.toString());
+        Claims claims = Jwts.claims();
+//        claims.setSubject(email); // claims 생성 및 payload 설정
+//        claims.put("accountId", accountId);
+//        claims.put("roles", roles); // 권한 설정, key/ value 쌍으로 저장
+
+        Date date = new Date();
+
+        return Jwts.builder()
+//                .setSubject(email)
+                .setClaims(claims) // 발행 유저 정보 저장
+//                .setIssuedAt(date) // 발행 시간 저장
+                .signWith(secretKey, SignatureAlgorithm.HS256)  // 해싱 알고리즘 및 키 설정
+//                .setExpiration(new Date(date.getTime() + tokenValid))  // 토큰 유효 시간 저장
+                .compact();
+    }
+
     // JWT 에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(this.getUserEmail(token));

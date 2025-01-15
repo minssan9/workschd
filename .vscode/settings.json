@@ -21,7 +21,7 @@
         // 하단 상태 배경색
         "statusBar.background": "#acacac",
         // Editor font weight
-        "editor.fontWeight": "500",
+        "editor.fontWeight": "100",
         // Editor font family
         "editor.fontFamily": "'JetBrains Mono', Consolas, 'Courier New', monospace",
         // Editor font size
