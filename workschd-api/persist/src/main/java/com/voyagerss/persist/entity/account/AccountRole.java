@@ -1,8 +1,9 @@
-package com.voyagerss.persist.entity;
+package com.voyagerss.persist.entity.account;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountRoleDTO;
+import com.voyagerss.persist.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class AccountRole extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_role_id", nullable = false)
-    private Integer accountRoleId;
+    private Long accountRoleId;
 
     @Column(name = "role_type", nullable = false)
     private EnumMaster.RoleType roleType;

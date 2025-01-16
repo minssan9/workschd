@@ -8,7 +8,7 @@ import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.AccountInfoDTO;
 import com.voyagerss.persist.dto.QueryDTO;
 import com.voyagerss.persist.dto.auth.LoginRequest;
-import com.voyagerss.persist.entity.Account;
+import com.voyagerss.persist.entity.account.Account;
 import com.voyagerss.persist.service.AccountInfoService;
 import com.voyagerss.persist.service.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,21 +18,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -73,7 +67,7 @@ public class AccountController {
 
 
     @GetMapping("/{accountId}")
-    public ResponseEntity getById(@Valid @NotNull @PathVariable("accountId") Integer accountId) {
+    public ResponseEntity getById(@Valid @NotNull @PathVariable("accountId") Long accountId) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         AccountDTO accountDTO = accountService.getAccountDtoById(accountId);
 
@@ -89,7 +83,7 @@ public class AccountController {
 
     @PutMapping(path = "/{accountId}")
     public ResponseEntity update(
-            @Valid @NotNull @PathVariable Integer accountId,
+            @Valid @NotNull @PathVariable Long accountId,
             @Valid @RequestBody AccountDTO dto) throws IOException {
         AccountDTO updatedAccount  = accountService.update(accountId, dto);
         return ResponseEntity.ok(updatedAccount);
@@ -98,7 +92,7 @@ public class AccountController {
 
 //    @PostMapping(path = "/{accountId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //    public ResponseEntity updateProfileImage(
-//            @Valid @NotNull @PathVariable Integer accountId,
+//            @Valid @NotNull @PathVariable Long accountId,
 //            @RequestPart(value = "profileImage") MultipartFile profileImage
 //    ) {
 //        AccountDTO accountDTO  = accountService.updateImage(accountId, profileImage);
@@ -107,7 +101,7 @@ public class AccountController {
 
 
     @GetMapping("/{accountId}/info")
-    public ResponseEntity getAccountInfoById(@Valid @NotNull @PathVariable("accountId") Integer accountId) {
+    public ResponseEntity getAccountInfoById(@Valid @NotNull @PathVariable("accountId") Long accountId) {
         return ResponseEntity.ok( accountInfoService.getById(accountId));
     }
 

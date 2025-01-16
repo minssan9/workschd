@@ -1,6 +1,6 @@
 package com.voyagerss.persist.repository;
 
-import com.voyagerss.persist.entity.AccountInfo;
+import com.voyagerss.persist.entity.account.AccountInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -13,5 +13,5 @@ public interface AccountInfoRepository extends JpaRepository<AccountInfo, Long>,
 
     List<AccountInfo> getEmployeesByBranchId(Long branchId);
 
-    Optional<AccountInfo> findByAccount_AccountId(Integer id);
+    Optional<AccountInfo> findByAccount_AccountId(Long id);
 }

@@ -1,23 +1,37 @@
 package com.voyagerss.persist.dto;
 
-import com.voyagerss.persist.entity.TeamMember.TeamRole;
-import com.voyagerss.persist.entity.TeamMember.InvitationStatus;
-import lombok.Getter;
-import lombok.Setter;
-import java.time.LocalDateTime;
+import com.voyagerss.persist.enums.TeamRole;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-public class TeamMemberDTO {
+import java.io.Serializable;
+
+@Data
+@NoArgsConstructor
+public class TeamMemberDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private Long id;
     private Long teamId;
     private Long accountId;
     private TeamRole role;
-    private InvitationStatus invitationStatus;
+    private boolean accepted;
+    private boolean rejected;
     private String invitationToken;
-    private LocalDateTime invitationExpiresAt;
     
-    // 추가 표시용 필드
+    // Additional display fields
     private String accountName;
     private String accountEmail;
+
+    public void validate() {
+        if (teamId == null) {
+            throw new IllegalArgumentException("Team ID cannot be null");
+        }
+        if (accountId == null) {
+            throw new IllegalArgumentException("Account ID cannot be null");
+        }
+        if (role == null) {
+            throw new IllegalArgumentException("Role cannot be null");
+        }
+    }
 } 

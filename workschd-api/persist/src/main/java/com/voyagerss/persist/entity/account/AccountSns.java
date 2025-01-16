@@ -1,8 +1,9 @@
-package com.voyagerss.persist.entity;
+package com.voyagerss.persist.entity.account;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountSnsDTO;
+import com.voyagerss.persist.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -26,7 +27,7 @@ public class AccountSns extends BaseEntity implements Serializable {
     @Id
     @Column(name = "account_sns_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer accountSnsId;
+    private Long accountSnsId;
 
     @Column(name = "user_id", nullable = false)
     private String userId;

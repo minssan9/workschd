@@ -1,7 +1,9 @@
-package com.voyagerss.persist.entity;
+package com.voyagerss.persist.entity.account;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.voyagerss.persist.dto.AccountDTO;
+import com.voyagerss.persist.entity.BaseEntity;
+import com.voyagerss.persist.entity.TeamMember;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -26,7 +28,7 @@ public class Account extends BaseEntity implements Serializable {
     @Id
     @Column(name = "account_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer accountId;
+    private Long accountId;
 
     @Column(name = "username", nullable = false)
     private String username;
@@ -93,7 +95,7 @@ public class Account extends BaseEntity implements Serializable {
         this.profileVideoUrl = ""; 
     }
 
-    public Account(Integer id) {
+    public Account(Long id) {
         this.accountId = id;
     }
 

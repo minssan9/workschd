@@ -3,9 +3,9 @@ package com.voyagerss.persist.service;
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.QueryDTO;
-import com.voyagerss.persist.entity.Account;
-import com.voyagerss.persist.entity.AccountRole;
-import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.entity.account.Account;
+import com.voyagerss.persist.entity.account.AccountRole;
+import com.voyagerss.persist.entity.account.AccountSns;
 import com.voyagerss.persist.querydsl.AccountRepositorySupport;
 import com.voyagerss.persist.repository.AccountInfoRepository;
 import com.voyagerss.persist.repository.AccountRepository;
@@ -16,10 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,7 +71,7 @@ public class AccountService {
         return account;
     }
 
-    public AccountDTO update(Integer accountId, AccountDTO accountDTO) {
+    public AccountDTO update(Long accountId, AccountDTO accountDTO) {
         Account account = requireOne(accountId);
 
         account.setEmail(accountDTO.getEmail());
@@ -85,7 +82,7 @@ public class AccountService {
     }
 
 
-//    public AccountDTO updateImage(Integer accountId, MultipartFile profileImage)  {
+//    public AccountDTO updateImage(Long accountId, MultipartFile profileImage)  {
 //        Account account = requireOne(accountId);
 //
 //        String storedFileName = s3Service.uploadFile(
@@ -100,7 +97,7 @@ public class AccountService {
 //    }
 
 
-    public AccountDTO addRoleByAccountId(Integer accountId, AccountDTO vO) {
+    public AccountDTO addRoleByAccountId(Long accountId, AccountDTO vO) {
         Account account = requireOne(accountId);
         if ( !accountRoleRepository.existsByAccount_AccountIdAndRoleType(accountId, vO.getRoleType())){
             AccountRole accountRole = new AccountRole(vO.getRoleType(), account);
@@ -120,7 +117,7 @@ public class AccountService {
         return toDTO(account);
     }
 
-    public Account addNewAccountSns(Integer accountId, AccountSns accountSns) {
+    public Account addNewAccountSns(Long accountId, AccountSns accountSns) {
         Account account = requireOne(accountId);
         if ( !accountSnsRepository.existsByAccount_AccountIdAndProviderType(accountId, accountSns.getProviderType())){
             accountSnsRepository.saveAndFlush(accountSns);
@@ -130,7 +127,7 @@ public class AccountService {
     }
 
 
-    public AccountDTO deleteRoleByAccountRole(Integer accountId, EnumMaster.RoleType roleType ) {
+    public AccountDTO deleteRoleByAccountRole(Long accountId, EnumMaster.RoleType roleType ) {
         AccountRole accountRole = accountRoleRepository.findByAccount_AccountIdAndRoleType(accountId, roleType);
         accountRoleRepository.deleteByAccountRoleId(accountRole.getAccountRoleId());
         accountRoleRepository.deleteByAccount_AccountIdAndRoleType(accountId, roleType);
@@ -138,12 +135,12 @@ public class AccountService {
     }
 
 
-    public AccountDTO getAccountDtoById(Integer id) {
+    public AccountDTO getAccountDtoById(Long id) {
         Account original = requireOne(id);
         return toDTO(original);
     }
 
-    public Account getAccountById(Integer id) {
+    public Account getAccountById(Long id) {
         return requireOne(id);
 
     }
@@ -154,7 +151,7 @@ public class AccountService {
         return dto;
     }
 
-    public Account requireOne(Integer id) {
+    public Account requireOne(Long id) {
         return accountRepository.findById(id).orElseThrow();
     }
 

@@ -1,7 +1,7 @@
 package com.voyagerss.persist.service;
 
 import com.voyagerss.persist.dto.AccountRoleDTO;
-import com.voyagerss.persist.entity.AccountRole;
+import com.voyagerss.persist.entity.account.AccountRole;
 import com.voyagerss.persist.repository.AccountRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -18,24 +18,24 @@ public class AccountRoleService {
 
     private final AccountRoleRepository accountRoleRepository;
 
-    public Integer save(AccountRoleDTO vO) {
+    public Long save(AccountRoleDTO vO) {
         AccountRole bean = new AccountRole();
         BeanUtils.copyProperties(vO, bean);
         bean = accountRoleRepository.save(bean);
         return bean.getAccountRoleId();
     }
 
-    public void delete(Integer id) {
+    public void delete(Long id) {
         accountRoleRepository.deleteByAccountRoleId(id);
     }
 
-    public void update(Integer id, AccountRoleDTO vO) {
+    public void update(Long id, AccountRoleDTO vO) {
         AccountRole bean = requireOne(id);
         BeanUtils.copyProperties(vO, bean);
         accountRoleRepository.save(bean);
     }
 
-    public AccountRoleDTO getById(Integer id) {
+    public AccountRoleDTO getById(Long id) {
         AccountRole original = requireOne(id);
         return toDTO(original);
     }
@@ -50,7 +50,7 @@ public class AccountRoleService {
         return bean;
     }
 
-    private AccountRole requireOne(Integer id) {
+    private AccountRole requireOne(Long id) {
         return accountRoleRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Resource not found: " + id));
     }

@@ -51,16 +51,16 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성.
-    public String createAccessToken(Integer accountId, String email, List<String> roles){
+    public String createAccessToken(Long accountId, String email, List<String> roles){
         return this.createToken(accountId, email, roles, accessTokenValidTime);
     }
     // Refresh Token 생성.
-    public String createRefreshToken(Integer accountId, String email, List<String> roles) {
+    public String createRefreshToken(Long accountId, String email, List<String> roles) {
         return this.createToken(accountId, email, roles, refreshTokenValidTime);
     }
 
     // Create token
-    public String createToken(Integer accountId, String email, List<String> roles, long tokenValid) {
+    public String createToken(Long accountId, String email, List<String> roles, long tokenValid) {
         Claims claims = Jwts.claims();
         claims.setSubject(email); // claims 생성 및 payload 설정
         claims.put("accountId", accountId);
@@ -106,8 +106,8 @@ public class JwtTokenProvider {
 
 
     // 토큰에서 회원 정보 추출
-    public Integer getUserId(String token) {
-        return Integer.parseInt(Jwts.parserBuilder()
+    public Long getUserId(String token) {
+        return Long.parseLong(Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)

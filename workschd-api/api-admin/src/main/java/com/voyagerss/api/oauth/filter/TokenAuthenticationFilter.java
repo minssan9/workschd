@@ -61,7 +61,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
                     if (validateRefreshToken && isRefreshToken) {
                         /// 리프레시 토큰으로 Account Id 정보 가져오기
-                        Integer accountId = jwtTokenProvider.getUserId(refreshToken);
+                        Long accountId = jwtTokenProvider.getUserId(refreshToken);
                         /// 리프레시 토큰으로 이메일 정보 가져오기
                         String email = jwtTokenProvider.getUserEmail(refreshToken);
                         /// 이메일로 권한정보 받아오기

@@ -16,8 +16,6 @@
         "tab.activeBackground": "#ffffff",
         // 비활성인 탭 배경색
         "tab.inactiveBackground": "#ebebeb", 
-        // 상단 타이틀 글자색
-        "titleBar.activeForeground": "#d3d3d3",
         // 하단 상태 배경색
         "statusBar.background": "#acacac",
         // Editor font weight
@@ -28,5 +26,8 @@
         "editor.fontSize": 13,
         // Editor line height
         "editor.lineHeight": 12,
+        // 상단 타이틀 글자색 
+        "titleBar.activeForeground": "#141414",
+        // composer font size 
     },
 }

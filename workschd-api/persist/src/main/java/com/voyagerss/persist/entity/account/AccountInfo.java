@@ -1,9 +1,11 @@
-package com.voyagerss.persist.entity;
+package com.voyagerss.persist.entity.account;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.voyagerss.persist.component.converter.IntegerArrayConverter;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.AccountInfoDTO;
+import com.voyagerss.persist.entity.BaseEntity;
+import com.voyagerss.persist.entity.EmployeeOffDates;
+import com.voyagerss.persist.entity.PreferredWorkDay;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +13,7 @@ import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -51,7 +51,7 @@ public class AccountInfo extends BaseEntity implements Serializable {
     private EmployeeType employeeType; // FULL_TIME, PART_TIME, TEMPORARY
 
     @OneToMany(mappedBy = "accountInfo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PreferredWorkDay> preferredWorkDays;
+    private List<PreferredWorkDay> employeePreferreds;
 
     @OneToMany(mappedBy = "accountInfo", fetch = FetchType.LAZY)
     private List<EmployeeOffDates> offDates; // 휴무 일자로 지정된 날들
@@ -71,21 +71,10 @@ public class AccountInfo extends BaseEntity implements Serializable {
     public void setAccountInfo(AccountInfoDTO vO) {
     }
 
-    // 직원의 선호 요일을 기준으로 근무 가능 여부 확인
-    public boolean isPreferredDay(LocalDate date) {
-        return date.getDayOfWeek().toString().equals(preferredDay);
-    }
-
-    // 휴무할 수 없는 요일 추가 (예: 주말)
-    public void addUnavailableDayOfWeek(Integer dayOfWeek) {
-        offDaysOfWeek.add(dayOfWeek);
-    }
-
     // 직원의 근무 가능 여부를 확인하는 메서드
     public boolean isAvailable(LocalDate date) {
         // 지정된 휴무일이거나, 근무할 수 없는 요일인 경우 false
-        if (offDates.stream().anyMatch(offDates -> offDates.getOffDate().equals(date)) ||
-                offDaysOfWeek.contains(date.getDayOfWeek().toString())) {
+        if (offDates.stream().anyMatch(offDates -> offDates.getOffDate().equals(date))  ) {
             return false;
         }
         return true;

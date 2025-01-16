@@ -2,7 +2,7 @@ package com.voyagerss.persist.dto;
 
 
 import com.voyagerss.persist.EnumMaster;
-import com.voyagerss.persist.entity.Account;
+import com.voyagerss.persist.entity.account.Account;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Data
 public class AccountDTO extends BaseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-    private Integer accountId;
+    private Long accountId;
 
     private String username;
 
@@ -44,7 +44,7 @@ public class AccountDTO extends BaseDTO implements Serializable {
     private EnumMaster.ProviderType providerType;
 
     private String userId;
-    private Integer accountSnsId;
+    private Long accountSnsId;
     private LocalDateTime expired;
     private String snsAccount;
 

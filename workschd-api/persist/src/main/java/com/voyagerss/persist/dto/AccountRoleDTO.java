@@ -1,7 +1,7 @@
 package com.voyagerss.persist.dto;
 
 
-import com.voyagerss.persist.entity.AccountRole;
+import com.voyagerss.persist.entity.account.AccountRole;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 public class AccountRoleDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-    private Integer accountId;
+    private Long accountId;
 
     private Integer accountRoleId;
 

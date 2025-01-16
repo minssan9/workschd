@@ -5,9 +5,9 @@ import com.voyagerss.api.oauth.info.OAuth2UserInfo;
 import com.voyagerss.api.oauth.info.OAuth2UserInfoFactory;
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountDTO;
-import com.voyagerss.persist.entity.Account;
-import com.voyagerss.persist.entity.AccountRole;
-import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.entity.account.Account;
+import com.voyagerss.persist.entity.account.AccountRole;
+import com.voyagerss.persist.entity.account.AccountSns;
 import com.voyagerss.persist.repository.AccountRepository;
 import com.voyagerss.persist.repository.AccountRoleRepository;
 import com.voyagerss.persist.repository.AccountSnsRepository;
@@ -15,21 +15,16 @@ import com.voyagerss.persist.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Transactional

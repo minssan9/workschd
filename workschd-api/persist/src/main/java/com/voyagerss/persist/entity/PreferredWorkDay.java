@@ -1,20 +1,17 @@
 package com.voyagerss.persist.entity;
 
+import com.voyagerss.persist.entity.account.AccountInfo;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.io.Serializable;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-@Getter
-@Setter
+@Data
 @Entity
-@Table(name = "preferred_work_day")
-public class PreferredWorkDay extends BaseEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
+@Table(name = "preferred_work_days")
+public class PreferredWorkDay {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,7 +1,7 @@
 package com.voyagerss.persist.service;
 
 import com.voyagerss.persist.dto.EmployeeDTO;
-import com.voyagerss.persist.entity.AccountInfo;
+import com.voyagerss.persist.entity.account.AccountInfo;
 import com.voyagerss.persist.repository.AccountInfoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

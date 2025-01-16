@@ -1,7 +1,7 @@
 package com.voyagerss.persist.service;
 
 import com.voyagerss.persist.dto.BranchDTO;
-import com.voyagerss.persist.entity.Account;
+import com.voyagerss.persist.entity.account.Account;
 import com.voyagerss.persist.entity.Team;
 import com.voyagerss.persist.entity.TeamMember;
 import com.voyagerss.persist.repository.AccountRepository;

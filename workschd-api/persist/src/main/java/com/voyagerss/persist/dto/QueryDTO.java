@@ -32,7 +32,7 @@ public class QueryDTO {
     private Integer courseId;
     private Integer contentId;
 
-    private Integer accountId;
+    private Long accountId;
     private Integer teacherId;
     private Integer studentId;
 

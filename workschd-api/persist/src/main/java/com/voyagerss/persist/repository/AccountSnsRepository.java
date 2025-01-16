@@ -1,7 +1,7 @@
 package com.voyagerss.persist.repository;
 
 import com.voyagerss.persist.EnumMaster;
-import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.entity.account.AccountSns;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,5 +15,5 @@ public interface AccountSnsRepository extends JpaRepository<AccountSns, Long> {
 
     AccountSns findBySnsEmailAndRefreshToken(String SnsEmail, String refreshToken);
 
-    boolean existsByAccount_AccountIdAndProviderType(Integer accountId, EnumMaster.ProviderType providerType);
+    boolean existsByAccount_AccountIdAndProviderType(Long accountId, EnumMaster.ProviderType providerType);
 }

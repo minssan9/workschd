@@ -10,6 +10,7 @@ import com.voyagerss.persist.component.util.QueryDslUtil;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.QueryDTO;
 import com.voyagerss.persist.entity.*;
+import com.voyagerss.persist.entity.account.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -147,7 +148,7 @@ public class AccountRepositorySupport extends QuerydslRepositorySupport {
 //        return accounts;
 //    }
 
-    private BooleanExpression eqAccountId(Integer accountId) {
+    private BooleanExpression eqAccountId(Long accountId) {
         if (accountId == null) return null;
         return account.accountId.eq(accountId);
     }
@@ -176,7 +177,7 @@ public class AccountRepositorySupport extends QuerydslRepositorySupport {
         return accountSns.accessToken.eq(accessToken);
     }
 
-    private BooleanExpression eqStatus(Integer teacherId) {
+    private BooleanExpression eqStatus(Long teacherId) {
         if (teacherId == null) return null;
         return account.accountId.eq(teacherId);
     }

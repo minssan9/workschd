@@ -1,7 +1,7 @@
 package com.voyagerss.api.oauth.entity;
 
-import com.voyagerss.persist.entity.Account;
-import com.voyagerss.persist.entity.AccountRole;
+import com.voyagerss.persist.entity.account.Account;
+import com.voyagerss.persist.entity.account.AccountRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
     private final Collection<GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public Integer getUserId(){
-        return Integer.parseInt(userId);
+    public Long getUserId(){
+        return Long.getLong(userId);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
         );
     }
 
-    public static UserPrincipal create(Integer accountId, List<String> roles){
+    public static UserPrincipal create(Long accountId, List<String> roles){
 
         Collection<GrantedAuthority> authorities =
                 roles.stream()

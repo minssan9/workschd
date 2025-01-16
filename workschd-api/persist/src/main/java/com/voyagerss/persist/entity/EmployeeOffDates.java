@@ -1,5 +1,6 @@
 package com.voyagerss.persist.entity;
 
+import com.voyagerss.persist.entity.account.AccountInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

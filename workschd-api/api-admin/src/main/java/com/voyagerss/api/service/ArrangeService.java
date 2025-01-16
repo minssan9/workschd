@@ -1,7 +1,7 @@
 package com.voyagerss.api.service;
 
 import com.voyagerss.persist.dto.AttendanceDTO;
-import com.voyagerss.persist.entity.AccountInfo;
+import com.voyagerss.persist.entity.account.AccountInfo;
 import com.voyagerss.persist.entity.EmployeeOffDates;
 import com.voyagerss.persist.service.AttendanceService;
 import com.voyagerss.persist.service.EmployeeService;
@@ -68,11 +68,11 @@ public class ArrangeService {
         // 조건에 걸리지 않는 직원 우선 배정
         for (AccountInfo accountInfo : availableAccountInfos) {
             if (assigned.size() >= requiredStaff) break;
-            if (accountInfo.getPreferredDay().equals(date.getDayOfWeek().toString())
-//                    && !accountEmployee.hasExceededOffDays(maxOffDaysPerMonth.getOrDefault(date.getMonthValue(), Integer.MAX_VALUE)) &&
-            ) {
-                assigned.add(accountInfo);
-            }
+//            if (accountInfo.getPreferredDay().equals(date.getDayOfWeek().toString())
+////                    && !accountEmployee.hasExceededOffDays(maxOffDaysPerMonth.getOrDefault(date.getMonthValue(), Integer.MAX_VALUE)) &&
+//            ) {
+//                assigned.add(accountInfo);
+//            }
         }
 
         // 여전히 최소 인원에 도달하지 못했을 경우, 나머지 직원 랜덤 배정
@@ -102,10 +102,10 @@ public class ArrangeService {
             for (AccountInfo accountInfo : accountInfos) {
                 // 직원의 출근 불가능 요일 또는 출근 불가능 일자가 있는지 확인
                 Set<LocalDate> offDates = accountInfo.getOffDates().stream().map(EmployeeOffDates::getOffDate).collect(Collectors.toSet());
-                Set<Integer> unavailableDays = accountInfo.getOffDaysOfWeek();
+
 
                 // 직원이 해당 일에 근무할 수 있는지 확인
-                if (offDates.contains(currentDate) || unavailableDays.contains(dayOfWeek)) {
+                if (offDates.contains(currentDate) ) {
                     continue; // 근무 불가능한 요일이나 일자면 건너뜀
                 }
 

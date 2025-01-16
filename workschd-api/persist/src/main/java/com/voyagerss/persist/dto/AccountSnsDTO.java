@@ -2,9 +2,8 @@ package com.voyagerss.persist.dto;
 
 
 import com.voyagerss.persist.EnumMaster;
-import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.entity.account.AccountSns;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
@@ -14,9 +13,9 @@ import java.time.LocalDateTime;
 @Data
 public class AccountSnsDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-    private Integer accountId;
+    private Long accountId;
 
-    private Integer accountSnsId;
+    private Long accountSnsId;
 
     private String userId;
 

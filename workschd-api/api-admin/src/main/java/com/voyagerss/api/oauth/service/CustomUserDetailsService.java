@@ -1,9 +1,9 @@
 package com.voyagerss.api.oauth.service;
 
 import com.voyagerss.api.oauth.entity.UserPrincipal;
-import com.voyagerss.persist.entity.Account;
-import com.voyagerss.persist.entity.AccountRole;
-import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.entity.account.Account;
+import com.voyagerss.persist.entity.account.AccountRole;
+import com.voyagerss.persist.entity.account.AccountSns;
 import com.voyagerss.persist.repository.AccountRepository;
 import com.voyagerss.persist.repository.AccountSnsRepository;
 import lombok.RequiredArgsConstructor;
