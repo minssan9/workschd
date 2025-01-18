@@ -15,9 +15,9 @@ const userStore = useUserStore()
 const token = route.query.token
 
 const redirect = async () => {
-  await userStore.fetchUser()
   if (token) {
-    userStore.login(token)
+    await userStore.login(token)
+    await userStore.fetchUser()
     try {
       const redirectPath = Cookies.get('redirect') || null
       

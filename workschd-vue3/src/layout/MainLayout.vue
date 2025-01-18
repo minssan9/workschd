@@ -25,11 +25,10 @@
         :width="200" 
         :breakpoint="700" 
         bordered
-        :model-value="drawerLeft"
         @update:model-value="layoutStore.setLeftDrawer"
       >
         <div class="drawer-header">Left Menu</div>
-        <q-scroll-area class="fit">
+        <q-scroll-area class="fit drawer-side">
           <q-list>
             <q-item v-for="route in routes" :key="route.name" :to="{ name: route.name }" clickable v-ripple>
               <q-item-section>{{ route.name }}</q-item-section>
@@ -46,11 +45,10 @@
         :width="200" 
         :breakpoint="700" 
         bordered
-        :model-value="drawerRight"
         @update:model-value="layoutStore.setRightDrawer"
       >
         <div class="drawer-header">Right Menu</div>
-        <q-scroll-area style="height: calc(100% - 150px); margin-top: 40px; border-right: 1px solid #ddd">
+        <q-scroll-area class="drawer-side">
           <div class="q-pa-sm">
             <h5>{{ $t('greeting') }}</h5>
             <h6>{{ $t('farewell') }}</h6>
@@ -124,4 +122,8 @@ onMounted(() => {
 
 <style lang="scss">
 @import "@/scss/layout.scss";
+
+.drawer-side {
+  height: calc(100vh - 190px);
+}
 </style>
