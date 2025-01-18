@@ -14,6 +14,7 @@ import com.voyagerss.persist.repository.AccountSnsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -167,6 +168,12 @@ public class AccountService {
         return accountRepositorySupport.getAccountDtoList(queryDTO).stream()
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    public AccountDTO getAccountDtoByEmail(String email) {
+        Account account = accountRepository.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        return toDTO(account);
     }
 
 }

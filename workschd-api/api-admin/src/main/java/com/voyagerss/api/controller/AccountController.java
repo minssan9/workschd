@@ -1,10 +1,12 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.api.oauth.entity.UserPrincipal;
+import com.voyagerss.api.oauth.token.JwtTokenProvider;
 import com.voyagerss.persist.component.exception.CommonException;
 import com.voyagerss.persist.component.exception.CommonExceptionType;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.AccountInfoDTO;
+import com.voyagerss.persist.dto.AccountRoleDTO;
 import com.voyagerss.persist.dto.QueryDTO;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.service.AccountInfoService;
@@ -12,6 +14,8 @@ import com.voyagerss.persist.service.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
@@ -28,7 +32,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtTokenProvider;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +49,6 @@ public class AccountController {
     private final AccountInfoService accountInfoService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
-    private final UserService userService;
 
     @GetMapping
     public ResponseEntity getUserByAuth(HttpServletRequest request) {
@@ -129,7 +131,16 @@ public class AccountController {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = tokenProvider.createToken(authentication);
+            
+            // Get user details from AccountService
+            AccountDTO accountDTO = accountService.getAccountDtoByEmail(loginRequest.getUsername());
+            
+            // Create token using JwtTokenProvider
+            String token = tokenProvider.createAccessToken(
+                accountDTO.getAccountId(),
+                accountDTO.getEmail(),
+                accountDTO.getAccountRoles().stream().map(AccountRoleDTO::getRoleType).toList()
+            );
 
             return ResponseEntity.ok(new AuthResponse(token));
         } catch (AuthenticationException e) {
