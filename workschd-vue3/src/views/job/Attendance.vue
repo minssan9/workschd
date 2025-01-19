@@ -2,7 +2,7 @@
   <q-page padding>
     <q-form @submit="handleSubmit" @reset="handleReset">
       <q-select
-          v-model="attendance.branch_id"
+          v-model="attendance.branchId"
           label="Branch"
           :options="branches"
           option-value="id"
@@ -10,7 +10,7 @@
           required
       />
       <q-select
-          v-model="attendance.task_id"
+          v-model="attendance.taskId"
           label="Task"
           :options="tasks"
           option-value="id"
@@ -18,17 +18,17 @@
           required
       />
       <q-input
-          v-model="attendance.actual_start_time"
+          v-model="attendance.actualStartTime"
           label="Actual Start Time"
           type="datetime-local"
       />
       <q-input
-          v-model="attendance.actual_end_time"
+          v-model="attendance.actualEndTime"
           label="Actual End Time"
           type="datetime-local"
       />
       <q-input
-          v-model="attendance.calculated_daily_wage"
+          v-model="attendance.calculatedDailyWage"
           label="Calculated Daily Wage"
           type="number"
       />
@@ -50,86 +50,90 @@
   </q-page>
 </template>
 
-<script>
-import { ref } from 'vue';
-import { AgGridVue } from 'ag-grid-vue3';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useQuasar } from 'quasar';
+import apiAttendance, { AttendanceDTO } from '@/api/modules/api-attendance';
+import apiBranch from '@/api/modules/api-branch';
+import apiTask from '@/api/modules/api-task';
 
-export default {
-  name: 'AttendancePage',
-  components: {
-    AgGridVue
-  },
-  setup() {
-    const attendance = ref({
-      branch_id: null,
-      task_id: null,
-      actual_start_time: '',
-      actual_end_time: '',
-      calculated_daily_wage: 0
+const $q = useQuasar();
+
+const attendance = ref<AttendanceDTO>({
+  branchId: 0,
+  taskId: 0,
+  calculatedDailyWage: 0,
+  employeeId: 0, // This should be set from logged in user
+  attendanceDate: new Date().toISOString().split('T')[0],
+  dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
+  startTime: '',
+  endTime: ''
+});
+
+const branches = ref([]);
+const tasks = ref([]);
+const rowData = ref([]);
+
+const loadBranches = async () => {
+  try {
+    const response = await apiBranch.getList();
+    branches.value = response.data;
+  } catch (error) {
+    $q.notify({
+      color: 'negative',
+      message: 'Failed to load branches'
     });
-
-    const branches = ref([
-      { id: 1, name: 'Branch 1' },
-      { id: 2, name: 'Branch 2' }
-      // 추가 지점 데이터를 여기에 추가하세요.
-    ]);
-
-    const tasks = ref([
-      { id: 1 },
-      { id: 2 }
-      // 추가 업무 데이터를 여기에 추가하세요.
-    ]);
-
-    const rowData = ref([]);
-    const columnDefs = ref([
-      { headerName: 'Branch', field: 'branch_id' },
-      { headerName: 'Task', field: 'task_id' },
-      { headerName: 'Actual Start Time', field: 'actual_start_time' },
-      { headerName: 'Actual End Time', field: 'actual_end_time' },
-      { headerName: 'Calculated Daily Wage', field: 'calculated_daily_wage' }
-    ]);
-
-    const onGridReady = async () => {
-      const response = await fetch('/api/attendance');
-      const data = await response.json();
-      rowData.value = data;
-    };
-
-    const handleSubmit = async () => {
-      await fetch('/api/attendance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(attendance.value)
-      });
-
-      await onGridReady();
-      handleReset();
-    };
-
-    const handleReset = () => {
-      attendance.value = {
-        branch_id: null,
-        task_id: null,
-        actual_start_time: '',
-        actual_end_time: '',
-        calculated_daily_wage: 0
-      };
-    };
-
-    return {
-      attendance,
-      branches,
-      tasks,
-      rowData,
-      columnDefs,
-      onGridReady,
-      handleSubmit,
-      handleReset
-    };
   }
 };
+
+const loadTasks = async () => {
+  try {
+    const response = await apiTask.getList();
+    tasks.value = response.data;
+  } catch (error) {
+    $q.notify({
+      color: 'negative',
+      message: 'Failed to load tasks'
+    });
+  }
+};
+
+const handleSubmit = async () => {
+  try {
+    await apiAttendance.create(attendance.value);
+    $q.notify({
+      color: 'positive',
+      message: 'Attendance recorded successfully'
+    });
+    await loadAttendanceData();
+    handleReset();
+  } catch (error) {
+    $q.notify({
+      color: 'negative',
+      message: 'Failed to record attendance'
+    });
+  }
+};
+
+const loadAttendanceData = async () => {
+  try {
+    const response = await apiAttendance.getByEmployeeId(attendance.value.employeeId);
+    rowData.value = response.data;
+  } catch (error) {
+    $q.notify({
+      color: 'negative',
+      message: 'Failed to load attendance data'
+    });
+  }
+};
+
+onMounted(() => {
+  loadBranches();
+  loadTasks();
+  loadAttendanceData();
+});
+
+// ... rest of your existing template and style
 </script>
 
 <style scoped>
