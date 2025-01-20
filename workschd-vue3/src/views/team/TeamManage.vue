@@ -1,117 +1,222 @@
 <template>
   <q-page class="q-pa-md">
-    <h1>Team Registration System</h1>
+    <div class="row q-mb-md justify-between items-center">
+      <h5 class="q-my-none">Team Management</h5>
+      <div>
+        <q-btn 
+          label="Register New Team" 
+          color="primary" 
+          @click="showRegistrationDialog = true"
+          class="q-mr-sm"
+        />
+        <q-btn-toggle
+          v-model="role"
+          :options="[
+            {label: 'Worker', value: 'worker'},
+            {label: 'Manager', value: 'manager'}
+          ]"
+        />
+      </div>
+    </div>
 
-    <!-- Worker Registration Form -->
-    <q-card v-if="role === 'worker'" class="q-mb-md">
-      <q-card-section>
-        <h2>Worker Registration</h2>
-        <q-form @submit="onWorkerSubmit" class="q-gutter-md">
-          <q-input v-model="teamId" label="Team ID" required />
-          <q-input v-model="name" label="Your Name" required />
-          <q-input v-model="location" label="Your Location" required />
-          <q-select
-              v-model="preferredPlaces"
-              label="Preferred Places"
-              multiple
-              :options="placeOptions"
-              use-chips
-              stack-label
-              :max-values="3"
-          />
-          <q-btn label="Submit" type="submit" color="primary" />
-        </q-form>
-      </q-card-section>
-    </q-card>
+    <!-- Team Grid -->
+    <div class="ag-theme-alpine" style="height: 400px">
+      <ag-grid-vue
+        :columnDefs="columnDefs"
+        :rowData="teams"
+        @grid-ready="onGridReady"
+        :defaultColDef="defaultColDef"
+      />
+    </div>
 
-    <!-- Manager Approval Section -->
-    <q-card v-if="role === 'manager'" class="q-mb-md">
-      <q-card-section>
-        <h2>Manager Approval</h2>
-        <q-list bordered separator>
-          <q-item v-for="request in requests" :key="request.id">
-            <q-item-section>
-              <q-item-label>{{ request.name }}</q-item-label>
-              <q-item-label caption>
-                Team ID: {{ request.teamId }}, Location: {{ request.location }}
-              </q-item-label>
-              <q-item-label caption>
-                Preferred Places: {{ request.preferredPlaces.join(', ') }}
-              </q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-btn label="Approve" color="positive" @click="approveRequest(request.id)" />
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card-section>
-    </q-card>
+    <!-- Registration Dialog -->
+    <q-dialog v-model="showRegistrationDialog">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Team Registration</div>
+        </q-card-section>
+        <q-card-section>
+          <TeamRegistration @team-registered="onTeamRegistered" />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
-    <!-- Role Selection -->
-    <q-btn-toggle
-        v-model="role"
-        :options="[
-        {label: 'Worker', value: 'worker'},
-        {label: 'Manager', value: 'manager'}
-      ]"
-        class="q-mt-lg"
-    />
+    <!-- Approval Dialog -->
+    <q-dialog v-model="approvalDialog">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Approve Join Requests</div>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <q-list dense>
+            <q-item v-for="request in selectedTeam?.joinRequests" :key="request.id">
+              <q-item-section>
+                <q-item-label>{{ request.name }}</q-item-label>
+                <q-item-label caption>{{ request.location }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-btn
+                  label="Approve"
+                  color="positive"
+                  dense
+                  @click="approveRequest(request)"
+                />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Close" color="primary" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
-<script>
-// - manager
-// request list
-// approve
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { AgGridVue } from 'ag-grid-vue3'
+import { useQuasar } from 'quasar'
+import TeamRegistration from './TeamRegistration.vue'
 
-export default {
-  name: 'TeamManage',
-  setup() {
-    const role = ref('worker')
-    const teamId = ref('')
-    const name = ref('')
-    const location = ref('')
-    const preferredPlaces = ref([])
-    const placeOptions = ['Place 1', 'Place 2', 'Place 3', 'Place 4', 'Place 5']
-    const requests = ref([])
+const $q = useQuasar()
+const role = ref('manager')
+const showRegistrationDialog = ref(false)
+const approvalDialog = ref(false)
+const selectedTeam = ref(null)
 
-    onMounted(() => {
-      // Simulating fetched data for manager
-      requests.value = [
-        { id: 1, teamId: 'T001', name: 'John Doe', location: 'New York', preferredPlaces: ['Place 1', 'Place 2'] },
-        { id: 2, teamId: 'T002', name: 'Jane Smith', location: 'Los Angeles', preferredPlaces: ['Place 3', 'Place 4'] },
-      ]
-    })
+interface Team {
+  id: number
+  name: string
+  location: string
+  memberCount: number
+  joinRequests: any[]
+  createdAt: string
+}
 
-    const onWorkerSubmit = () => {
-      console.log('Worker registration submitted:', {
-        teamId: teamId.value,
-        name: name.value,
-        location: location.value,
-        preferredPlaces: preferredPlaces.value
-      })
-      // Here you would typically send this data to your backend
-    }
+const teams = ref<Team[]>([])
 
-    const approveRequest = (id) => {
-      console.log('Request approved:', id)
-      // Here you would typically send an approval request to your backend
-      // and then remove the request from the list
-      requests.value = requests.value.filter(request => request.id !== id)
-    }
-
-    return {
-      role,
-      teamId,
-      name,
-      location,
-      preferredPlaces,
-      placeOptions,
-      requests,
-      onWorkerSubmit,
-      approveRequest
+const columnDefs = ref([
+  { 
+    headerName: 'Team Name', 
+    field: 'name',
+    sortable: true,
+    filter: true 
+  },
+  { 
+    headerName: 'Location', 
+    field: 'location',
+    sortable: true,
+    filter: true 
+  },
+  { 
+    headerName: 'Members', 
+    field: 'memberCount',
+    sortable: true,
+    filter: true 
+  },
+  { 
+    headerName: 'Pending Requests', 
+    field: 'joinRequests',
+    valueGetter: (params: any) => params.data.joinRequests.length,
+    sortable: true,
+    filter: true 
+  },
+  { 
+    headerName: 'Created At', 
+    field: 'createdAt',
+    sortable: true,
+    filter: true 
+  },
+  {
+    headerName: 'Actions',
+    cellRenderer: (params: any) => {
+      const hasRequests = params.data.joinRequests.length > 0
+      return `
+        <button 
+          class="q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle text-primary q-btn--actionable q-focusable q-hoverable"
+          ${!hasRequests ? 'disabled' : ''}
+        >
+          View Requests
+        </button>
+      `
+    },
+    onCellClicked: (params: any) => {
+      if (params.data.joinRequests.length > 0) {
+        selectedTeam.value = params.data
+        approvalDialog.value = true
+      }
     }
   }
+])
+
+const defaultColDef = {
+  flex: 1,
+  minWidth: 100,
+  resizable: true
 }
+
+const onGridReady = async () => {
+  try {
+    const response = await fetch('/api/teams')
+    teams.value = await response.json()
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to fetch teams'
+    })
+  }
+}
+
+const onTeamRegistered = (team: Team) => {
+  teams.value.push(team)
+  showRegistrationDialog.value = false
+  $q.notify({
+    type: 'positive',
+    message: 'Team registered successfully'
+  })
+}
+
+const approveRequest = async (request: any) => {
+  try {
+    await fetch(`/api/teams/${selectedTeam.value.id}/approve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(request)
+    })
+
+    // Remove request from the list
+    const teamIndex = teams.value.findIndex(t => t.id === selectedTeam.value.id)
+    if (teamIndex !== -1) {
+      const requestIndex = teams.value[teamIndex].joinRequests.findIndex(
+        r => r.id === request.id
+      )
+      if (requestIndex !== -1) {
+        teams.value[teamIndex].joinRequests.splice(requestIndex, 1)
+      }
+    }
+
+    $q.notify({
+      type: 'positive',
+      message: 'Request approved successfully'
+    })
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to approve request'
+    })
+  }
+}
+
+onMounted(() => {
+  onGridReady()
+})
 </script>
+
+<style scoped>
+.ag-theme-alpine {
+  width: 100%;
+}
+</style>

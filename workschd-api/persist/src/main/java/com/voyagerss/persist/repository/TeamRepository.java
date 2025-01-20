@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface TeamRepository extends JpaRepository<Team, Long>, JpaSpecificationExecutor<Team> {
 
     Optional<Team> findByInvitationHash(String hash);
+    Optional<Team> findByName(String name);
 }
