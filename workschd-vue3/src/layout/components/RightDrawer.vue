@@ -1,61 +1,167 @@
 <template>
   <q-drawer 
     side="right" 
-    v-model="drawerRight" 
-    show-if-above 
+    v-model="drawerRight"
     :width="200" 
     :breakpoint="700" 
     bordered
     @update:model-value="layoutStore.setRightDrawer"
   >
-    <div class="drawer-header">Right Menu</div>
+    <div class="drawer-header">
+      <q-avatar size="32px">
+        <img :src="userStore.user.profileImageUrl" />
+      </q-avatar>
+      <span class="q-ml-sm">{{ userStore.user.username || 'Guest' }}</span>
+    </div>
+
     <q-scroll-area class="drawer-side">
-      <div class="q-pa-sm">
-        <h5>{{ $t('greeting') }}</h5>
-        <h6>{{ $t('farewell') }}</h6>
-        <div class="language-selector">
-          <q-btn flat dense @click="changeLanguage('en')">English</q-btn>
-          <q-btn flat dense @click="changeLanguage('ko')">Korean</q-btn>
-          <q-btn flat dense @click="changeLanguage('fr')">French</q-btn>
-          <q-btn flat dense @click="changeLanguage('es')">Spanish</q-btn>
-          <q-btn flat dense @click="changeLanguage('ja')">Japanese</q-btn>
-        </div>
-        <div class="theme-toggle q-mt-md">
-          <q-btn flat dense @click="toggleDarkMode">
+      <q-list padding>
+        <!-- Account Section -->
+        <q-item-label header>Account</q-item-label>
+        <q-item clickable v-ripple :to="{ name: 'AccountPreferences' }">
+          <q-item-section avatar>
+            <q-icon name="person" />
+          </q-item-section>
+          <q-item-section>Profile</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple :to="{ name: 'AccountSchedule' }">
+          <q-item-section avatar>
+            <q-icon name="person" />
+          </q-item-section>
+          <q-item-section>Account Schedule</q-item-section>
+        </q-item>
+
+        <!-- Settings Section -->
+        <q-item-label header>Settings</q-item-label>
+        
+        <!-- Language Selector -->
+        <q-item>
+          <q-item-section avatar>
+            <q-icon name="language" />
+          </q-item-section>
+          <q-item-section>
+            <q-select
+              v-model="locale"
+              :options="languageOptions"
+              dense
+              outlined
+              emit-value
+              map-options
+            />
+          </q-item-section>
+        </q-item>
+
+        <!-- Theme Toggle -->
+        <q-item clickable v-ripple @click="toggleDarkMode">
+          <q-item-section avatar>
             <q-icon :name="$q.dark.isActive ? 'light_mode' : 'dark_mode'" />
+          </q-item-section>
+          <q-item-section>
             {{ $q.dark.isActive ? 'Light Mode' : 'Dark Mode' }}
-          </q-btn>
-        </div>
-      </div>
+          </q-item-section>
+        </q-item>
+
+        <!-- System Section -->
+        <q-item-label header>System</q-item-label>
+        <q-item clickable v-ripple @click="openHelp">
+          <q-item-section avatar>
+            <q-icon name="help" />
+          </q-item-section>
+          <q-item-section>Help</q-item-section>
+        </q-item>
+        
+        <q-item clickable v-ripple @click="openFeedback">
+          <q-item-section avatar>
+            <q-icon name="feedback" />
+          </q-item-section>
+          <q-item-section>Feedback</q-item-section>
+        </q-item>
+      </q-list>
     </q-scroll-area>
+
     <div class="drawer-footer">
-      <q-btn flat dense :to="{ name: 'login' }">Login</q-btn>
-      <q-btn flat dense @click="logout">Logout</q-btn>
+      <q-item v-if="!userStore.user.accountId" clickable v-ripple :to="{ name: 'login' }">
+        <q-item-section avatar>
+          <q-icon name="login" />
+        </q-item-section>
+        <q-item-section>Login</q-item-section>
+      </q-item>
+      <q-item v-else clickable v-ripple @click="logout">
+        <q-item-section avatar>
+          <q-icon name="logout" />
+        </q-item-section>
+        <q-item-section>Logout</q-item-section>
+      </q-item>
     </div>
   </q-drawer>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useLayoutStore } from '@/stores/modules/store_layout'
+import { useUserStore } from '@/stores/modules/store_user'
 import { storeToRefs } from 'pinia'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const layoutStore = useLayoutStore()
+const userStore = useUserStore()
 const { drawerRight } = storeToRefs(layoutStore)
 const $q = useQuasar()
 const { locale } = useI18n()
+
+const languageOptions = [
+  { label: 'English', value: 'en' },
+  { label: 'Korean', value: 'ko' },
+  { label: 'French', value: 'fr' }, 
+  { label: 'Spanish', value: 'es' },
+  { label: 'Japanese', value: 'ja' }
+]
 
 const toggleDarkMode = () => {
   $q.dark.set(!$q.dark.isActive)
 }
 
-const changeLanguage = (lang: string) => {
-  locale.value = lang
+const openHelp = () => {
+  window.open('https://your-help-documentation-url', '_blank')
 }
 
-// TODO: Implement logout functionality
-const logout = () => {
-  // Add logout logic here
+const openFeedback = () => {
+  window.open('https://your-feedback-form-url', '_blank')
 }
-</script> 
+
+const logout = async () => {
+  await userStore.logout()
+  router.push({ name: 'login' })
+}
+
+onMounted(() => {
+  console.log(drawerRight)
+})
+</script>
+
+<style scoped>
+.drawer-header {
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.drawer-side {
+  height: calc(100vh - 150px);
+}
+
+.drawer-footer {
+  position: fixed;
+  bottom: 0;
+  width: 200px;
+  border-top: 1px solid #ddd;
+}
+
+:deep(.q-item__section--avatar) {
+  min-width: 40px;
+}
+</style> 

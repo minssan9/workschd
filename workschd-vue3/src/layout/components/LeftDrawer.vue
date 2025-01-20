@@ -1,8 +1,6 @@
 <template>
   <q-drawer 
-
     v-model="drawerLeft" 
-    show-if-above 
     :width="200" 
     :breakpoint="700" 
     bordered
@@ -21,11 +19,17 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useLayoutStore } from '@/stores/modules/store_layout'
 import { storeToRefs } from 'pinia'
 import router from "@/router/index.js"
 
 const layoutStore = useLayoutStore()
 const { drawerLeft } = storeToRefs(layoutStore)
-const routes = router.options.routes.filter(route => route.name !== 'login')
+const routes = router.options.routes.filter(route => !route.hidden)
+
+
+onMounted(() => {
+  console.log(drawerLeft)
+})
 </script> 

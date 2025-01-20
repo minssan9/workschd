@@ -55,7 +55,7 @@ import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import apiAttendance, { AttendanceDTO } from '@/api/modules/api-attendance';
 import apiBranch from '@/api/modules/api-branch';
-import apiTask from '@/api/modules/api-task';
+// import apiTask from '@/api/modules/api-task';
 
 const $q = useQuasar();
 
@@ -88,8 +88,8 @@ const loadBranches = async () => {
 
 const loadTasks = async () => {
   try {
-    const response = await apiTask.getList();
-    tasks.value = response.data;
+    // const response = await apiTask.getList();
+    // tasks.value = response.data;
   } catch (error) {
     $q.notify({
       color: 'negative',

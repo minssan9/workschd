@@ -6,7 +6,8 @@ interface LayoutState {
 }
 
 export const useLayoutStore = defineStore('layout', {
-  state: (): LayoutState => ({
+  state: () => ({
+    title: 'Scheduler',
     drawerLeft: false,
     drawerRight: false
   }),
