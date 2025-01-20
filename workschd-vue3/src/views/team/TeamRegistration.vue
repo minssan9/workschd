@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-md">
-    <h1>Team Registration</h1>
+    <h5>Team Registration</h5>
     <q-card class="q-mt-md">
       <q-card-section>
         <q-form @submit="onSubmit" class="q-gutter-md">
