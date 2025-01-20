@@ -99,7 +99,7 @@ export const useUserStore = defineStore('user', {
                 throw error
             }
         },
-        login(token) {
+        async login(token) {
             if (token) {
                 Cookies.set('accessToken', token)
 
@@ -114,7 +114,7 @@ export const useUserStore = defineStore('user', {
                           this.user = res
                           return res
                       })
-                      .then(account => {
+                      .then(async account => {
                           apiAccount.getAccountInfo(account.accountId)
                             .then(accountInfo => {
                                 if (accountInfo.accountId) {

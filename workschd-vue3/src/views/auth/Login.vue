@@ -73,6 +73,7 @@
 import { ref } from 'vue'
 import apiAccount from "@/api/modules/api-account"
 import { removeAllCookies } from '@/utils/cookieUtils'
+import { useRouter } from 'vue-router'
 
 const VITE_CDN_URL = import.meta.env.VITE_CDN_URL
 
@@ -127,19 +128,29 @@ const loginForm = ref({
   password: ''
 })
 
-// Add login handler
+// Add router
+const router = useRouter()
+
+// Update login handler
 const handleLogin = async () => {
   try {
     const response = await apiAccount.login(loginForm.value)
-    if (response.data.success) {
-      // Handle successful login (store token, redirect, etc.)
-      alert('로그인 성공!')
+    if (response.data && response.data.token) {
+      // Redirect to the redirect page with token
+      router.push({
+        path: '/redirect',
+        query: { token: response.data.token }
+      })
     } else {
-      alert('로그인 실패: ' + response.data.message)
+      alert('로그인 실패: 토큰이 없습니다.')
     }
   } catch (error) {
     console.error('Login error:', error)
-    alert('로그인 중 오류가 발생했습니다.')
+    if (error.response?.status === 401) {
+      alert('아이디 또는 비밀번호가 올바르지 않습니다.')
+    } else {
+      alert('로그인 중 오류가 발생했습니다.')
+    }
   }
 }
 </script>
