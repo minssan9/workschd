@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from "@/views/auth/Login.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,14 +10,26 @@ const router = createRouter({
     { path: '/about',             name: 'about',        component: () => import('@/views/AboutView.vue') },
     { path: '/job/list',          name: 'JobList',      component: () => import('@/views/job/JobList.vue') },
     { path: '/job/today',         name: 'JobToday',     component: () => import('@/views/job/JobToday.vue') },
+    { path: '/job/attendance',    name: 'Attendance',   component: () => import('@/views/job/Attendance.vue') },
+    { path: '/job/schedule',      name: 'Schedule',     component: () => import('@/views/job/ScheduleConfig.vue') },
     { path: '/team/register',     name: 'TeamRegister', component: () => import('@/views/team/TeamRegistration.vue') },
     { path: '/team/manage',       name: 'TeamManage',   component: () => import('@/views/team/TeamManage.vue') },
-
+    // { path: '/team/members',      name: 'TeamMembers',  component: () => import('@/views/team/TeamMembers.vue') },
+    { path: '/team/branch',       name: 'Branch',       component: () => import('@/views/team/Branch.vue') },
+    { path: '/team/workplace',    name: 'WorkPlace',    component: () => import('@/views/team/WorkPlace.vue') },
+    { path: '/team/employee',     name: 'Employee',     component: () => import('@/views/team/Employee.vue') },
+    { path: '/account/preferences', name: 'AccountPreferences', component: () => import('@/views/account/AccountPreferences.vue') },
     { path: '/create-team',        name: 'CreateTeam',     component: () => import('@/views/team/TeamRegistration.vue') },
     { path: '/join-team-request',  name: 'JoinTeamRequest', component: () => import('@/views/team/TeamRegistration.vue') },
     { path: '/register-workplace', name: 'RegisterWorkplace', component: () => import('@/views/team/TeamRegistration.vue') },
   ]
   /* eslint-enable */
+})
+
+// Add navigation guard if needed
+router.beforeEach((to, from, next) => {
+  // Add your navigation guard logic here
+  next()
 })
 
 export default router

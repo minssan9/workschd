@@ -21,63 +21,55 @@
   </q-page>
 </template>
 
-<script>
-import { ref } from 'vue';
-import { AgGridVue } from 'ag-grid-vue3';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useQuasar } from 'quasar';
+import apiBranch, { BranchDTO } from '@/api/modules/api-branch';
 
-export default {
-  name: 'BranchPage',
-  components: {
-    AgGridVue
-  },
-  setup() {
-    const branch = ref({
-      name: '',
-      region: ''
+const $q = useQuasar();
+
+const branch = ref<BranchDTO>({
+  name: '',
+  region: '',
+  address: ''
+});
+
+const rowData = ref([]);
+
+const loadBranches = async () => {
+  try {
+    const response = await apiBranch.getList();
+    rowData.value = response.data;
+  } catch (error) {
+    $q.notify({
+      color: 'negative',
+      message: 'Failed to load branches'
     });
-
-    const rowData = ref([]);
-    const columnDefs = ref([
-      { headerName: 'Branch Name', field: 'name' },
-      { headerName: 'Region', field: 'region' }
-    ]);
-
-    const onGridReady = async () => {
-      const response = await fetch('/api/branches');
-      const data = await response.json();
-      rowData.value = data;
-    };
-
-    const handleSubmit = async () => {
-      await fetch('/api/branches', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(branch.value)
-      });
-
-      await onGridReady();
-      handleReset();
-    };
-
-    const handleReset = () => {
-      branch.value = {
-        name: '',
-        region: ''
-      };
-    };
-
-    return {
-      branch,
-      rowData,
-      columnDefs,
-      onGridReady,
-      handleSubmit,
-      handleReset
-    };
   }
 };
+
+const handleSubmit = async () => {
+  try {
+    await apiBranch.create(branch.value);
+    $q.notify({
+      color: 'positive',
+      message: 'Branch created successfully'
+    });
+    await loadBranches();
+    handleReset();
+  } catch (error) {
+    $q.notify({
+      color: 'negative',
+      message: 'Failed to create branch'
+    });
+  }
+};
+
+onMounted(() => {
+  loadBranches();
+});
+
+// ... rest of your existing template and style
 </script>
 
 <style scoped>
