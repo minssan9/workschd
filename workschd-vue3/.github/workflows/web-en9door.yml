@@ -1,0 +1,122 @@
+name: web-en9door CD
+
+on:
+  push:
+    branches: [ release-en9door ] # release  push될 때 CD가 일어나도록 핸들링
+
+env:
+  VERSION: ${{ github.sha }}
+  DO_REPOSITORY_FULL_PATH: ${{ secrets.DO_REGISTRY}}/${{github.event.repository.name}}_${{ github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x] # 템플릿 기본값: [10.x, 12.x, 14.x]
+    steps:
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DDTHH-mm-ss # 다른 포맷으로 변경 가능(MomentJS format syntax)
+          utcOffset: "+09:00" # 한국 시간에 맞추기 위함
+
+      - name: Set Git Revision
+        id: set_revision
+        run: echo "REVISION=${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      # npm ci는 npm install과 같은 기능을 수행한다. 자세한 내용은 아래 링크 참조.
+      - run: npm install
+      # --if-present 옵션은 npm 스크립트가 존재할 때만 실행시키라는 의미이다.
+      # 만약 build 스크립트가 없는 경우, 오류 없이 지나간다.
+      #      - run: npm run build:${BRANCH_NAME} --if-present
+      - run: npm run build:${{github.ref_name}} --if-present
+      #      - run: npm test
+
+#      - name: Upload Build
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: dist
+#          path: dist
+#          retention-days: 1  # 7일 동안 아티팩트를 보관
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ env.DO_REPOSITORY_FULL_PATH }}:${{ env.VERSION }}
+          build-args: |
+            PROFILES=${{ github.ref_name }}
+      - name: Install SSH
+        run: sudo apt-get install openssh-client -y
+      - name: Resolve IP address from domain
+        run: echo "::set-output name=ip::$(dig +short en9doors.com)"
+
+  deploy-release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref_name == 'release-en9door'
+    steps:
+      - name: release deploy
+        run: echo "Condition met, Deploy release"
+
+      - name: Install SSH
+        run: sudo apt-get install openssh-client -y
+
+      - name: Resolve IP address from domain
+        run: echo "::set-output name=ip::$(dig +short en9doors.com)"
+
+      - name: Deploy to DigitalOcean Droplet@Image
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.DROPLET_HOST}}
+          username: ${{secrets.DROPLET_USERNAME}}
+          password: ${{secrets.DROPLET_KEY}}
+          script: |
+            sudo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.DO_REGISTRY }} -u ${{ github.actor }} --password-stdin
+            sudo docker pull ${{ env.DO_REPOSITORY_FULL_PATH }}:${{env.VERSION}} || true
+            sudo docker tag ${{ env.DO_REPOSITORY_FULL_PATH }}:${{env.VERSION}} ${{ env.DO_REPOSITORY_FULL_PATH }}:latest || true
+            sudo docker stop ${{github.event.repository.name }} || true
+            sudo docker rm -f ${{github.event.repository.name }} || true
+        continue-on-error: true
+
+      - name: Deploy to DigitalOcean Droplet@Run
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.DROPLET_HOST}}
+          username: ${{secrets.DROPLET_USERNAME}}
+          password: ${{secrets.DROPLET_KEY}}
+          script: | 
+            sudo docker run -it -d --name=${{github.event.repository.name }} --restart=always -p 80:80 -p 443:443 -m 128m -v /var/log/nginx:/var/log/nginx ${{ env.DO_REPOSITORY_FULL_PATH }}:${{env.VERSION}} 
+  
+
+#docker stop en9door_web && docker rm en9door_web
+#sudo docker run -it -d --name=en9door_web --restart=always --privileged \
+#  -p 80:80 -p 443:443 -m 128m \
+#  -v /var/log/nginx:/var/log/nginx \
+#  ghcr.io/minssan9/en9door_web_release-en9door:latest
+
+#  sudo docker run -it -d --name=en9door_web --restart=always  \
+#  -p 80:80 -p 443:443 -m 128m \
+#  -v /var/log/nginx:/var/log/nginx \
+#  ghcr.io/minssan9/en9door_web_release-en9door:bb3b7b069b497321e0c91f8af9aa47c5d263e967

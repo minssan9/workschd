@@ -7,11 +7,31 @@
     bordered
     @update:model-value="layoutStore.setRightDrawer"
   >
-    <div class="drawer-header">
-      <q-avatar size="32px">
-        <img :src="userStore.user.profileImageUrl" />
-      </q-avatar>
-      <span class="q-ml-sm">{{ userStore.user.username || 'Guest' }}</span>
+    <div class="drawer-header">      
+      <div class="row ">      
+        <div class="col-12">
+          <q-avatar size="32px">
+            <img :src="userStore.user.profileImageUrl" />
+          </q-avatar>
+          <span class="q-ml-sm">{{ userStore.user.username || 'Guest' }}</span>
+        </div>
+        <div class="col-12">
+          <q-list>
+            <q-item v-if="!userStore.user.accountId" clickable v-ripple :to="{ name: 'login' }">
+              <q-item-section avatar>
+                <q-icon name="login" />
+              </q-item-section>
+              <q-item-section>Login</q-item-section>
+            </q-item>
+            <q-item v-else clickable v-ripple @click="logout">
+              <q-item-section avatar>
+                <q-icon name="logout" />
+              </q-item-section>
+              <q-item-section>Logout</q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+      </div>
     </div>
 
     <q-scroll-area class="drawer-side">
@@ -79,19 +99,7 @@
       </q-list>
     </q-scroll-area>
 
-    <div class="drawer-footer">
-      <q-item v-if="!userStore.user.accountId" clickable v-ripple :to="{ name: 'login' }">
-        <q-item-section avatar>
-          <q-icon name="login" />
-        </q-item-section>
-        <q-item-section>Login</q-item-section>
-      </q-item>
-      <q-item v-else clickable v-ripple @click="logout">
-        <q-item-section avatar>
-          <q-icon name="logout" />
-        </q-item-section>
-        <q-item-section>Logout</q-item-section>
-      </q-item>
+    <div class="drawer-footer"> 
     </div>
   </q-drawer>
 </template>
@@ -151,7 +159,7 @@ onMounted(() => {
 }
 
 .drawer-side {
-  height: calc(100vh - 150px);
+  height: calc(100vh - 190px);
 }
 
 .drawer-footer {

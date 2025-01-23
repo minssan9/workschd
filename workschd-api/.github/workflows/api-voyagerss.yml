@@ -2,7 +2,7 @@ name: api-voyagerss CI/CD
 
 on:
   push:
-    branches: [ release-voyagerss ] # release  push될 때 CD가 일어나도록 핸들링
+    branches: [ release ] # release  push될 때 CD가 일어나도록 핸들링
 
 env:
   VERSION: ${{ github.sha }}

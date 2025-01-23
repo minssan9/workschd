@@ -17,7 +17,7 @@
         // 비활성인 탭 배경색
         "tab.inactiveBackground": "#ebebeb", 
         // 상단 타이틀 글자색
-        "titleBar.activeForeground": "#d3d3d3",
+        "titleBar.activeForeground": "#000000",
         // 하단 상태 배경색
         "statusBar.background": "#acacac",
         // Editor font weight

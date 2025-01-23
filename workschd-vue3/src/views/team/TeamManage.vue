@@ -97,39 +97,12 @@ interface Team {
 const teams = ref<Team[]>([])
 
 const columnDefs = ref([
-  { 
-    headerName: 'Team Name', 
-    field: 'name',
-    sortable: true,
-    filter: true 
-  },
-  { 
-    headerName: 'Location', 
-    field: 'location',
-    sortable: true,
-    filter: true 
-  },
-  { 
-    headerName: 'Members', 
-    field: 'memberCount',
-    sortable: true,
-    filter: true 
-  },
-  { 
-    headerName: 'Pending Requests', 
-    field: 'joinRequests',
-    valueGetter: (params: any) => params.data.joinRequests.length,
-    sortable: true,
-    filter: true 
-  },
-  { 
-    headerName: 'Created At', 
-    field: 'createdAt',
-    sortable: true,
-    filter: true 
-  },
-  {
-    headerName: 'Actions',
+  { headerName: 'Team Name',  field: 'name',  sortable: true,  filter: true },
+  { headerName: 'Location',  field: 'location',  sortable: true,  filter: true },
+  { headerName: 'Members',   field: 'memberCount', sortable: true, filter: true  },
+  { headerName: 'Pending Requests', field: 'joinRequests', valueGetter: (params: any) => params.data.joinRequests.length, sortable: true, filter: true },
+  { headerName: 'Created At',  field: 'createdAt',  sortable: true,  filter: true },
+  { headerName: 'Actions',
     cellRenderer: (params: any) => {
       const hasRequests = params.data.joinRequests.length > 0
       return `
