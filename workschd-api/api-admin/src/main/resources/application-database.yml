@@ -12,7 +12,7 @@ spring:
 #        useServerPrepStmts: false
   jpa: #JPA 설정
     open-in-view: false
-    show-sql: false
+    show-sql: true
     database-platform: org.hibernate.dialect.MySQLDialect
     properties:
       hibernate:
@@ -51,14 +51,6 @@ decorator:
       logging: slf4j
       enable-logging: false
 
-db_url: jdbc:mysql://db-mysql-sgp1-16043-do-user-17124156-0.i.db.ondigitalocean.com:25060/workschd?characterEncoding=utf8&serverTimezone=Asia/Seoul&useUnicode=true&createDatabaseIfNotExist=true
-
-
-db-voyager:
-  driver-class-name: com.mysql.cj.jdbc.Driver
-  url: ${db_url}
-  username: ${db_username}
-  password: ${db_password}
 
 
 ---
@@ -75,18 +67,15 @@ spring:
         format_sql: true
         highlight_sql: true
         show_sql: false          #하이버네이트가 실행하는 모든 SQL문을 콘솔로 출력해 준다.
-decorator:
-  datasource:
-    p6spy:
-      logging: slf4j
-      enable-logging: false
 
+db-voyager:
+  driver-class-name: com.mysql.cj.jdbc.Driver
+  url: ${db_url}
+  username: ${db_username}
+  password: ${db_password}
 ---
 spring.config.activate.on-profile: develop
 
 ---
 spring.config.activate.on-profile: release
-
-db_url: jdbc:mysql://db-mysql-sgp1-16043-do-user-17124156-0.i.db.ondigitalocean.com:25060/workschd?characterEncoding=utf8&serverTimezone=Asia/Seoul&useUnicode=true&createDatabaseIfNotExist=true
-
 

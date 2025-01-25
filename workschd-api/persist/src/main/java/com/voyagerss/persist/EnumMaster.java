@@ -1,11 +1,11 @@
 package com.voyagerss.persist;
 
+import java.util.Arrays;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Arrays;
 
 @Data
 public class EnumMaster {

@@ -21,70 +21,38 @@
 
     <!-- Team Grid -->
     <div class="ag-theme-alpine" style="height: 400px">
-      <ag-grid-vue
-        :columnDefs="columnDefs"
-        :rowData="teams"
-        @grid-ready="onGridReady"
-        :defaultColDef="defaultColDef"
+      <GridTeam
+          style="width: 100%; height: 100%"
+          :columnDefs="columnDefs"
+          :rowData="teams"
+          @grid-ready="onGridReady"
+          class="ag-theme-alpine-dark"
       />
     </div>
 
     <!-- Registration Dialog -->
-    <q-dialog v-model="showRegistrationDialog">
-      <q-card style="min-width: 350px">
-        <q-card-section>
-          <div class="text-h6">Team Registration</div>
-        </q-card-section>
-        <q-card-section>
-          <TeamRegistration @team-registered="onTeamRegistered" />
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <TeamRegistrationDialog
+      v-model="showRegistrationDialog"
+      @team-registered="onTeamRegistered"
+    />
 
     <!-- Approval Dialog -->
-    <q-dialog v-model="approvalDialog">
-      <q-card style="min-width: 350px">
-        <q-card-section>
-          <div class="text-h6">Approve Join Requests</div>
-        </q-card-section>
-        <q-card-section class="q-pt-none">
-          <q-list dense>
-            <q-item v-for="request in selectedTeam?.joinRequests" :key="request.id">
-              <q-item-section>
-                <q-item-label>{{ request.name }}</q-item-label>
-                <q-item-label caption>{{ request.location }}</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-btn
-                  label="Approve"
-                  color="positive"
-                  dense
-                  @click="approveRequest(request)"
-                />
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="Close" color="primary" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <TeamApproveDialog
+      v-model="approvalDialog"
+      :selected-team="selectedTeam"
+      @request-approved="handleRequestApproved"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { AgGridVue } from 'ag-grid-vue3'
 import { useQuasar } from 'quasar'
-import TeamRegistration from './TeamRegistration.vue'
+import GridTeam from "@/components/grid/GridTeam.vue";
+import TeamApproveDialog from './dialog/TeamApproveDialog.vue'
+import TeamRegistrationDialog from './dialog/TeamRegistrationDialog.vue'
 
-const $q = useQuasar()
-const role = ref('manager')
-const showRegistrationDialog = ref(false)
-const approvalDialog = ref(false)
-const selectedTeam = ref(null)
-
+// Types
 interface Team {
   id: number
   name: string
@@ -94,19 +62,69 @@ interface Team {
   createdAt: string
 }
 
-const teams = ref<Team[]>([])
+interface JoinRequest {
+  id: number
+  name: string
+  location: string
+}
 
+// State
+const $q = useQuasar()
+const role = ref('manager')
+const showRegistrationDialog = ref(false)
+const approvalDialog = ref(false)
+const selectedTeam = ref<Team | null>(null)
+
+const teams = ref<Team[]>([
+  {
+    id: 1,
+    name: "Team A",
+    location: "Location A",
+    memberCount: 12,
+    joinRequests: [
+      {
+        name: "emp A",
+        location: "KR Incheon"
+      },
+      {
+        name: "emp B",
+        location: "KR Incheon"
+      }
+    ],
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    name: "Team B",
+    location: "Location C",
+    memberCount: 8,
+    joinRequests: [
+      {
+        name: "emp A",
+        location: "KR Incheon"
+      },
+      {
+        name: "emp B",
+        location: "KR Incheon"
+      }
+    ],
+    createdAt: new Date().toISOString(),
+  },
+])
+
+
+// Grid Configuration
 const columnDefs = ref([
-  { headerName: 'Team Name',  field: 'name',  sortable: true,  filter: true },
-  { headerName: 'Location',  field: 'location',  sortable: true,  filter: true },
-  { headerName: 'Members',   field: 'memberCount', sortable: true, filter: true  },
-  { headerName: 'Pending Requests', field: 'joinRequests', valueGetter: (params: any) => params.data.joinRequests.length, sortable: true, filter: true },
-  { headerName: 'Created At',  field: 'createdAt',  sortable: true,  filter: true },
+  { headerName: 'Team Name',  field: 'name' },
+  { headerName: 'Location',  field: 'location' },
+  { headerName: 'Members',  field: 'memberCount' },
+  { headerName: 'Pending Requests',  field: 'joinRequests',  valueGetter: (params: any) => params.data.joinRequests.length },
+  { headerName: 'Created At',  field: 'createdAt' },
   { headerName: 'Actions',
     cellRenderer: (params: any) => {
       const hasRequests = params.data.joinRequests.length > 0
       return `
-        <button 
+        <button
           class="q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle text-primary q-btn--actionable q-focusable q-hoverable"
           ${!hasRequests ? 'disabled' : ''}
         >
@@ -123,45 +141,24 @@ const columnDefs = ref([
   }
 ])
 
-const defaultColDef = {
-  flex: 1,
-  minWidth: 100,
-  resizable: true
-}
-
-const onGridReady = async () => {
+// Methods
+const onGridReady = () => {
   try {
-    const response = await fetch('/api/teams')
-    teams.value = await response.json()
+    // const response = await fetch('/api/teams')
+    // teams.value = await response.json()
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to fetch teams'
-    })
+    $q.notify({ type: 'negative',  message: 'Failed to fetch teams' })
   }
 }
 
 const onTeamRegistered = (team: Team) => {
   teams.value.push(team)
-  showRegistrationDialog.value = false
-  $q.notify({
-    type: 'positive',
-    message: 'Team registered successfully'
-  })
 }
 
-const approveRequest = async (request: any) => {
+const handleRequestApproved = ({ teamId, request }: { teamId: number, request: JoinRequest }) => {
   try {
-    await fetch(`/api/teams/${selectedTeam.value.id}/approve`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(request)
-    })
-
     // Remove request from the list
-    const teamIndex = teams.value.findIndex(t => t.id === selectedTeam.value.id)
+    const teamIndex = teams.value.findIndex(t => t.id === teamId)
     if (teamIndex !== -1) {
       const requestIndex = teams.value[teamIndex].joinRequests.findIndex(
         r => r.id === request.id
@@ -170,21 +167,14 @@ const approveRequest = async (request: any) => {
         teams.value[teamIndex].joinRequests.splice(requestIndex, 1)
       }
     }
-
-    $q.notify({
-      type: 'positive',
-      message: 'Request approved successfully'
-    })
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to approve request'
-    })
+    $q.notify({ type: 'negative', message: 'Failed to approve request'})
   }
 }
 
+// Lifecycle
 onMounted(() => {
-  onGridReady()
+  // onGridReady()
 })
 </script>
 

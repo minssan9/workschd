@@ -1,7 +1,10 @@
 <template>
-  <q-page class="q-pa-md">
-    <h5>Team Registration</h5>
-    <q-card class="q-mt-md">
+  <q-dialog v-model="isOpen">
+    <q-card style="min-width: 800px">
+      <q-card-section>
+        <div class="text-h6">Team Registration</div>
+      </q-card-section>
+
       <q-card-section>
         <q-form @submit="onSubmit" class="q-gutter-md">
           <q-input
@@ -72,32 +75,31 @@
           </div>
         </q-form>
       </q-card-section>
-    </q-card>
 
-    <!-- Team Members Grid -->
-    <q-card class="q-mt-lg">
+      <!-- Team Members Grid -->
       <q-card-section>
         <div class="text-h6">Team Members</div>
         <div class="ag-theme-alpine" style="height: 300px; width: 100%;">
-          <ag-grid-vue
+          <GridTeam
             :columnDefs="columnDefs"
             :rowData="teamMembers"
-            :defaultColDef="defaultColDef"
             @grid-ready="onGridReady"
+            class="ag-theme-alpine-dark"
           />
         </div>
       </q-card-section>
     </q-card>
-  </q-page>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useQuasar } from 'quasar'
-import { AgGridVue } from 'ag-grid-vue3'
+import GridTeam from "@/components/grid/GridTeam.vue"
 
 const $q = useQuasar()
 const emit = defineEmits(['team-registered'])
+const isOpen = defineModel('modelValue')
 
 interface TeamForm {
   name: string
@@ -113,6 +115,20 @@ interface TeamMember {
   status: string
 }
 
+interface Team {
+  id: number
+  name: string
+  location: string
+  memberCount: number
+  joinRequests: any[]
+  createdAt: string
+}
+
+const props = defineProps<{
+  modelValue: boolean
+}>()
+
+// Form State
 const teamForm = ref<TeamForm>({
   name: '',
   location: '',
@@ -127,7 +143,7 @@ const placeOptions = [
 const inviteLink = ref('')
 const teamMembers = ref<TeamMember[]>([])
 
-// AG Grid Configuration
+// Grid Configuration
 const columnDefs = ref([
   { 
     headerName: 'Name', 
@@ -160,19 +176,15 @@ const columnDefs = ref([
   }
 ])
 
-const defaultColDef = {
-  flex: 1,
-  minWidth: 100,
-  resizable: true
-}
-
+// Methods
 const onGridReady = async () => {
   if (!teamForm.value.name) return
   
   try {
     const response = await fetch(`/api/teams/${teamForm.value.name}/members`)
     if (response.ok) {
-      teamMembers.value = await response.json()
+      const data = await response.json()
+      teamMembers.value = data
     }
   } catch (error) {
     console.error('Failed to fetch team members:', error)
@@ -232,8 +244,13 @@ const onSubmit = async () => {
       })
     })
 
+    if (!response.ok) {
+      throw new Error('Failed to register team')
+    }
+
     const newTeam = await response.json()
     emit('team-registered', newTeam)
+    isOpen.value = false
     
     // Reset form
     teamForm.value = {
@@ -257,15 +274,15 @@ const onSubmit = async () => {
     })
   }
 }
-
-onMounted(() => {
-  onGridReady()
-})
 </script>
 
 <style scoped>
-.q-page {
+.q-card {
   max-width: 800px;
   margin: auto;
 }
-</style>
+
+.ag-theme-alpine {
+  width: 100%;
+}
+</style> 
