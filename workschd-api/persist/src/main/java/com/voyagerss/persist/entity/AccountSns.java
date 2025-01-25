@@ -1,18 +1,30 @@
 package com.voyagerss.persist.entity;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import org.springframework.beans.BeanUtils;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountSnsDTO;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
@@ -34,7 +46,8 @@ public class AccountSns extends BaseEntity implements Serializable {
     @Column(name = "sns_email")
     private String snsEmail;
 
-    @Column(name = "provider_type", nullable = false)
+    @Column(name = "provider_type", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
     private EnumMaster.ProviderType providerType;
 
     @Column(name = "sns_phone")

@@ -29,13 +29,15 @@ public class EnumMaster {
         }
     }
 
+    @RequiredArgsConstructor
     @Getter
     public enum ProviderType {
-        GOOGLE,
-        FACEBOOK,
-        NAVER,
-        KAKAO,
-        LOCAL;
+        GOOGLE("GOOGLE"),
+        FACEBOOK("FACEBOOK"),
+        NAVER("NAVER"),
+        KAKAO("KAKAO"),
+        LOCAL("LOCAL");
+        private final String code;
     }
 
     @Getter

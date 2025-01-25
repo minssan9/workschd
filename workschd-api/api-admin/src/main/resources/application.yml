@@ -3,6 +3,6 @@ spring:
   profiles:
     active: local
   profiles.group:
-    "local"   : "default, api, swagger, security-api, database, logging, redis, google, secret"
-    "develop" : "default, api, swagger, security-api, database, logging, redis, google, secret"
-    "release" : "default, api, swagger, security-api, database, logging, redis, google, secret"
+    "local"   : "default, api, swagger, security-api, database, logging, cache, google, secret"
+    "develop" : "default, api, swagger, security-api, database, logging, cache, google, secret"
+    "release" : "default, api, swagger, security-api, database, logging, cache, google, secret"

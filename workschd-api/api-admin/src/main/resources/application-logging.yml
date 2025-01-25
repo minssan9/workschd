@@ -17,10 +17,6 @@ logging:
       info: "%clr(%5p){green}"
       debug: "%clr(%5p){blue}"
       trace: "%clr(%5p){faint}"
-  level:
-    root: info
-    org.hibernate.SQL: warn
-    com.hae.sf.iphm: debug
   file:
     name: /var/log/iphm-collector.log
   logback:
@@ -28,6 +24,10 @@ logging:
       max-file-size: 20MB
       max-history: 10
       file-name-pattern: /var/log/iphm-collector.%d{yyyy-MM-dd}.%i.log
+
+  level:
+    root: info
+    org.hibernate.SQL: debug
 
 ---
 spring.config.activate.on-profile: local

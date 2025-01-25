@@ -26,6 +26,7 @@ public class AccountRole extends BaseEntity implements Serializable {
     private Integer accountRoleId;
 
     @Column(name = "role_type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private EnumMaster.RoleType roleType;
 
     @JsonBackReference
