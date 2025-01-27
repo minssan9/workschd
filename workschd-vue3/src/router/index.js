@@ -29,7 +29,7 @@ const router = createRouter({
     { path: '/team', name: 'Team',
       children: [
         // { path: '/team/employee',           name: 'Employee',            component: () => import('@/views/team/TeamEmployee.vue') },
-        { path: '/register',           name: 'TeamRegister',             component: () => import('@/views/team/TeamRegistration.vue'),       hidden: true },
+        // { path: '/register',           name: 'TeamRegister',             component: () => import('@/views/team/TeamRegistration.vue'),       hidden: true },
         { path: '/join/:token',        name: 'TeamJoin',                 component: () => import('@/views/team/TeamJoin.vue'),               hidden: true,
           meta: {
             roles: ['WORKER', 'MANAGER', 'SCHEDULER'],
