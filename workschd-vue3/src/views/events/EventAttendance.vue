@@ -59,7 +59,7 @@ import apiBranch from '@/api/modules/api-branch';
 // import apiTask from '@/api/modules/api-task';
 
 const { t } = useI18n();
-const $q = useQuasar();
+const $q = useQuasar()
 
 const attendance = ref<AttendanceDTO>({
   branchId: 0,
@@ -82,7 +82,7 @@ const loadBranches = async () => {
     branches.value = response.data;
   } catch (error) {
     $q.notify({
-      color: 'negative',
+      type: 'negative',
       message: 'Failed to load branches'
     });
   }
@@ -90,11 +90,11 @@ const loadBranches = async () => {
 
 const loadTasks = async () => {
   try {
-    // const response = await apiTask.getList();
-    // tasks.value = response.data;
+    const response = await apiTask.getList();
+    tasks.value = response.data;
   } catch (error) {
     $q.notify({
-      color: 'negative',
+      type: 'negative',
       message: 'Failed to load tasks'
     });
   }
@@ -104,14 +104,13 @@ const handleSubmit = async () => {
   try {
     await apiAttendance.create(attendance.value);
     $q.notify({
-      color: 'positive',
+      type: 'positive',
       message: t('attendance.notification.success', 'Attendance recorded successfully')
     });
     await loadAttendanceData();
-    handleReset();
   } catch (error) {
     $q.notify({
-      color: 'negative',
+      type: 'negative',
       message: t('attendance.notification.error', 'Failed to record attendance')
     });
   }
@@ -123,7 +122,7 @@ const loadAttendanceData = async () => {
     rowData.value = response.data;
   } catch (error) {
     $q.notify({
-      color: 'negative',
+      type: 'negative',
       message: 'Failed to load attendance data'
     });
   }

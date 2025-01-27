@@ -5,8 +5,10 @@ const router = createRouter({
   /* eslint-disable */
   routes: [
     // Info
-    { path: '/',                        name: 'home',                     component: () => import('@/views/info/HomeView.vue') },
-    { path: '/about',                   name: 'about',                    component: () => import('@/views/info/AboutView.vue') },
+    { path: '/',                        name: 'home',                     component: () => import('@/views/info/Home.vue') },
+    { path: '/about',                   name: 'about',                    component: () => import('@/views/info/About.vue') },
+    { path: '/subscription',            name: 'Subscription',             component: () => import('@/views/info/Subscription.vue') },
+
 
     // Auth
     { path: '/login',                   name: 'login',                    component: () => import('@/views/auth/Login.vue'),          hidden: true },
@@ -19,9 +21,9 @@ const router = createRouter({
     // Job
     { path: '/event', name: 'Event',
       children: [
-        { path: '/list',                name: 'EventList',                  component: () => import('@/views/job/JobList.vue') },
+        { path: '/list',                name: 'EventList',                  component: () => import('@/views/events/EventList.vue') },
         // { path: '/job/today',               name: 'JobToday',                 component: () => import('@/views/job/JobToday.vue') },
-        { path: '/attendance',          name: 'EventAttendance',               component: () => import('@/views/job/Attendance.vue') },
+        { path: '/attendance',          name: 'EventAttendance',               component: () => import('@/views/events/EventAttendance.vue') },
       ]
     },
 

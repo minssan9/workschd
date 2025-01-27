@@ -145,10 +145,10 @@ const columnDefs = ref([
 ])
 
 // Methods
-const onGridReady = () => {
+const onGridReady = async () => {
   try {
-    // const response = await fetch('/api/teams')
-    // teams.value = await response.json()
+    const response = await fetch('/api/teams')
+    teams.value = await response.json()
   } catch (error) {
     $q.notify({ type: 'negative',  message: 'Failed to fetch teams' })
   }
@@ -177,7 +177,7 @@ const handleRequestApproved = ({ teamId, request }: { teamId: number, request: J
 
 // Lifecycle
 onMounted(() => {
-  // onGridReady()
+  onGridReady()
 })
 </script>
 
