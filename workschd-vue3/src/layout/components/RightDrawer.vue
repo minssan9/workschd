@@ -133,11 +133,11 @@ const toggleDarkMode = () => {
 }
 
 const openHelp = () => {
-  window.open('https://your-help-documentation-url', '_blank')
+  window.open(`${import.meta.env.VITE_API_WEB}/help`, '_blank')
 }
 
 const openFeedback = () => {
-  window.open('https://your-feedback-form-url', '_blank')
+  window.open(`${import.meta.env.VITE_API_WEB}/feedback`, '_blank')
 }
 
 const logout = async () => {

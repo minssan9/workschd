@@ -6,6 +6,11 @@ import { useCounterStore } from '@/stores/modules/counter.js'
 const { t } = useI18n()
 const counterStore = useCounterStore()
 
+// Add computed property for URLs
+const webUrl = computed(() => import.meta.env.VITE_API_WEB)
+const privacyUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/privacy-policy`)
+const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-term`)
+
 const count = computed(() => counterStore.count)
 const doubleCount = computed(() => counterStore.doubleCount)
 const increment = () => counterStore.increment()
@@ -18,14 +23,14 @@ const increment = () => counterStore.increment()
     <!-- Header Section -->
     <div class="row justify-center items-center q-pa-xl bg-primary text-white">
       <div class="col-12 col-md-8 text-center">
-        <h1 class="text-h3 q-mb-md">{{ t('home.header.title', '근무 스케줄표 자동 생성 서비스') }}</h1>
+        <h1 class="text-h4 q-mb-md">{{ t('home.header.title', '근무 스케줄표 자동 생성 서비스') }}</h1>
         <p class="text-h6 q-mb-lg">{{ t('home.header.subtitle', '효율적인 근무 관리를 위한 스케줄 자동화 솔루션') }}</p>
         <div class="row q-col-gutter-md justify-center">
           <div class="col-auto">
             <q-btn
               color="green"
               :label="t('home.header.button.start', '지금 시작하기')"
-              href="https://gamma.app"
+              :href="webUrl"
               class="q-px-md"
             />
           </div>
@@ -34,7 +39,7 @@ const increment = () => counterStore.increment()
               outline
               color="white"
               :label="t('home.header.button.learnMore', '더 알아보기')"
-              href="https://gamma.app"
+              :href="webUrl"
               class="q-px-md"
             />
           </div>
@@ -104,19 +109,57 @@ const increment = () => counterStore.increment()
       </div>
     </div>
 
-    <!-- Footer -->
-    <q-footer class="bg-grey-9 text-white q-pa-lg">
-      <div class="row items-center justify-between">
-        <div class="col-12 col-md-auto text-center text-md-left">
-          {{ t('home.footer.support', '문의 및 지원: 언제든 연락주세요. 친절하게 상담해 드리겠습니다.') }}
+    <!-- Updated Footer -->
+    <q-footer class="bg-grey-9 text-white">
+      <div class="q-pa-lg">
+        <div class="row items-center justify-between q-mb-md">
+          <div class="col-12 col-md-auto text-center text-md-left">
+            {{ t('home.footer.support', '문의 및 지원: 언제든 연락주세요. 친절하게 상담해 드리겠습니다.') }}
+          </div>
+          <div class="col-12 col-md-auto text-center text-md-right q-mt-sm q-mt-md-none">
+            <q-btn
+              color="white"
+              outline
+              :label="t('home.footer.button.contact', '문의하기')"
+              :href="webUrl"
+            />
+          </div>
         </div>
-        <div class="col-12 col-md-auto text-center text-md-right q-mt-sm q-mt-md-none">
-          <q-btn
-            color="white"
-            outline
-            :label="t('home.footer.button.contact', '문의하기')"
-            href="https://gamma.app"
-          />
+        
+        <!-- Legal Links -->
+        <div class="row justify-center q-mt-md">
+          <div class="col-auto">
+            <q-btn
+              flat
+              dense
+              color="white"
+              :label="t('home.footer.privacyPolicy', '개인정보처리방침')"
+              :href="privacyUrl"
+              target="_blank"
+              class="text-caption"
+            />
+          </div>
+          <div class="col-auto">
+            <q-separator vertical dark class="q-mx-sm" />
+          </div>
+          <div class="col-auto">
+            <q-btn
+              flat
+              dense
+              color="white"
+              :label="t('home.footer.terms', '이용약관')"
+              :href="termsUrl"
+              target="_blank"
+              class="text-caption"
+            />
+          </div>
+        </div>
+        
+        <!-- Copyright -->
+        <div class="row justify-center q-mt-sm">
+          <div class="col-auto text-caption text-grey-5">
+            © {{ new Date().getFullYear() }} {{ t('home.footer.copyright', '모든 권리 보유') }}
+          </div>
         </div>
       </div>
     </q-footer>
@@ -124,4 +167,10 @@ const increment = () => counterStore.increment()
 </template>
 
 <style lang="scss">
+.q-footer {
+  .q-separator.vertical {
+    height: 12px;
+    margin-top: 8px;
+  }
+}
 </style>

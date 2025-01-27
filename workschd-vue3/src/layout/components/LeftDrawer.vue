@@ -6,7 +6,7 @@
     bordered
     @update:model-value="layoutStore.setLeftDrawer"
   >
-    <div class="drawer-header">Left Menu</div>
+    <div class="drawer-header">Menus</div>
     <q-scroll-area class="drawer-side">
       <q-list>
         <template v-for="route in filteredRoutes" :key="route.name">
@@ -42,7 +42,7 @@
         </template>
       </q-list>
     </q-scroll-area>
-    <div class="drawer-footer">Left Drawer Footer</div>
+    <!-- <div class="drawer-footer">Left Drawer Footer</div> -->
   </q-drawer>
 </template>
 

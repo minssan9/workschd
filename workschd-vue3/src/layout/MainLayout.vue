@@ -19,6 +19,7 @@
           <slot></slot>
         </q-page>
       </q-page-container>
+      <Footer />
     </q-layout>
   </div>
 </template>
@@ -28,6 +29,7 @@ import { ref, onMounted } from 'vue'
 import MainHeader from './components/MainHeader.vue'
 import LeftDrawer from './components/LeftDrawer.vue'
 import RightDrawer from './components/RightDrawer.vue'
+import Footer from './components/Footer.vue'
 import { useLayoutStore } from '@/stores/modules/store_layout'
 import * as ChannelService from '@channel.io/channel-web-sdk-loader'
 

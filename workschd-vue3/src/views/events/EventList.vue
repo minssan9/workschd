@@ -6,34 +6,11 @@
       <q-btn color="primary" label="Add New Job" @click="showAddDialog = true" />
     </div>
 
-    <q-list bordered separator>
-      <q-item v-for="job in jobs" :key="job.id" clickable v-ripple>
-        <q-item-section>
-          <q-item-label>{{ job.place }}</q-item-label>
-          <q-item-label caption>
-            Slots: {{ job.slots }} |
-            Time: {{ job.startTime }} - {{ job.endTime }}
-          </q-item-label>
-        </q-item-section>
-        
-        <q-item-section side >
-          <!--  v-if="userRole === 'manager' && job.joinRequests.length > 0"        -->
-          <q-btn
-              label="Approve Joins"
-              color="positive"
-              @click="showApprovalDialog(job)"
-          />
-        </q-item-section>
-      </q-item>
-    </q-list>
-
     <div class="q-mt-lg">
-      <ag-grid-vue
-        class="ag-theme-alpine"
-        style="width: 100%; height: 400px;"
+      <GridDefault
         :rowData="rowData"
         :columnDefs="columnDefs"
-        @grid-ready="onGridReady"
+        @onCellClicked="handleCellClicked"
       />
     </div>
 
@@ -130,9 +107,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { AgGridVue } from 'ag-grid-vue3'
+import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
+import GridDefault from '@/components/grid/GridDefault.vue'
 
 const $q = useQuasar()
 
@@ -186,28 +163,46 @@ const stores = ref([
 
 const rowData = ref([])
 const columnDefs = ref([
-  { headerName: 'Branch', field: 'branch_id' },
-  { headerName: 'Store', field: 'store_id' },
-  { headerName: 'Additional Info', field: 'additional_info' },
-  { headerName: 'Task DateTime', field: 'task_datetime' },
-  { headerName: 'Start Time', field: 'start_time' },
-  { headerName: 'End Time', field: 'end_time' },
-  { headerName: 'Daily Wage', field: 'daily_wage' }
+  { field: 'branch_id', headerName: 'Branch' },
+  { field: 'store_id', headerName: 'Store' },
+  { field: 'additional_info', headerName: 'Additional Info' },
+  { field: 'task_datetime', headerName: 'Task DateTime' },
+  { field: 'start_time', headerName: 'Start Time' },
+  { field: 'end_time', headerName: 'End Time' },
+  { field: 'daily_wage', headerName: 'Daily Wage' }
 ])
 
 const showAddDialog = ref(false)
 const approvalDialogVisible = ref(false)
 const selectedJobRequests = ref<JoinRequest[]>([])
 
-const onGridReady = async () => {
+const handleCellClicked = (params: any) => {
+  console.log('Cell clicked:', params)
+  // Add your cell click handling logic here
+}
+
+const onSubmit = async () => {
   try {
-    const response = await fetch('/api/tasks')
-    const data = await response.json()
-    rowData.value = data
+    await fetch('/api/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newJob.value)
+    })
+
+    await loadGridData()
+    handleReset()
+    showAddDialog.value = false
+    
+    $q.notify({
+      type: 'positive',
+      message: 'Job registered successfully'
+    })
   } catch (error) {
     $q.notify({
       type: 'negative',
-      message: 'Failed to fetch tasks'
+      message: 'Failed to register job'
     })
   }
 }
@@ -236,40 +231,6 @@ const handleApproveRequest = async (request: JoinRequest) => {
   }
 }
 
-const onSubmit = async () => {
-  try {
-    await fetch('/api/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newJob.value)
-    })
-
-    await onGridReady()
-    handleReset()
-    showAddDialog.value = false
-    
-    $q.notify({
-      type: 'positive',
-      message: 'Job registered successfully'
-    })
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to register job'
-    })
-  }
-}
-
-const approvalDialog = ref(false)
-const selectedJob = ref<Job | null>(null)
-
-const showApprovalDialog = (job: Job) => {
-  selectedJob.value = job
-  approvalDialog.value = true
-}
-
 const handleReset = () => {
   newJob.value = {
     branch_id: null,
@@ -281,6 +242,23 @@ const handleReset = () => {
     daily_wage: 0
   }
 }
+
+const loadGridData = async () => {
+  try {
+    const response = await fetch('/api/tasks')
+    const data = await response.json()
+    rowData.value = data
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to fetch tasks'
+    })
+  }
+}
+
+onMounted(() => {
+  loadGridData()
+})
 </script>
 
 <style scoped>

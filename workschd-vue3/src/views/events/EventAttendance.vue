@@ -39,13 +39,11 @@
     </q-form>
 
     <div class="q-mt-lg">
-      <ag-grid-vue
-          class="ag-theme-alpine"
-          style="width: 100%; height: 400px;"
-          :rowData="rowData"
-          :columnDefs="columnDefs"
-          @grid-ready="onGridReady"
-      ></ag-grid-vue>
+      <GridDefault
+        :rowData="rowData"
+        :columnDefs="columnDefs"
+        @onCellClicked="handleCellClicked"
+      />
     </div>
   </q-page>
 </template>
@@ -54,18 +52,19 @@
 import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
+import GridDefault from '@/components/grid/GridDefault.vue';
 import apiAttendance, { AttendanceDTO } from '@/api/modules/api-attendance';
 import apiBranch from '@/api/modules/api-branch';
 // import apiTask from '@/api/modules/api-task';
 
 const { t } = useI18n();
-const $q = useQuasar()
+const $q = useQuasar();
 
 const attendance = ref<AttendanceDTO>({
   branchId: 0,
   taskId: 0,
   calculatedDailyWage: 0,
-  employeeId: 0, // This should be set from logged in user
+  employeeId: 0,
   attendanceDate: new Date().toISOString().split('T')[0],
   dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
   startTime: '',
@@ -75,6 +74,13 @@ const attendance = ref<AttendanceDTO>({
 const branches = ref([]);
 const tasks = ref([]);
 const rowData = ref([]);
+const columnDefs = ref([
+  { field: 'branchId', headerName: t('attendance.grid.branch', 'Branch') },
+  { field: 'taskId', headerName: t('attendance.grid.task', 'Task') },
+  { field: 'actualStartTime', headerName: t('attendance.grid.startTime', 'Start Time') },
+  { field: 'actualEndTime', headerName: t('attendance.grid.endTime', 'End Time') },
+  { field: 'calculatedDailyWage', headerName: t('attendance.grid.wage', 'Daily Wage') }
+]);
 
 const loadBranches = async () => {
   try {
@@ -126,6 +132,24 @@ const loadAttendanceData = async () => {
       message: 'Failed to load attendance data'
     });
   }
+};
+
+const handleCellClicked = (params: any) => {
+  console.log('Cell clicked:', params);
+  // Add your cell click handling logic here
+};
+
+const handleReset = () => {
+  attendance.value = {
+    branchId: 0,
+    taskId: 0,
+    calculatedDailyWage: 0,
+    employeeId: 0,
+    attendanceDate: new Date().toISOString().split('T')[0],
+    dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
+    startTime: '',
+    endTime: ''
+  };
 };
 
 onMounted(() => {

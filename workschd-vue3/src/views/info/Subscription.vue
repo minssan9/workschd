@@ -7,123 +7,44 @@
 
         <!-- Pricing Cards -->
         <div class="row q-col-gutter-md">
-          <!-- Premium Plan -->
-          <div class="col-3">
+          <div 
+            v-for="plan in plans" 
+            :key="plan.type"
+            class="col-3 col-xs-12"
+          >
             <q-card 
               flat 
               bordered 
               class="subscription-card"
-              :class="{ 'selected-plan': planType === 'premium' }"
+              :class="{ 'selected-plan': planType === plan.type }"
             >
               <q-card-section>
-                <div class="text-grey">PREMIUM</div>
-                <div class="text-h4 q-mt-sm">
-                  <span class="text-primary">$150</span>
+                <div class="row items-center justify-between">
+                  <div class="col-auto">
+                    <div class="text-grey">{{ plan.name }}</div>
+                    <div class="text-h4 q-mt-sm">
+                      <span class="text-primary">${{ plan.price }}</span>
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <q-btn 
+                      :color="planType === plan.type ? 'grey' : plan.buttonColor"
+                      :class="[
+                        'subscription-btn',
+                        planType === plan.type ? 'current-plan' : ''
+                      ]"
+                      :label="planType === plan.type ? 'Current Plan' : 'Choose'" 
+                      @click="subscribe(plan.type)"
+                      :disable="planType === plan.type"
+                      rounded
+                      unelevated
+                    />
+                  </div>
                 </div>
                 <div class="text-grey-7 q-mt-md">
-                  Premium features and support for advanced users
+                  {{ plan.description }}
                 </div>
               </q-card-section>
-              <q-card-actions>
-                <q-btn 
-                  flat 
-                  :color="planType === 'premium' ? 'grey' : 'primary'"
-                  class="full-width"
-                  :label="planType === 'premium' ? 'Current Plan' : 'Choose'" 
-                  @click="subscribe('premium')"
-                  :disable="planType === 'premium'"
-                />
-              </q-card-actions>
-            </q-card>
-          </div>
-
-          <!-- Basic Plan -->
-          <div class="col-3">
-            <q-card 
-              flat 
-              bordered 
-              class="subscription-card"
-              :class="{ 'selected-plan': planType === 'basic' }"
-            >
-              <q-card-section>
-                <div class="text-grey">BASIC</div>
-                <div class="text-h4 q-mt-sm">
-                  <span class="text-primary">$100</span>
-                </div>
-                <div class="text-grey-7 q-mt-md">
-                  Standard features for regular users
-                </div>
-              </q-card-section>
-              <q-card-actions>
-                <q-btn 
-                  flat 
-                  :color="planType === 'basic' ? 'grey' : 'primary'"
-                  class="full-width"
-                  :label="planType === 'basic' ? 'Current Plan' : 'Choose'" 
-                  @click="subscribe('basic')"
-                  :disable="planType === 'basic'"
-                />
-              </q-card-actions>
-            </q-card>
-          </div>
-
-          <!-- Starter Plan -->
-          <div class="col-3">
-            <q-card 
-              flat 
-              bordered 
-              class="subscription-card"
-              :class="{ 'selected-plan': planType === 'starter' }"
-            >
-              <q-card-section>
-                <div class="text-grey">STARTER</div>
-                <div class="text-h4 q-mt-sm">
-                  <span class="text-primary">$50</span>
-                </div>
-                <div class="text-grey-7 q-mt-md">
-                  Essential features for beginners
-                </div>
-              </q-card-section>
-              <q-card-actions>
-                <q-btn 
-                  flat 
-                  :color="planType === 'starter' ? 'grey' : 'primary'"
-                  class="full-width"
-                  :label="planType === 'starter' ? 'Current Plan' : 'Choose'" 
-                  @click="subscribe('starter')"
-                  :disable="planType === 'starter'"
-                />
-              </q-card-actions>
-            </q-card>
-          </div>
-
-          <!-- Small Plan -->
-          <div class="col-3">
-            <q-card 
-              flat 
-              bordered 
-              class="subscription-card"
-              :class="{ 'selected-plan': planType === 'small' }"
-            >
-              <q-card-section>
-                <div class="text-grey">SMALL</div>
-                <div class="text-h4 q-mt-sm">
-                  <span class="text-primary">$10</span>
-                </div>
-                <div class="text-grey-7 q-mt-md">
-                  Basic features for small needs
-                </div>
-              </q-card-section>
-              <q-card-actions>
-                <q-btn 
-                  flat 
-                  :color="planType === 'small' ? 'grey' : 'primary'"
-                  class="full-width"
-                  :label="planType === 'small' ? 'Current Plan' : 'Choose'" 
-                  @click="subscribe('small')"
-                  :disable="planType === 'small'"
-                />
-              </q-card-actions>
             </q-card>
           </div>
         </div>
@@ -153,6 +74,37 @@ import apiSubscription from '@/api/modules/api-subscription'
 const $q = useQuasar()
 const planType = ref(null)
 
+const plans = [
+  {
+    type: 'premium',
+    name: 'PREMIUM',
+    price: 150,
+    buttonColor: 'deep-purple',
+    description: 'Premium features and support for advanced users'
+  },
+  {
+    type: 'basic',
+    name: 'BASIC',
+    price: 100,
+    buttonColor: 'blue-7',
+    description: 'Standard features for regular users'
+  },
+  {
+    type: 'starter',
+    name: 'STARTER',
+    price: 50,
+    buttonColor: 'teal',
+    description: 'Essential features for beginners'
+  },
+  {
+    type: 'small',
+    name: 'SMALL',
+    price: 10,
+    buttonColor: 'cyan-7',
+    description: 'Basic features for small needs'
+  }
+]
+
 const features = [
   'One user included',
   'Basic support',
@@ -180,13 +132,13 @@ async function subscribe(plan) {
     $q.notify({
       type: 'positive',
       message: 'Successfully subscribed to ' + plan + ' plan',
-      position: 'top'
+      position: 'bottom'
     })
   } catch (error) {
     $q.notify({
       type: 'negative',
       message: 'Error during subscription process. Please try again.',
-      position: 'top'
+      position: 'bottom'
     })
   }
 }
@@ -211,7 +163,13 @@ async function subscribe(plan) {
   padding: 24px;
 }
 
-.subscription-card .q-card__actions {
-  padding: 16px 24px;
+.subscription-btn {
+  min-width: 120px;
+  font-weight: 500;
+}
+
+.subscription-btn.current-plan {
+  background-color: #e0e0e0 !important;
+  color: #666 !important;
 }
 </style>
