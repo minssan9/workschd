@@ -3,7 +3,7 @@
     <q-form @submit="handleSubmit" @reset="handleReset">
       <q-select
           v-model="attendance.branchId"
-          label="Branch"
+          :label="t('attendance.label.branch', 'Branch')"
           :options="branches"
           option-value="id"
           option-label="name"
@@ -11,7 +11,7 @@
       />
       <q-select
           v-model="attendance.taskId"
-          label="Task"
+          :label="t('attendance.label.task', 'Task')"
           :options="tasks"
           option-value="id"
           option-label="id"
@@ -19,22 +19,22 @@
       />
       <q-input
           v-model="attendance.actualStartTime"
-          label="Actual Start Time"
+          :label="t('attendance.label.actualStartTime', 'Actual Start Time')"
           type="datetime-local"
       />
       <q-input
           v-model="attendance.actualEndTime"
-          label="Actual End Time"
+          :label="t('attendance.label.actualEndTime', 'Actual End Time')"
           type="datetime-local"
       />
       <q-input
           v-model="attendance.calculatedDailyWage"
-          label="Calculated Daily Wage"
+          :label="t('attendance.label.calculatedDailyWage', 'Calculated Daily Wage')"
           type="number"
       />
       <div class="q-mt-md">
-        <q-btn label="Submit" type="submit" color="primary" />
-        <q-btn label="Reset" type="reset" color="secondary" />
+        <q-btn :label="t('common.button.submit', 'Submit')" type="submit" color="primary" />
+        <q-btn :label="t('common.button.reset', 'Reset')" type="reset" color="secondary" />
       </div>
     </q-form>
 
@@ -53,10 +53,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
+import { useI18n } from 'vue-i18n';
 import apiAttendance, { AttendanceDTO } from '@/api/modules/api-attendance';
 import apiBranch from '@/api/modules/api-branch';
 // import apiTask from '@/api/modules/api-task';
 
+const { t } = useI18n();
 const $q = useQuasar();
 
 const attendance = ref<AttendanceDTO>({
@@ -103,14 +105,14 @@ const handleSubmit = async () => {
     await apiAttendance.create(attendance.value);
     $q.notify({
       color: 'positive',
-      message: 'Attendance recorded successfully'
+      message: t('attendance.notification.success', 'Attendance recorded successfully')
     });
     await loadAttendanceData();
     handleReset();
   } catch (error) {
     $q.notify({
       color: 'negative',
-      message: 'Failed to record attendance'
+      message: t('attendance.notification.error', 'Failed to record attendance')
     });
   }
 };

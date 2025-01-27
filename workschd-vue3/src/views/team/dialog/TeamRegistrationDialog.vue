@@ -80,7 +80,7 @@
       <q-card-section>
         <div class="text-h6">Team Members</div>
         <div class="ag-theme-alpine" style="height: 300px; width: 100%;">
-          <GridTeam
+          <GridDefault
             :columnDefs="columnDefs"
             :rowData="teamMembers"
             @grid-ready="onGridReady"
@@ -94,8 +94,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useQuasar } from 'quasar'
-import GridTeam from "@/components/grid/GridTeam.vue"
+import { useQuasar } from 'quasar' 
+import GridDefault from '@/components/grid/GridDefault.vue'
 
 const $q = useQuasar()
 const emit = defineEmits(['team-registered'])

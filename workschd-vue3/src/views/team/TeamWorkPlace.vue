@@ -1,29 +1,29 @@
 <template>
   <q-page padding>
     <q-form @submit.prevent="handleSubmit" @reset="handleReset">
-      <q-input v-model="storeForm.name" label="Store Name" required />
-      <q-input v-model="storeForm.address" label="Address" />
-      <q-input v-model="storeForm.region" label="Region" />
+      <q-input v-model="storeForm.name" :label="t('team.workplace.storeName', 'Store Name')" required />
+      <q-input v-model="storeForm.address" :label="t('team.workplace.address', 'Address')" />
+      <q-input v-model="storeForm.region" :label="t('team.workplace.region', 'Region')" />
       <q-select
         v-model="storeForm.branch_id"
-        label="Branch"
+        :label="t('team.workplace.branch', 'Branch')"
         :options="branches"
         option-value="id"
         option-label="name"
       />
       <div class="q-mt-md">
-        <q-btn label="Submit" type="submit" color="primary" />
-        <q-btn label="Reset" type="reset" color="secondary" class="q-ml-sm" />
+        <q-btn :label="t('common.submit', 'Submit')" type="submit" color="primary" />
+        <q-btn :label="t('common.reset', 'Reset')" type="reset" color="secondary" class="q-ml-sm" />
       </div>
     </q-form>
 
     <div class="q-mt-lg">
-      <ag-grid-vue
-        class="ag-theme-alpine"
-        style="width: 100%; height: 400px;"
-        :rowData="rowData"
-        :columnDefs="columnDefs"
-        @grid-ready="onGridReady"
+      <GridDefault
+          style="width: 100%; height: 100%"
+          :columnDefs="columnDefs"
+          :rowData="rowData"
+          @grid-ready="onGridReady"
+          class="ag-theme-alpine-dark"
       />
     </div>
   </q-page>
@@ -33,7 +33,9 @@
 import { ref, onMounted } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
 import { useQuasar } from 'quasar'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const $q = useQuasar()
 
 interface Store {
@@ -63,10 +65,10 @@ const branches = ref<Branch[]>([
 const rowData = ref([])
 
 const columnDefs = ref([
-  { headerName: 'Store Name', field: 'name' },
-  { headerName: 'Address', field: 'address' },
-  { headerName: 'Region', field: 'region' },
-  { headerName: 'Branch', field: 'branch_id' }
+  { headerName: t('team.workplace.grid.storeName', 'Store Name'), field: 'name' },
+  { headerName: t('team.workplace.grid.address', 'Address'), field: 'address' },
+  { headerName: t('team.workplace.grid.region', 'Region'), field: 'region' },
+  { headerName: t('team.workplace.grid.branch', 'Branch'), field: 'branch_id' }
 ])
 
 const fetchStores = async () => {

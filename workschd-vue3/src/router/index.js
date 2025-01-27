@@ -4,17 +4,17 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   /* eslint-disable */
   routes: [
-    { path: '/',                        name: 'home',                     component: () => import('@/views/HomeView.vue') },
+    // Info
+    { path: '/',                        name: 'home',                     component: () => import('@/views/info/HomeView.vue') },
+    { path: '/about',                   name: 'about',                    component: () => import('@/views/info/AboutView.vue') },
+
+    // Auth
     { path: '/login',                   name: 'login',                    component: () => import('@/views/auth/Login.vue'),          hidden: true },
     { path: '/oauth/redirect',          name: 'redirect',                 component: () => import('@/views/auth/redirect.vue'),       hidden: true},
 
     // Account
-    { path: '/account/preferences',     name: 'AccountPreferences',       component: () => import('@/views/account/AccountPreferences.vue'),    hidden: true },
+    { path: '/account/profile',         name: 'AccountProfile',       component: () => import('@/views/account/AccountProfile.vue'),    hidden: true },
     { path: '/account/schedule',        name: 'AccountSchedule',          component: () => import('@/views/account/AccountSchedule.vue'),       hidden: true },
-
-    // Info
-    // { path: '/info/branch',             name: 'Branch',                   component: () => import('@/views/info/Branch.vue') },
-    { path: '/about',                   name: 'about',                    component: () => import('@/views/AboutView.vue') },
 
     // Job
     { path: '/event', name: 'Event',

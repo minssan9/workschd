@@ -38,7 +38,7 @@
       <q-list padding>
         <!-- Account Section -->
         <q-item-label header>Account</q-item-label>
-        <q-item clickable v-ripple :to="{ name: 'AccountPreferences' }">
+        <q-item clickable v-ripple :to="{ name: 'AccountProfile' }">
           <q-item-section avatar>
             <q-icon name="person" />
           </q-item-section>

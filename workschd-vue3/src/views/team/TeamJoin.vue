@@ -4,10 +4,10 @@
       <div class="col-12 col-md-6">
         <q-card class="join-team-card">
           <q-card-section>
-            <div class="text-h6">Join Team</div>
+            <div class="text-h6">{{ t('team.join.title', 'Join Team') }}</div>
             <div v-if="loading" class="text-center q-pa-md">
               <q-spinner color="primary" size="3em" />
-              <div class="q-mt-sm">Verifying invitation...</div>
+              <div class="q-mt-sm">{{ t('team.join.verifying', 'Verifying invitation...') }}</div>
             </div>
             
             <div v-else-if="error" class="text-center q-pa-md">
@@ -22,22 +22,22 @@
               <q-list bordered class="rounded-borders q-mt-md">
                 <q-item>
                   <q-item-section>
-                    <q-item-label>Team Manager</q-item-label>
+                    <q-item-label>{{ t('team.join.teamManager', 'Team Manager') }}</q-item-label>
                     <q-item-label caption>{{ teamInfo.managerName }}</q-item-label>
                   </q-item-section>
                 </q-item>
                 
                 <q-item>
                   <q-item-section>
-                    <q-item-label>Member Count</q-item-label>
-                    <q-item-label caption>{{ teamInfo.memberCount }} members</q-item-label>
+                    <q-item-label>{{ t('team.join.memberCount', 'Member Count') }}</q-item-label>
+                    <q-item-label caption>{{ t('team.join.membersCount', '{count} members', { count: teamInfo.memberCount }) }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
 
               <div class="text-center q-mt-lg">
                 <q-btn
-                  label="Join Team"
+                  :label="t('team.join.joinTeam', 'Join Team')"
                   color="primary"
                   :loading="joining"
                   @click="joinTeam"
@@ -56,7 +56,9 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useUserStore } from '@/stores/modules/store_user'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()

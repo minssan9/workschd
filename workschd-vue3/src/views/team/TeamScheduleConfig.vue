@@ -1,33 +1,33 @@
 <template>
   <q-page padding>
-    <h2>Schedule Configuration</h2>
+    <h2>{{ t('team.schedule.title', 'Schedule Configuration') }}</h2>
 
     <div class="schedule-section">
-      <h3>Minimum Staff Per Day</h3>
+      <h3>{{ t('team.schedule.minStaffTitle', 'Minimum Staff Per Day') }}</h3>
       <q-input
         v-for="day in daysOfWeek"
         :key="day.value"
         v-model="minStaffPerDay[day.value]"
-        :label="`Minimum staff for ${day.label}`"
+        :label="t('team.schedule.minStaffFor', 'Minimum staff for {day}', { day: t(`days.${day.value.toLowerCase()}`, day.label) })"
         type="number"
         class="q-mb-md"
       />
     </div>
 
     <div class="schedule-section">
-      <h3>Maximum Off Days Per Month</h3>
+      <h3>{{ t('team.schedule.maxOffDaysTitle', 'Maximum Off Days Per Month') }}</h3>
       <q-input
         v-for="month in months"
         :key="month.value"
         v-model="maxOffDaysPerMonth[month.value]"
-        :label="`Max off days for ${month.label}`"
+        :label="t('team.schedule.maxOffDaysFor', 'Max off days for {month}', { month: t(`months.${month.value}`, month.label) })"
         type="number"
         class="q-mb-md"
       />
     </div>
 
     <div class="q-mt-lg">
-      <q-btn label="Save Configuration" color="primary" @click="saveConfiguration" />
+      <q-btn :label="t('team.schedule.saveConfig', 'Save Configuration')" color="primary" @click="saveConfiguration" />
     </div>
   </q-page>
 </template>
@@ -35,7 +35,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const $q = useQuasar()
 
 interface DayConfig {

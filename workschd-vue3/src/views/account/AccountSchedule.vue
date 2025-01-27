@@ -1,196 +1,146 @@
 <template>
-  <q-page padding>
+  <q-page padding class="q-px-sm q-px-md-lg">
     <div class="row q-col-gutter-md">
-      <!-- Profile Settings -->
-      <div class="col-12 col-md-6">
+      <!-- Schedule Preferences -->
+      <div class="col-12 col-sm-10 col-md-8 self-center">
         <q-card>
-          <q-card-section>
-            <div class="text-h6">Profile Settings</div>
+          <q-card-section class="bg-primary text-white q-py-sm">
+            <div class="text-subtitle1">{{ t('schedule.preferences.title', '스케줄 설정') }}</div>
           </q-card-section>
 
-          <q-card-section>
-            <q-form @submit="handleProfileUpdate">
-              <q-input
-                v-model="profile.name"
-                label="Name"
-                :rules="[val => !!val || 'Name is required']"
-              />
-              <q-input
-                v-model="profile.email"
-                label="Email"
-                type="email"
-                :rules="[val => !!val || 'Email is required']"
-              />
-              <q-input
-                v-model="profile.phone"
-                label="Phone"
-                type="tel"
-              />
-              <q-btn
-                label="Update Profile"
-                type="submit"
-                color="primary"
-                class="q-mt-md"
-              />
+          <q-card-section class="q-pa-sm-md">
+            <q-form @submit="handleScheduleUpdate" class="q-gutter-y-md">
+              <div class="row q-col-gutter-sm">
+                <div class="col-12">
+                  <q-select
+                    v-model="schedulePreferences.preferredDays"
+                    :label="t('schedule.preferences.preferredDays', '선호 근무일')"
+                    :options="daysOfWeek"
+                    multiple
+                    dense
+                    outlined
+                    use-chips
+                    options-dense
+                  />
+                </div>
+                <div class="col-12">
+                  <q-select
+                    v-model="schedulePreferences.preferredShifts"
+                    :label="t('schedule.preferences.preferredShifts', '선호 근무 시간대')"
+                    :options="shiftOptions"
+                    multiple
+                    dense
+                    outlined
+                    use-chips
+                    options-dense
+                  />
+                </div>
+              </div>
+
+              <div class="row justify-end q-mt-sm">
+                <q-btn
+                  :label="t('schedule.preferences.save', '설정 저장')"
+                  type="submit"
+                  color="primary"
+                  :loading="isSaving"
+                  size="sm"
+                />
+              </div>
             </q-form>
           </q-card-section>
         </q-card>
       </div>
 
-      <!-- Notification Settings -->
-      <div class="col-12 col-md-6">
+      <!-- Schedule Calendar -->
+      <div class="col-12">
         <q-card>
-          <q-card-section>
-            <div class="text-h6">Notification Settings</div>
+          <q-card-section class="bg-primary text-white q-py-sm">
+            <div class="text-subtitle1">{{ t('schedule.calendar.title', '근무 일정') }}</div>
           </q-card-section>
 
-          <q-card-section>
-            <q-list>
-              <q-item tag="label">
-                <q-item-section>
-                  <q-item-label>Email Notifications</q-item-label>
-                  <q-item-label caption>Receive notifications via email</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-toggle v-model="notifications.email" />
-                </q-item-section>
-              </q-item>
-
-              <q-item tag="label">
-                <q-item-section>
-                  <q-item-label>Push Notifications</q-item-label>
-                  <q-item-label caption>Receive push notifications</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-toggle v-model="notifications.push" />
-                </q-item-section>
-              </q-item>
-
-              <q-item tag="label">
-                <q-item-section>
-                  <q-item-label>Schedule Updates</q-item-label>
-                  <q-item-label caption>Get notified about schedule changes</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-toggle v-model="notifications.schedule" />
-                </q-item-section>
-              </q-item>
-            </q-list>
+          <q-card-section class="q-pa-sm-md">
+            <!-- Add your calendar component here -->
           </q-card-section>
         </q-card>
-      </div>
-
-      <div class="col-12">
-        <!-- 직원별 선호 요일 및 지점 설정 -->
-        <div>
-          <h3>Employee Preferences</h3>
-          <q-table :rows="employees" :columns="employeeColumns" row-key="id">
-            <template v-slot:body-cell-preferredDay="props">
-              <q-select v-model="props.row.preferredDay" :options="daysOfWeek" option-value="value" option-label="label"/>
-            </template>
-            <template v-slot:body-cell-preferredBranch="props">
-              <q-select v-model="props.row.preferredBranch" :options="branches" option-value="id" option-label="name"/>
-            </template>
-          </q-table>
-        </div>
-
-        <!-- 배정 실행 버튼 -->
-        <q-btn @click="runScheduling" label="Run Scheduling" color="primary" class="q-mt-md"/>
-
-        <!-- 배정 결과 출력 -->
-        <div v-if="schedulingResult.length > 0" class="q-mt-lg">
-          <h3>Scheduling Results</h3>
-          <ag-grid-vue
-              class="ag-theme-alpine"
-              style="width: 100%; height: 400px;"
-              :rowData="schedulingResult"
-              :columnDefs="resultColumns"
-          ></ag-grid-vue>
-        </div>
       </div>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useQuasar } from 'quasar';
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useQuasar } from 'quasar'
 
-const $q = useQuasar();
+const { t } = useI18n()
+const $q = useQuasar()
 
+interface SchedulePreferences {
+  preferredDays: string[]
+  preferredShifts: string[]
+}
 
-const schedulingResult = ref([]);
-const profile = ref({
-  name: '',
-  email: '',
-  phone: ''
-});
+const schedulePreferences = ref<SchedulePreferences>({
+  preferredDays: [],
+  preferredShifts: []
+})
 
-const notifications = ref({
-  email: true,
-  push: true,
-  schedule: true
-});
+const isSaving = ref(false)
 
-const handleProfileUpdate = async () => {
+const daysOfWeek = [
+  { label: t('days.monday', '월요일'), value: 'MONDAY' },
+  { label: t('days.tuesday', '화요일'), value: 'TUESDAY' },
+  { label: t('days.wednesday', '수요일'), value: 'WEDNESDAY' },
+  { label: t('days.thursday', '목요일'), value: 'THURSDAY' },
+  { label: t('days.friday', '금요일'), value: 'FRIDAY' },
+  { label: t('days.saturday', '토요일'), value: 'SATURDAY' },
+  { label: t('days.sunday', '일요일'), value: 'SUNDAY' }
+]
+
+const shiftOptions = [
+  { label: t('shifts.morning', '오전 (06:00-14:00)'), value: 'MORNING' },
+  { label: t('shifts.afternoon', '오후 (14:00-22:00)'), value: 'AFTERNOON' },
+  { label: t('shifts.night', '야간 (22:00-06:00)'), value: 'NIGHT' }
+]
+
+const handleScheduleUpdate = async () => {
   try {
-    // TODO: Implement API call to update profile
+    isSaving.value = true
+    // Add your API call here
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
     $q.notify({
-      color: 'positive',
-      message: 'Profile updated successfully'
-    });
+      type: 'positive',
+      message: t('schedule.preferences.saveSuccess', '스케줄 설정이 저장되었습니다')
+    })
   } catch (error) {
     $q.notify({
-      color: 'negative',
-      message: 'Failed to update profile'
-    });
+      type: 'negative',
+      message: t('schedule.preferences.saveError', '스케줄 설정 저장에 실패했습니다')
+    })
+  } finally {
+    isSaving.value = false
   }
-};
+}
+</script>
 
-// Load user preferences on component mount
-const loadUserPreferences = async () => {
-  try {
-    // TODO: Implement API call to get user preferences
-    // For now, using mock data
-    profile.value = {
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+1234567890'
-    };
-  } catch (error) {
-    $q.notify({
-      color: 'negative',
-      message: 'Failed to load user preferences'
-    });
+<style lang="scss" scoped>
+// Add responsive padding
+@media (max-width: 599px) {
+  .q-card-section {
+    padding: 8px !important;
   }
-};
+  
+  .q-gutter-y-md > * {
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+  }
+}
 
-
-const employees = ref([
-  { id: 1, name: 'John Doe', preferredDay: '', preferredBranch: null },
-  { id: 2, name: 'Jane Smith', preferredDay: '', preferredBranch: null }
-  // 추가 직원 정보를 여기에 추가
-]);
-const employeeColumns = [
-  { name: 'name', required: true, label: 'Name', align: 'left', field: 'name' },
-  { name: 'preferredDay', label: 'Preferred Day', align: 'left', field: 'preferredDay' },
-  { name: 'preferredBranch', label: 'Preferred Branch', align: 'left', field: 'preferredBranch' }
-];
-
-const runScheduling = () => {
-  // 여기에 배정 로직을 구현 (예: Spring Backend와 통신하여 배정 결과를 가져옴)
-  schedulingResult.value = [
-    { employeeName: 'John Doe', date: '2024-09-10', branch: 'Downtown Branch' },
-    { employeeName: 'Jane Smith', date: '2024-09-11', branch: 'Uptown Branch' }
-    // 배정된 추가 결과를 여기에 추가
-  ];
-};
-
-const resultColumns = ref([
-  { headerName: 'Employee', field: 'employeeName' },
-  { headerName: 'Date', field: 'date' },
-  { headerName: 'Branch', field: 'branch' }
-]);
-
-loadUserPreferences();
-</script> 
+// Make chips smaller on mobile
+:deep(.q-chip) {
+  font-size: 12px;
+  padding: 0 6px;
+  height: 24px;
+}
+</style> 

@@ -1,10 +1,10 @@
 <template>
   <q-page class="q-pa-md">
     <div class="row q-mb-md justify-between items-center">
-      <h5 class="q-my-none">Team Management</h5>
+      <h5 class="q-my-none">{{ t('team.manage.title', 'Team Management') }}</h5>
       <div>
         <q-btn 
-          label="Register New Team" 
+          :label="t('team.manage.registerNewTeam', 'Register New Team')" 
           color="primary" 
           @click="showRegistrationDialog = true"
           class="q-mr-sm"
@@ -12,8 +12,8 @@
         <q-btn-toggle
           v-model="role"
           :options="[
-            {label: 'Worker', value: 'worker'},
-            {label: 'Manager', value: 'manager'}
+            {label: t('team.manage.worker', 'Worker'), value: 'worker'},
+            {label: t('team.manage.manager', 'Manager'), value: 'manager'}
           ]"
         />
       </div>
@@ -21,7 +21,7 @@
 
     <!-- Team Grid -->
     <div class="ag-theme-alpine" style="height: 400px">
-      <GridTeam
+      <GridDefault
           style="width: 100%; height: 100%"
           :columnDefs="columnDefs"
           :rowData="teams"
@@ -48,9 +48,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
-import GridTeam from "@/components/grid/GridTeam.vue";
+import { useI18n } from 'vue-i18n' 
 import TeamApproveDialog from './dialog/TeamApproveDialog.vue'
 import TeamRegistrationDialog from './dialog/TeamRegistrationDialog.vue'
+import GridDefault from '@/components/grid/GridDefault.vue';
 
 // Types
 interface Team {
@@ -70,6 +71,7 @@ interface JoinRequest {
 
 // State
 const $q = useQuasar()
+const { t } = useI18n()
 const role = ref('manager')
 const showRegistrationDialog = ref(false)
 const approvalDialog = ref(false)
@@ -115,12 +117,13 @@ const teams = ref<Team[]>([
 
 // Grid Configuration
 const columnDefs = ref([
-  { headerName: 'Team Name',  field: 'name' },
-  { headerName: 'Location',  field: 'location' },
-  { headerName: 'Members',  field: 'memberCount' },
-  { headerName: 'Pending Requests',  field: 'joinRequests',  valueGetter: (params: any) => params.data.joinRequests.length },
-  { headerName: 'Created At',  field: 'createdAt' },
-  { headerName: 'Actions',
+  { headerName: t('team.manage.grid.teamName', 'Team Name'), field: 'name' },
+  { headerName: t('team.manage.grid.location', 'Location'), field: 'location' },
+  { headerName: t('team.manage.grid.members', 'Members'), field: 'memberCount' },
+  { headerName: t('team.manage.grid.pendingRequests', 'Pending Requests'), field: 'joinRequests', valueGetter: (params: any) => params.data.joinRequests.length },
+  { headerName: t('team.manage.grid.createdAt', 'Created At'), field: 'createdAt' },
+  { 
+    headerName: t('team.manage.grid.actions', 'Actions'),
     cellRenderer: (params: any) => {
       const hasRequests = params.data.joinRequests.length > 0
       return `
@@ -128,7 +131,7 @@ const columnDefs = ref([
           class="q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle text-primary q-btn--actionable q-focusable q-hoverable"
           ${!hasRequests ? 'disabled' : ''}
         >
-          View Requests
+          ${t('team.manage.grid.viewRequests', 'View Requests')}
         </button>
       `
     },
