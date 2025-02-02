@@ -10,22 +10,22 @@ export interface BranchDTO {
 
 export default {
   create(data: BranchDTO): Promise<AxiosResponse> {
-    return request.post('/api/branch', data);
+    return request.post('/branch', data);
   },
 
   update(id: number, data: BranchDTO): Promise<AxiosResponse> {
-    return request.put(`/api/branch/${id}`, data);
+    return request.put(`/branch/${id}`, data);
   },
 
   delete(id: number): Promise<AxiosResponse> {
-    return request.delete(`/api/branch/${id}`);
+    return request.delete(`/branch/${id}`);
   },
 
   getById(id: number): Promise<AxiosResponse> {
-    return request.get(`/api/branch/${id}`);
+    return request.get(`/branch/${id}`);
   },
 
   getList(): Promise<AxiosResponse> {
-    return request.get('/api/branch');
+    return request.get('/branch');
   }
 }; 

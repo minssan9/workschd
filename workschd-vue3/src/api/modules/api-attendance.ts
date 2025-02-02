@@ -17,26 +17,26 @@ export interface AttendanceDTO {
 
 export default {
   create(data: AttendanceDTO): Promise<AxiosResponse> {
-    return request.post('/api/attendance', data);
+    return request.post('/attendance', data);
   },
 
   update(id: number, data: AttendanceDTO): Promise<AxiosResponse> {
-    return request.put(`/api/attendance/${id}`, data);
+    return request.put(`/attendance/${id}`, data);
   },
 
   delete(id: number): Promise<AxiosResponse> {
-    return request.delete(`/api/attendance/${id}`);
+    return request.delete(`/attendance/${id}`);
   },
 
   getById(id: number): Promise<AxiosResponse> {
-    return request.get(`/api/attendance/${id}`);
+    return request.get(`/attendance/${id}`);
   },
 
   getByEmployeeId(employeeId: number): Promise<AxiosResponse> {
-    return request.get(`/api/attendance/employee/${employeeId}`);
+    return request.get(`/attendance/employee/${employeeId}`);
   },
 
   getByDateRange(startDate: string, endDate: string): Promise<AxiosResponse> {
-    return request.get(`/api/attendance/range?start=${startDate}&end=${endDate}`);
+    return request.get(`/attendance/range?start=${startDate}&end=${endDate}`);
   }
 }; 

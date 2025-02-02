@@ -52,22 +52,9 @@ import { useI18n } from 'vue-i18n'
 import TeamApproveDialog from './dialog/TeamApproveDialog.vue'
 import TeamRegistrationDialog from './dialog/TeamRegistrationDialog.vue'
 import GridDefault from '@/components/grid/GridDefault.vue';
-
-// Types
-interface Team {
-  id: number
-  name: string
-  location: string
-  memberCount: number
-  joinRequests: any[]
-  createdAt: string
-}
-
-interface JoinRequest {
-  id: number
-  name: string
-  location: string
-}
+import { useTeamStore } from '@/stores/modules/teamStore';
+import { Team, JoinRequest } from '@/interface/team';
+import apiTeam from '@/api/modules/api-team'
 
 // State
 const $q = useQuasar()
@@ -77,40 +64,24 @@ const showRegistrationDialog = ref(false)
 const approvalDialog = ref(false)
 const selectedTeam = ref<Team | null>(null)
 
+const teamStore = useTeamStore();
+
 const teams = ref<Team[]>([
   {
     id: 1,
     name: "Team A",
     location: "Location A",
     memberCount: 12,
-    joinRequests: [
-      {
-        name: "emp A",
-        location: "KR Incheon"
-      },
-      {
-        name: "emp B",
-        location: "KR Incheon"
-      }
-    ],
     createdAt: new Date().toISOString(),
+    joinRequests: [new JoinRequest(1, "emp A", "KR Incheon"), new JoinRequest(2, "emp B", "KR Incheon")],
   },
   {
     id: 2,
     name: "Team B",
     location: "Location C",
     memberCount: 8,
-    joinRequests: [
-      {
-        name: "emp A",
-        location: "KR Incheon"
-      },
-      {
-        name: "emp B",
-        location: "KR Incheon"
-      }
-    ],
     createdAt: new Date().toISOString(),
+    joinRequests: [new JoinRequest(1, "emp A", "KR Incheon"), new JoinRequest(2, "emp B", "KR Incheon")],
   },
 ])
 
@@ -145,13 +116,14 @@ const columnDefs = ref([
 ])
 
 // Methods
-const onGridReady = async () => {
-  try {
-    const response = await fetch('/api/teams')
-    teams.value = await response.json()
-  } catch (error) {
-    $q.notify({ type: 'negative',  message: 'Failed to fetch teams' })
-  }
+const onGridReady = () => { 
+  apiTeam.getTeams() 
+    .then(response => {
+      teams.value = response.data;
+    })
+    .catch(error => {
+      $q.notify({ type: 'negative', message: 'Failed to fetch teams' })
+    }) 
 }
 
 const onTeamRegistered = (team: Team) => {

@@ -183,7 +183,7 @@ const handleCellClicked = (params: any) => {
 
 const onSubmit = async () => {
   try {
-    await fetch('/api/tasks', {
+    await fetch('/tasks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -209,7 +209,7 @@ const onSubmit = async () => {
 
 const handleApproveRequest = async (request: JoinRequest) => {
   try {
-    await fetch(`/api/requests/${request.id}/approve`, {
+    await fetch(`/requests/${request.id}/approve`, {
       method: 'POST'
     })
     
@@ -245,8 +245,8 @@ const handleReset = () => {
 
 const loadGridData = async () => {
   try {
-    const response = await fetch('/api/tasks')
-    const data = await response.json()
+    const response = await fetch('/tasks')
+    const data = response
     rowData.value = data
   } catch (error) {
     $q.notify({

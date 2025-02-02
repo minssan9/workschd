@@ -34,21 +34,13 @@ import { ref, onMounted } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
+import { useTeamStore } from '@/stores/modules/teamStore'
+import { Store, Branch } from '@/interface/workplace'
 
 const { t } = useI18n()
 const $q = useQuasar()
 
-interface Store {
-  name: string
-  address: string
-  region: string
-  branch_id: number | null
-}
-
-interface Branch {
-  id: number
-  name: string
-}
+const teamStore = useTeamStore()
 
 const storeForm = ref<Store>({
   name: '',
@@ -73,8 +65,8 @@ const columnDefs = ref([
 
 const fetchStores = async () => {
   try {
-    const response = await fetch('/api/stores')
-    const data = await response.json()
+    const response = await fetch('/stores')
+    const data = response
     rowData.value = data
   } catch (error) {
     $q.notify({
@@ -90,7 +82,7 @@ const onGridReady = () => {
 
 const handleSubmit = async () => {
   try {
-    await fetch('/api/stores', {
+    await fetch('/stores', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

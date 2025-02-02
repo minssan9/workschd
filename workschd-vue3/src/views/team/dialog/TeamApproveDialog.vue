@@ -33,21 +33,15 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
+import apiTeam from '@/api/modules/api-team'
+import { useTeamStore } from '@/stores/modules/teamStore'
+import { Team, JoinRequest } from '@/interface/team'
 
 const $q = useQuasar()
 const emit = defineEmits(['request-approved'])
 const isOpen = defineModel('modelValue')
 
-interface JoinRequest {
-  id: number
-  name: string
-  location: string
-}
-
-interface Team {
-  id: number
-  joinRequests: JoinRequest[]
-}
+const teamStore = useTeamStore()
 
 const props = defineProps<{
   selectedTeam: Team | null
@@ -57,13 +51,7 @@ const handleApprove = async (request: JoinRequest) => {
   try {
     if (!props.selectedTeam) return
 
-    await fetch(`/api/teams/${props.selectedTeam.id}/approve`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(request)
-    })
+    await apiTeam.approveRequest(props.selectedTeam.id, request)
 
     emit('request-approved', { teamId: props.selectedTeam.id, request })
     $q.notify({ type: 'positive', message: 'Request approved successfully' })

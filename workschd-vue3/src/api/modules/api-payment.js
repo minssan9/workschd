@@ -1,14 +1,14 @@
-import {methods} from '@/api/axios-voyagerss.js'
+import request from '@/api/axios-voyagerss.js'
 
 const apiPayment = {
   success (payObject) {
-    return methods.post('/ed/payment/success', payObject)
+    return request.post('/ed/payment/success', payObject)
   },
   fail() {
-    return methods.get('/ed/payment/fail')
+    return request.get('/ed/payment/fail')
   },
   receiptUrl(orderId) {
-    return methods.get(`/ed/payment/receipt?orderId=${orderId}` )
+    return request.get(`/ed/payment/receipt?orderId=${orderId}` )
   }
 }
 

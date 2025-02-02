@@ -57,36 +57,31 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useUserStore } from '@/stores/modules/store_user'
 import { useI18n } from 'vue-i18n'
+import { useTeamStore } from '@/stores/modules/teamStore'
+import { Team } from '@/interface/team'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
 const userStore = useUserStore()
-
-interface TeamInfo {
-  id: number
-  name: string
-  location: string
-  managerName: string
-  memberCount: number
-}
+const teamStore = useTeamStore()
 
 const loading = ref(true)
 const joining = ref(false)
 const error = ref('')
-const teamInfo = ref<TeamInfo | null>(null)
+const teamInfo = ref<Team | null>(null)
 
 const fetchTeamInfo = async () => {
   const token = route.params.token as string
   
   try {
-    const response = await fetch(`/api/teams/invite/${token}`)
+    const response = await fetch(`/teams/invite/${token}`)
     if (!response.ok) {
       throw new Error('Invalid or expired invitation link')
     }
     
-    teamInfo.value = await response.json()
+    teamInfo.value = response
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to fetch team information'
   } finally {
@@ -103,7 +98,7 @@ const joinTeam = async () => {
   const token = route.params.token as string
 
   try {
-    const response = await fetch(`/api/teams/${teamInfo.value.id}/join`, {
+    const response = await fetch(`/teams/${teamInfo.value.id}/join`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

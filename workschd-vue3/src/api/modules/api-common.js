@@ -1,19 +1,19 @@
-import {methods} from '@/api/axios-voyagerss.js'
+import request from '@/api/axios-voyagerss.js'
 
 const apiCommon = {
   getContent () {
-    return methods.get('/ed/common/content')
+    return request.get('/ed/common/content')
   },
   getCourse () {
-    return methods.get('/ed/common/course')
+    return request.get('/ed/common/course')
   },
   getSysConfLike (code) {
-    return methods.get(`/ed/common/sys/conf/${code}`)
+    return request.get(`/ed/common/sys/conf/${code}`)
   },
   getAssignByOrderId(orderId){
     let queryDto = {}
     queryDto.orderId = orderId
-    return methods.get(`/ed/common/assign`, queryDto)
+    return request.get(`/ed/common/assign`, queryDto)
   },
 }
 

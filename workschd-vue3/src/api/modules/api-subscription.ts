@@ -8,10 +8,10 @@ export interface SubscriptionDTO {
 
 export default {
   subscribe(planType: SubscriptionDTO['planType']): Promise<AxiosResponse> {
-    return request.post('/api/subscription', { planType });
+    return request.post('/subscription', { planType });
   },
 
   getCurrentPlan(): Promise<AxiosResponse> {
-    return request.get('/api/subscription/current');
+    return request.get('/subscription/current');
   }
 }; 

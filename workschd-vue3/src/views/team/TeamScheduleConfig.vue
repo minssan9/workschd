@@ -36,19 +36,13 @@
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
+import { useTeamStore } from '@/stores/modules/teamStore'
+import { ScheduleConfig, DayConfig, MonthConfig } from '@/interface/schedule'
 
 const { t } = useI18n()
 const $q = useQuasar()
 
-interface DayConfig {
-  value: string
-  label: string
-}
-
-interface MonthConfig {
-  value: number
-  label: string
-}
+const teamStore = useTeamStore()
 
 const daysOfWeek: DayConfig[] = [
   { value: 'MONDAY', label: 'Monday' },
@@ -92,7 +86,7 @@ const maxOffDaysPerMonth = ref({
 
 const saveConfiguration = async () => {
   try {
-    await fetch('/api/schedule-config', {
+    await fetch('/schedule-config', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

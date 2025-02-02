@@ -26,17 +26,15 @@ public enum CommonExceptionType {
     INVALID_ACCESS_TOKEN("3000","Invalid access token."),
     INVALID_REFRESH_TOKEN("3000","Invalid refresh token."),
     NOT_EXPIRED_TOKEN_YET("3000","Not expired token yet."),
+    INVALID_CREDENTIALS("3000", "Invalid Credentials" ),
+
 
 
     // database
     NONEXIST_DATA_EXCEPTION_MSG("8000",  "데이터를 찾을 수 없습니다. "),
     // business
     NOTEXIST_ITEM("4100", "Cannot found Item"),
-    NOTEXIST_ITEM_TEMPLATE("4100", "Cannot found Item template"),
-
-
-    // HOMS
-    REGEX_ERROR("9999", "REGEX_ERROR");
+    NOTEXIST_ITEM_TEMPLATE("4100", "Cannot found Item template");
 
     private final String code;
     private final String message;

@@ -121,19 +121,19 @@ public class AccountController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@RequestBody AccountDTO accountDTO) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(),
-                    loginRequest.getPassword()
+                    accountDTO.getUsername(),
+                    accountDTO.getPassword()
                 )
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             
             // Get user details from AccountService
-            AccountDTO accountDTO = accountService.getAccountDtoByEmail(loginRequest.getUsername());
+            accountDTO = accountService.getAccountDtoByEmail(accountDTO.getUsername());
             
             // Create token using JwtTokenProvider
             String token = tokenProvider.createAccessToken(
@@ -142,29 +142,11 @@ public class AccountController {
                 accountDTO.getAccountRoles().stream().map(AccountRoleDTO::getRoleType).toList()
             );
 
-            return ResponseEntity.ok(new AuthResponse(token));
+            return ResponseEntity.ok(token);
         } catch (AuthenticationException e) {
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Invalid username or password"));
+                .body(new CommonException(CommonExceptionType.INVALID_CREDENTIALS));
         }
     }
-}
-
-@Data
-class LoginRequest {
-    private String username;
-    private String password;
-}
-
-@Data
-@AllArgsConstructor
-class AuthResponse {
-    private String token;
-}
-
-@Data
-@AllArgsConstructor
-class ErrorResponse {
-    private String message;
 }

@@ -94,39 +94,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useQuasar } from 'quasar' 
+import { useQuasar } from 'quasar'
 import GridDefault from '@/components/grid/GridDefault.vue'
+import { useTeamStore } from '@/stores/modules/teamStore'
+import { TeamForm, TeamMember } from '@/interface/team'
 
 const $q = useQuasar()
 const emit = defineEmits(['team-registered'])
 const isOpen = defineModel('modelValue')
 
-interface TeamForm {
-  name: string
-  location: string
-  preferredPlaces: string[]
-}
-
-interface TeamMember {
-  id: number
-  name: string
-  email: string
-  joinDate: string
-  status: string
-}
-
-interface Team {
-  id: number
-  name: string
-  location: string
-  memberCount: number
-  joinRequests: any[]
-  createdAt: string
-}
-
 const props = defineProps<{
   modelValue: boolean
 }>()
+
+const teamStore = useTeamStore()
 
 // Form State
 const teamForm = ref<TeamForm>({
@@ -181,9 +162,9 @@ const onGridReady = async () => {
   if (!teamForm.value.name) return
   
   try {
-    const response = await fetch(`/api/teams/${teamForm.value.name}/members`)
+    const response = await fetch(`/teams/${teamForm.value.name}/members`)
     if (response.ok) {
-      const data = await response.json()
+      const data = response
       teamMembers.value = data
     }
   } catch (error) {
@@ -193,7 +174,7 @@ const onGridReady = async () => {
 
 const generateInviteLink = async () => {
   try {
-    const response = await fetch('/api/teams/generate-invite', {
+    const response = await fetch('/teams/generate-invite', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -208,7 +189,7 @@ const generateInviteLink = async () => {
       throw new Error('Failed to generate invite link')
     }
 
-    const { inviteToken } = await response.json()
+    const { inviteToken } = response
     inviteLink.value = `${window.location.origin}/join-team/${inviteToken}`
 
     $q.notify({
@@ -233,7 +214,7 @@ const copyInviteLink = () => {
 
 const onSubmit = async () => {
   try {
-    const response = await fetch('/api/teams', {
+    const response = await fetch('/teams', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -248,7 +229,7 @@ const onSubmit = async () => {
       throw new Error('Failed to register team')
     }
 
-    const newTeam = await response.json()
+    const newTeam = response
     emit('team-registered', newTeam)
     isOpen.value = false
     
