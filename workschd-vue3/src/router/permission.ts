@@ -1,6 +1,6 @@
 import { Router, RouteLocationNormalized } from 'vue-router'
 import { useUserStore } from '@/stores/modules/store_user'
-import { Loading, QSpinnerGears } from 'quasar'
+import { LoadingService } from '@/utils/loading'
 
 // Whitelist routes that don't require authentication
 const whiteList = [
@@ -18,13 +18,8 @@ const whiteList = [
 
 export function setupRouterGuards(router: Router) {
   router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
-    // Show loading
-    Loading.show({
-      spinner: QSpinnerGears,
-      spinnerColor: 'primary',
-      message: 'Loading...',
-      messageColor: 'grey-8'
-    })
+    // Start progress bar
+    LoadingService.start()
 
     const userStore = useUserStore()
     const hasToken = userStore.accessToken
@@ -64,7 +59,12 @@ export function setupRouterGuards(router: Router) {
   })
 
   router.afterEach(() => {
-    // Hide loading when navigation is complete
-    Loading.hide()
+    // Complete progress bar
+    LoadingService.done()
+  })
+
+  router.onError(() => {
+    // Ensure progress bar is completed on error
+    LoadingService.done()
   })
 } 
