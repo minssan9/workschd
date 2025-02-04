@@ -49,10 +49,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useLayoutStore } from '@/stores/modules/store_layout'
+import { useUserStore } from '@/stores/modules/store_user'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 
 const layoutStore = useLayoutStore()
+const userStore = useUserStore()
 const { drawerLeft } = storeToRefs(layoutStore)
 const route = useRoute()
 const router = useRouter()
@@ -62,9 +64,31 @@ const filteredRoutes = computed(() => {
   return filterHiddenRoutes(router.options.routes)
 })
 
-// Helper function to filter hidden routes
+// Helper function to check if user has required role
+function hasRequiredRole(routeMeta) {
+  if (!routeMeta?.roles) return true
+  return routeMeta.roles.includes(userStore.role)
+}
+
+// Updated helper function to filter hidden and role-based routes
 function filterHiddenRoutes(routes) {
-  return routes.filter(route => !route.hidden)
+  return routes.filter(route => {
+    // Filter out hidden routes
+    if (route.hidden) return false
+    
+    // Check parent route roles
+    if (!hasRequiredRole(route.meta)) return false
+    
+    // If route has children, check if at least one child is accessible
+    if (route.children) {
+      const accessibleChildren = route.children.filter(child => 
+        !child.hidden && hasRequiredRole(child.meta)
+      )
+      return accessibleChildren.length > 0
+    }
+    
+    return true
+  })
 }
 
 // Check if route should be expanded based on current route

@@ -63,12 +63,12 @@ const ServerError = 500
 
 export const requestFile = (method, url, data) => {
   return service({
-    method,
-    url: url,
-    data,
-    processData: false,
-    contentType: 'Content-Type: Multipart-file'
-  })
+      method,
+      url: url,
+      data,
+      processData: false,
+      contentType: 'Content-Type: Multipart-file'
+    })
     .then(result => result)
     .catch(err => errLogic(err))
     .catch(err => this.$dialog.notify.error(err.message, {position: 'top-right', timeout: 1500}))

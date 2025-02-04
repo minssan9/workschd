@@ -1,19 +1,14 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
-import { useCounterStore } from '@/stores/modules/counter.js'
 
 const { t } = useI18n()
-const counterStore = useCounterStore()
 
 // Add computed property for URLs
 const webUrl = computed(() => import.meta.env.VITE_API_WEB)
 const privacyUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/privacy-policy`)
 const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-term`)
 
-const count = computed(() => counterStore.count)
-const doubleCount = computed(() => counterStore.doubleCount)
-const increment = () => counterStore.increment()
 </script>
 
 <template>

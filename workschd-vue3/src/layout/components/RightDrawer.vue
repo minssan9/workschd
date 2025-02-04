@@ -9,7 +9,7 @@
   >
     <div class="drawer-header">      
       <div class="row ">      
-        <div class="col-12">
+        <div class="col-12" v-if="userStore.user.accountId">
           <q-avatar size="32px">
             <img :src="userStore.user.profileImageUrl" />
           </q-avatar>
@@ -35,22 +35,23 @@
     </div>
 
     <q-scroll-area class="drawer-side">
-      <q-list padding>
+      <q-list padding >
         <!-- Account Section -->
-        <q-item-label header>Account</q-item-label>
-        <q-item clickable v-ripple :to="{ name: 'AccountProfile' }">
-          <q-item-section avatar>
-            <q-icon name="person" />
-          </q-item-section>
-          <q-item-section>Profile</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple :to="{ name: 'AccountSchedule' }">
-          <q-item-section avatar>
-            <q-icon name="person" />
-          </q-item-section>
-          <q-item-section>Account Schedule</q-item-section>
-        </q-item>
-
+        <div v-if="userStore.user.accountId">
+          <q-item-label header>Account</q-item-label>
+          <q-item clickable v-ripple :to="{ name: 'AccountProfile' }">
+            <q-item-section avatar>
+              <q-icon name="person" />
+            </q-item-section>
+            <q-item-section>Profile</q-item-section>
+          </q-item>
+          <q-item clickable v-ripple :to="{ name: 'AccountSchedule' }">
+            <q-item-section avatar>
+              <q-icon name="person" />
+            </q-item-section>
+            <q-item-section>Account Schedule</q-item-section>
+          </q-item>
+        </div>
         <!-- Settings Section -->
         <q-item-label header>Settings</q-item-label>
         

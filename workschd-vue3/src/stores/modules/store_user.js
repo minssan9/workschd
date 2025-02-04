@@ -130,7 +130,11 @@ export const useUserStore = defineStore('user', {
             }
         },
         async logout() {
-            Cookies.keys().forEach(cookie => Cookies.remove(cookie))
+            Cookies.remove('refreshToken')
+            Cookies.remove('accountId')
+            Cookies.remove('username')
+            Cookies.remove('email')
+            Cookies.remove('role')
             this.user = {
                 accountId: null,
                 username: null,
