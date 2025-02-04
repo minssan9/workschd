@@ -52,7 +52,7 @@ import { useI18n } from 'vue-i18n'
 import TeamApproveDialog from './dialog/TeamApproveDialog.vue'
 import TeamRegistrationDialog from './dialog/TeamRegistrationDialog.vue'
 import GridDefault from '@/components/grid/GridDefault.vue';
-import { useTeamStore } from '@/stores/modules/teamStore';
+import { useTeamStore } from '@/stores/modules/store_team';
 import { Team, JoinRequest } from '@/interface/team';
 import apiTeam from '@/api/modules/api-team'
 

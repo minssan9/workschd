@@ -57,7 +57,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useUserStore } from '@/stores/modules/store_user'
 import { useI18n } from 'vue-i18n'
-import { useTeamStore } from '@/stores/modules/teamStore'
+import { useTeamStore } from '@/stores/modules/store_team'
 import { Team } from '@/interface/team'
 
 const { t } = useI18n()

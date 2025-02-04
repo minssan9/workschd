@@ -34,7 +34,7 @@ import { ref, onMounted } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
-import { useTeamStore } from '@/stores/modules/teamStore'
+import { useTeamStore } from '@/stores/modules/store_team'
 import { Store, Branch } from '@/interface/workplace'
 
 const { t } = useI18n()

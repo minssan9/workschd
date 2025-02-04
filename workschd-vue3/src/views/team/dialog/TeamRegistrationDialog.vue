@@ -96,7 +96,7 @@
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import GridDefault from '@/components/grid/GridDefault.vue'
-import { useTeamStore } from '@/stores/modules/teamStore'
+import { useTeamStore } from '@/stores/modules/store_team'
 import { TeamForm, TeamMember } from '@/interface/team'
 
 const $q = useQuasar()
