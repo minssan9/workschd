@@ -13,8 +13,8 @@ public class EnumMaster {
     @Getter
     @RequiredArgsConstructor
     public enum RoleType {
-        STUDENT("STUDENT", "학생"),
-        TEACHER("TEACHER", "선생님"),
+        WORKER("WORKER", "근로자"),
+        SCHEDULER("SCHEDULER", "스케쥴러"),
         MANAGER("MANAGER", "관리자"),
         OWNER("OWNER", "소유자");
 
@@ -25,9 +25,10 @@ public class EnumMaster {
             return Arrays.stream(RoleType.values())
                     .filter(r -> r.getCode().equals(code))
                     .findAny()
-                    .orElse(STUDENT);
+                    .orElse(WORKER);
         }
     }
+
 
     @RequiredArgsConstructor
     @Getter

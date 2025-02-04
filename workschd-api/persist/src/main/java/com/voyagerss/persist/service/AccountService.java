@@ -17,15 +17,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.voyagerss.persist.EnumMaster.RoleType.TEACHER;
+import static com.voyagerss.persist.EnumMaster.RoleType.SCHEDULER;
 
 
 @Service
@@ -51,7 +48,7 @@ public class AccountService {
         accountRepository.saveAndFlush(account);
 
         if (isNew){
-            AccountRole accountRole = new AccountRole(EnumMaster.RoleType.STUDENT, account);
+            AccountRole accountRole = new AccountRole(EnumMaster.RoleType.WORKER, account);
             accountRoleRepository.saveAndFlush(accountRole);
 
             AccountSns accountSns = new AccountSns(
@@ -108,7 +105,7 @@ public class AccountService {
             accountRoleRepository.save(accountRole);
             account.getAccountRoles().add(accountRole);
 
-            if(vO.getRoleType().equals(TEACHER)) {
+            if(vO.getRoleType().equals(SCHEDULER)) {
 //                deleteRoleByAccountRoleId(accountId, EN9DOOR_STUDENT);
 //                MessageDTO messageDTO = MessageDTO.builder()
 //                        .templateCode(TEACHER_WELCOME)
