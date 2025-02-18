@@ -10,3 +10,6 @@ workschd-vue3/package-lock.json
 workschd-api/persist/src/main/resources/credentials.json
 workschd-api/**/src/main/generated
 workschd-nextjs/.env
+*.log
+workschd-nextjs/package-lock.json
+workschd-nextjs/package-lock.json

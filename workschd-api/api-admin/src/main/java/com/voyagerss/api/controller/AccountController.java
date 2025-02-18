@@ -120,33 +120,4 @@ public class AccountController {
         return ResponseEntity.ok(accountInfoService.save(vO));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody AccountDTO accountDTO) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    accountDTO.getUsername(),
-                    accountDTO.getPassword()
-                )
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            
-            // Get user details from AccountService
-            accountDTO = accountService.getAccountDtoByEmail(accountDTO.getUsername());
-            
-            // Create token using JwtTokenProvider
-            String token = tokenProvider.createAccessToken(
-                accountDTO.getAccountId(),
-                accountDTO.getEmail(),
-                accountDTO.getAccountRoles().stream().map(AccountRoleDTO::getRoleType).toList()
-            );
-
-            return ResponseEntity.ok(token);
-        } catch (AuthenticationException e) {
-            return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(new CommonException(CommonExceptionType.INVALID_CREDENTIALS));
-        }
-    }
 }

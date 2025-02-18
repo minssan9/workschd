@@ -17,9 +17,9 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot-ApiApplication<api-admin>",
+            "name": "Debug Spring Boot-ApiApplication<api-admin>",
             "request": "launch",
-            "cwd": "${workspaceFolder}workschd-api",
+            "cwd": "${workspaceFolder}/workschd-api",
             "mainClass": "com.voyagerss.api.ApiApplication",
             "projectName": "api-admin",
             "args": "",

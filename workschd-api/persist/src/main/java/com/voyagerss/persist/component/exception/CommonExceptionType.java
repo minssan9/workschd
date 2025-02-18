@@ -34,7 +34,8 @@ public enum CommonExceptionType {
     NONEXIST_DATA_EXCEPTION_MSG("8000",  "데이터를 찾을 수 없습니다. "),
     // business
     NOTEXIST_ITEM("4100", "Cannot found Item"),
-    NOTEXIST_ITEM_TEMPLATE("4100", "Cannot found Item template");
+    NOTEXIST_ITEM_TEMPLATE("4100", "Cannot found Item template"),
+    EMAIL_ALREADY_EXISTS("403", "Email Already Exist." );
 
     private final String code;
     private final String message;

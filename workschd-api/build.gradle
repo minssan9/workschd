@@ -57,7 +57,6 @@ allprojects {
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
         implementation 'org.springframework.boot:spring-boot-starter-validation'
-        implementation 'org.springframework.boot:spring-boot-starter-security'
 
 // QueryDSL dependencies
         implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

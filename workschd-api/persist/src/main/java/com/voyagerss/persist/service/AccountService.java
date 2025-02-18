@@ -41,35 +41,7 @@ public class AccountService {
     }
 
     public Account save(AccountDTO accountDTO) {
-        boolean isNew = false;
-        Account account = accountRepository.findByEmail(accountDTO.getEmail())
-                .orElseGet(() -> new Account(accountDTO));
-        if(account.getAccountId() == null) isNew = true;
-        accountRepository.saveAndFlush(account);
-
-        if (isNew){
-            AccountRole accountRole = new AccountRole(EnumMaster.RoleType.WORKER, account);
-            accountRoleRepository.saveAndFlush(accountRole);
-
-            AccountSns accountSns = new AccountSns(
-                    accountDTO.getUsername(),
-                    accountDTO.getPhone(),
-                    accountDTO.getEmail(),
-                    "Y",
-                    accountDTO.getProfileImageUrl(),
-                    accountDTO.getProviderType(),
-                    "",
-                    "",
-                    account);
-            accountSnsRepository.saveAndFlush(accountSns);
-
-            HashMap<String, String> kakaoVariables = new HashMap<>();
-            kakaoVariables.put("#{username}",       account.getUsername());
-
-            account.setAccountRoles(List.of(accountRole));
-            account.setAccountSnsList(List.of(accountSns));
-        }
-        return account;
+        return null;
     }
 
     public AccountDTO update(Integer accountId, AccountDTO accountDTO) {
@@ -171,6 +143,10 @@ public class AccountService {
         Account account = accountRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
         return toDTO(account);
+    }
+
+    public boolean existsByEmail(String email) {
+        return accountRepository.existsByEmail(email);
     }
 
 }

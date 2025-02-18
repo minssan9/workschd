@@ -116,6 +116,19 @@
             class="full-width q-py-sm q-mt-lg"
             size="lg"
           />
+
+          <!-- Add signup link -->
+          <div class="row justify-center q-mt-md">
+            <span class="text-grey-7">{{ t('login.signup.prompt', '계정이 없으신가요?') }}</span>
+            <q-btn
+              flat
+              dense
+              color="primary"
+              class="q-px-sm"
+              :label="t('login.signup.link', '회원가입')"
+              @click="router.push('/auth/signup')"
+            />
+          </div>
         </q-form>
       </div>
     </div>
