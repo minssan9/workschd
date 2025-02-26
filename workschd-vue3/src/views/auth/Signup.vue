@@ -21,6 +21,21 @@
         </q-input>
 
         <q-input
+          v-model="signupForm.username"
+          :label="t('signup.username.label', '사용자 이름')"
+          outlined
+          class="signup-input"
+          :rules="[
+            val => !!val || t('signup.validation.required', '필수 입력 항목입니다'),
+            val => val.length >= 2 || t('signup.validation.username.length', '사용자 이름은 2자 이상이어야 합니다')
+          ]"
+        >
+          <template v-slot:prepend>
+            <q-icon name="person" />
+          </template>
+        </q-input>
+
+        <q-input
           v-model="signupForm.password"
           :label="t('signup.password.label', '비밀번호')"
           type="password"
@@ -28,7 +43,7 @@
           class="signup-input"
           :rules="[
             val => !!val || t('signup.validation.required', '필수 입력 항목입니다'),
-            val => val.length >= 8 || t('signup.validation.password.length', '비밀번호는 8자 이상이어야 합니다')
+            val => val.length >= 4 || t('signup.validation.password.length', '비밀번호는 4자 이상이어야 합니다')
           ]"
         >
           <template v-slot:prepend>
@@ -51,6 +66,8 @@
             <q-icon name="lock" />
           </template>
         </q-input>
+
+        
 
         <q-btn
           type="submit"
@@ -89,6 +106,7 @@ const router = useRouter()
 
 const signupForm = ref({
   email: '',
+  username: '',
   password: '',
   confirmPassword: ''
 })
@@ -102,6 +120,7 @@ const handleSignup = async () => {
   try {
     const response = await apiAccount.signup({
       email: signupForm.value.email,
+      username: signupForm.value.username,
       password: signupForm.value.password
     })
 

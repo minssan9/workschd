@@ -5,12 +5,14 @@ import { LoadingService } from '@/utils/loading'
 // Whitelist routes that don't require authentication
 const whiteList = [
   '/',
-  '/login',
+  '/auth/login',
+  '/auth/signup',
+  '/oauth/redirect',
   '/about',
   '/subscription',
   '/privacy-policy',
-  '/terms',
-  '/oauth/redirect',
+  '/terms', 
+  '/test/*',
   '/401',
   '/403',
   '/404'
@@ -25,7 +27,7 @@ export function setupRouterGuards(router: Router) {
     const hasToken = userStore.accessToken
     
     // Allow access to whitelisted routes
-    if (whiteList.includes(to.path)) {
+    if (whiteList.includes(to.path) || whiteList.some(path => path.endsWith('*') && to.path.startsWith(path.slice(0, -1)))) {
       next()
       return
     }

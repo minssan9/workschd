@@ -9,36 +9,65 @@
     <div class="drawer-header">Menus</div>
     <q-scroll-area class="drawer-side">
       <q-list>
+        <!-- Info Section -->
+        <q-item-label header>{{ t('menu.info', '정보') }}</q-item-label>
+        
+        <q-item to="/" exact clickable v-ripple>
+          <q-item-section avatar>
+            <q-icon name="home" />
+          </q-item-section>
+          <q-item-section>{{ t('menu.home', '홈') }}</q-item-section>
+        </q-item>
+
+        <q-item to="/about" exact clickable v-ripple>
+          <q-item-section avatar>
+            <q-icon name="info" />
+          </q-item-section>
+          <q-item-section>{{ t('menu.about', '소개') }}</q-item-section>
+        </q-item>
+
+        <!-- Add Assembly menu item -->
+        <q-item to="/test/assembly" exact clickable v-ripple>
+          <q-item-section avatar>
+            <q-icon name="account_balance" />
+          </q-item-section>
+          <q-item-section>{{ t('menu.assembly', '국회의원') }}</q-item-section>
+        </q-item>
+
+        <!-- Rest of the menu items -->
         <template v-for="route in filteredRoutes" :key="route.name">
-          <!-- Parent route with children -->
-          <template v-if="route.children">
-            <q-expansion-item
-              :label="route.name"
-              :default-opened="isRouteExpanded(route)"
+          <!-- Skip the info routes since we handle them separately -->
+          <template v-if="!['home', 'about', 'Assembly'].includes(route.name)">
+            <!-- Parent route with children -->
+            <template v-if="route.children">
+              <q-expansion-item
+                :label="formatRouteName(route.name)"
+                :default-opened="isRouteExpanded(route)"
+              >
+                <q-list>
+                  <q-item
+                    v-for="child in filterHiddenRoutes(route.children)"
+                    :key="child.name"
+                    :to="{ name: child.name }"
+                    clickable
+                    v-ripple
+                  >
+                    <q-item-section>{{ formatRouteName(child.name) }}</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-expansion-item>
+            </template>
+            
+            <!-- Routes without children -->
+            <q-item
+              v-else
+              :to="{ name: route.name }"
+              clickable
+              v-ripple
             >
-              <q-list>
-                <q-item
-                  v-for="child in filterHiddenRoutes(route.children)"
-                  :key="child.name"
-                  :to="{ name: child.name }"
-                  clickable
-                  v-ripple
-                >
-                  <q-item-section>{{ formatRouteName(child.name) }}</q-item-section>
-                </q-item>
-              </q-list>
-            </q-expansion-item>
+              <q-item-section>{{ formatRouteName(route.name) }}</q-item-section>
+            </q-item>
           </template>
-          
-          <!-- Routes without children -->
-          <q-item
-            v-else
-            :to="{ name: route.name }"
-            clickable
-            v-ripple
-          >
-            <q-item-section>{{ formatRouteName(route.name) }}</q-item-section>
-          </q-item>
         </template>
       </q-list>
     </q-scroll-area>
@@ -52,7 +81,9 @@ import { useLayoutStore } from '@/stores/modules/store_layout'
 import { useUserStore } from '@/stores/modules/store_user'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const layoutStore = useLayoutStore()
 const userStore = useUserStore()
 const { drawerLeft } = storeToRefs(layoutStore)
@@ -116,5 +147,19 @@ onMounted(() => {
 
 .q-expansion-item :deep(.q-list) {
   padding-left: 2rem;
+}
+
+.drawer-header {
+  padding: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Add styling for section headers */
+.q-item-label.header {
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  letter-spacing: .1em;
+  color: rgba(0, 0, 0, 0.6);
 }
 </style> 

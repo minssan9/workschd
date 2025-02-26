@@ -59,11 +59,9 @@ public class EnumMaster {
 
     @Getter
     @AllArgsConstructor
-    public enum EmployeeStatus {
+    public enum AccountStatus {
         ACTIVE("ACTIVE", "진행 중"),
         INACTIVE("INACTIVE", "비활성"),
-        NOT_PAID("NOT_PAID", "미결제"),
-        END("END", "종료"),
         STOP("STOP", "중단"),
         PAUSE("PAUSE", "일시중지");
 

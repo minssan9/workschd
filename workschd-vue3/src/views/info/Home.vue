@@ -103,61 +103,7 @@ const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-ter
         </div>
       </div>
     </div>
-
-    <!-- Updated Footer -->
-    <q-footer class="bg-grey-9 text-white">
-      <div class="q-pa-lg">
-        <div class="row items-center justify-between q-mb-md">
-          <div class="col-12 col-md-auto text-center text-md-left">
-            {{ t('home.footer.support', '문의 및 지원: 언제든 연락주세요. 친절하게 상담해 드리겠습니다.') }}
-          </div>
-          <div class="col-12 col-md-auto text-center text-md-right q-mt-sm q-mt-md-none">
-            <q-btn
-              color="white"
-              outline
-              :label="t('home.footer.button.contact', '문의하기')"
-              :href="webUrl"
-            />
-          </div>
-        </div>
-        
-        <!-- Legal Links -->
-        <div class="row justify-center q-mt-md">
-          <div class="col-auto">
-            <q-btn
-              flat
-              dense
-              color="white"
-              :label="t('home.footer.privacyPolicy', '개인정보처리방침')"
-              :href="privacyUrl"
-              target="_blank"
-              class="text-caption"
-            />
-          </div>
-          <div class="col-auto">
-            <q-separator vertical dark class="q-mx-sm" />
-          </div>
-          <div class="col-auto">
-            <q-btn
-              flat
-              dense
-              color="white"
-              :label="t('home.footer.terms', '이용약관')"
-              :href="termsUrl"
-              target="_blank"
-              class="text-caption"
-            />
-          </div>
-        </div>
-        
-        <!-- Copyright -->
-        <div class="row justify-center q-mt-sm">
-          <div class="col-auto text-caption text-grey-5">
-            © {{ new Date().getFullYear() }} {{ t('home.footer.copyright', '모든 권리 보유') }}
-          </div>
-        </div>
-      </div>
-    </q-footer>
+ 
   </q-page>
 </template>
 

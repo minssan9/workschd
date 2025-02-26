@@ -27,6 +27,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +42,7 @@ public class AuthController {
     private final AccountInfoService accountInfoService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     public ResponseEntity getUserByAuth(HttpServletRequest request) {
@@ -60,6 +62,8 @@ public class AuthController {
             if (accountService.existsByEmail(accountDTO.getEmail())) {
                 throw new CommonException(CommonExceptionType.EMAIL_ALREADY_EXISTS);
             }
+
+            accountDTO.setPassword(passwordEncoder.encode(accountDTO.getPassword())); // Encrypt password
 
             Account account = accountService.save(accountDTO);
             AccountInfoDTO accountInfoDTO = new AccountInfoDTO();

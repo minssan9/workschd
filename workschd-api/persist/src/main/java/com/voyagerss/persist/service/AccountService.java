@@ -18,11 +18,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.voyagerss.persist.EnumMaster.RoleType.SCHEDULER;
+import static com.voyagerss.persist.EnumMaster.RoleType.WORKER;
+
 
 
 @Service
@@ -40,8 +43,21 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
+    @Transactional
     public Account save(AccountDTO accountDTO) {
-        return null;
+        // Create new Account entity from DTO
+        Account account = new Account();
+        account.setEmail(accountDTO.getEmail());
+        account.setUsername(accountDTO.getUsername());
+        account.setStatus(EnumMaster.AccountStatus.ACTIVE); // Set default status as ACTIVE
+        account.setCreatedAt(LocalDateTime.now());
+
+        // Save and return the new account
+        accountRepository.save(account);
+
+        accountDTO.setRoleType(WORKER);
+        addRoleByAccountId(account.getAccountId(), accountDTO);
+        return account;
     }
 
     public AccountDTO update(Integer accountId, AccountDTO accountDTO) {
