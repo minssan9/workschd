@@ -129,23 +129,41 @@
               @click="router.push('/auth/signup')"
             />
           </div>
+
+          <!-- Add Google Sign In Button -->
+          <q-btn
+            type="button"
+            color="red"
+            class="full-width"
+            icon="fab fa-google"
+            label="Google로 로그인"
+            @click="handleGoogleSignIn"
+            :loading="isGoogleLoading"
+          />
         </q-form>
       </div>
     </div>
   </q-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from 'quasar'
 import apiAccount from "@/api/modules/api-account"
 import { removeAllCookies } from '@/utils/cookieUtils'
 import { useRouter } from 'vue-router'
+import { GoogleAuthAPI } from './GoogleAuth'
+import { useUserStore } from '@/stores/modules/store_user'
 
 const { t } = useI18n()
 const $q = useQuasar()
 const VITE_CDN_URL = import.meta.env.VITE_CDN_URL
+const router = useRouter()
+const userStore = useUserStore()
+
+const isGoogleLoading = ref(false)
+const googleAuth = new GoogleAuthAPI()
 
 const kakaoLogin = () => {
   window.Kakao.Auth.login({
@@ -199,9 +217,6 @@ const loginForm = ref({
 })
 const rememberMe = ref(false)
 
-// Add router
-const router = useRouter()
-
 // Update login handler
 const handleLogin = async () => {
   try {
@@ -222,6 +237,41 @@ const handleLogin = async () => {
     } else {
       alert('로그인 중 오류가 발생했습니다.')
     }
+  }
+}
+
+const handleGoogleSignIn = async () => {
+  isGoogleLoading.value = true
+  try {
+    const user = await googleAuth.signIn()
+    
+    // Get the ID token
+    const idToken = await user.getIdToken()
+    
+    // Update user store with Firebase user info
+    userStore.setUser({
+      id: user.uid,
+      email: user.email || '',
+      name: user.displayName || '',
+      photo: user.photoURL || '',
+      token: idToken
+    })
+
+    $q.notify({
+      type: 'positive',
+      message: t('auth.login.success', '로그인 성공')
+    })
+
+    // Redirect to home or intended page
+    router.push({ name: 'home' })
+  } catch (error: any) {
+    console.error('Google sign in error:', error)
+    $q.notify({
+      type: 'negative',
+      message: t('auth.login.error', '로그인 실패')
+    })
+  } finally {
+    isGoogleLoading.value = false
   }
 }
 </script>
@@ -272,5 +322,13 @@ const handleLogin = async () => {
   background-color: #f5f5f5;
   background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
   background-size: 20px 20px;
+}
+
+.q-card {
+  width: 360px;
+  
+  @media (max-width: 600px) {
+    width: 100%;
+  }
 }
 </style>
