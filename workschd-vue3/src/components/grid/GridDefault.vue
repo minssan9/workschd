@@ -1,11 +1,11 @@
 <template>
   <div id="gridDiv">
-    <div class="button">
-      <button @click="gridApi?.undoCellEditing()">undo</button>
-      <button @click="gridApi?.redoCellEditing()">redo</button>
-      <button @click="update">update</button>
-    </div>
-    <div style="height: 700px; overflow: auto">
+<!--    <div class="button">-->
+<!--      <button @click="gridApi?.undoCellEditing()">undo</button>-->
+<!--      <button @click="gridApi?.redoCellEditing()">redo</button>-->
+<!--      <button @click="update">update</button>-->
+<!--    </div>-->
+    <div style="height: 50vh; overflow: auto">
 
       <AgGridVue
           style="width: 100%; height: 100%"

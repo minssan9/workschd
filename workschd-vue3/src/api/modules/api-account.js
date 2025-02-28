@@ -1,9 +1,6 @@
 import service from "@/api/axios-voyagerss.js";
  
-const baesURL = `account`
-const ELECTION_API_URL = 'http://apis.data.go.kr/9760000/PofelcddInfoInqireService/getPoelpcddRegistSttusInfoInqire'
-const SERVICE_KEY = 'dKNTmNiGHpcJLrC4HIJc3nW4AaPPKOQLCvlzV7IQZDTTztv6PTuDusZxS8iC1vpBEtkLsnk97WEzKpEvf3Zqgg%3D%3D'
-
+const baesURL = `account` 
 const apiAccount = {
   getUser () {
     return service.get(`${baesURL}`)
@@ -48,27 +45,7 @@ const apiAccount = {
   signup: (accountDTO) => {
     return service.post('/auth/signup', accountDTO)
   },
-
-  getElectionData: (params = {}) => {
-    const defaultParams = {
-      serviceKey: SERVICE_KEY,
-      pageNo: '1',
-      numOfRows: '10',
-      sgId: '20240410',
-      sgTypecode: '2',
-      sggName: '',
-      sdName: ''
-    }
-
-    return service.get(ELECTION_API_URL, {
-      params: { ...defaultParams, ...params },
-      headers: {
-        'Accept': 'application/json'
-      }
-    })
-  }
+ 
 }
 
 export default apiAccount
-
-// dKNTmNiGHpcJLrC4HIJc3nW4AaPPKOQLCvlzV7IQZDTTztv6PTuDusZxS8iC1vpBEtkLsnk97WEzKpEvf3Zqgg%3D%3D

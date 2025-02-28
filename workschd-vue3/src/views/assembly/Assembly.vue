@@ -8,7 +8,7 @@
           <div class="row q-gutter-sm">
             <q-input
               v-model="searchText"
-              :placeholder="t('assembly.search.placeholder', '이름, 정당으로 검색')"
+              :placeholder="t('assembly.search.placeholder', '이름, 정당, 당선차수로 검색')"
               dense
               outlined
               class="col-auto"
@@ -35,17 +35,32 @@
         </div>
       </div>
 
-      <!-- Grid View -->
-      <div v-if="viewMode === 'grid'" class="col-12">
-        <GridDefault
-          :columnDefs="columnDefs"
-          :rowData="filteredMembers"
-          @grid-ready="onGridReady"
-          class="ag-theme-alpine"
-          style="height: 600px"
-        />
-      </div>
+      <!-- First Grid (Original) -->
+      <template v-if="viewMode === 'grid'">
+        <div class="col-12 q-mb-lg">
+          <h6>국회의원 목록 (기존)</h6>
+          <GridDefault
+            :columnDefs="columnDefs"
+            :rowData="filteredMembers"
+            @grid-ready="onGridReady"
+            class="ag-theme-alpine"
+            style="height: 50vh"
+          />
+        </div>
 
+        <!-- New Grid (Current Members) -->
+        <div class="col-12">
+          <h6>국회의원 현황</h6>
+          <GridDefault
+            :columnDefs="memberColumnDefs"
+            :rowData="currentMembers"
+            @grid-ready="onMemberGridReady"
+            class="ag-theme-alpine"
+            style="height: 50vh"
+          />
+        </div>
+      </template>
+      
       <!-- Card View -->
       <template v-else>
         <div v-for="member in filteredMembers" :key="member.NAAS_CD" class="col-12 col-sm-6 col-md-4">
@@ -239,6 +254,13 @@ const isLoading = ref(false)
 // Grid Configuration
 const columnDefs = ref<ColDef[]>([
   {
+    headerName: t('assembly.grid.id', '의원번호'),
+    field: 'NAAS_CD',
+    sortable: true,
+    filter: true,
+    width: 100
+  },
+  {
     headerName: t('assembly.grid.name', '이름'),
     field: 'NAAS_NM',
     sortable: true,
@@ -258,11 +280,24 @@ const columnDefs = ref<ColDef[]>([
     valueGetter: (params) => params.data.ELECD_NM || params.data.ELECD_DIV_NM
   },
   {
+    headerName: t('assembly.grid.divDistrict', '선거구분'),
+    field: 'ELECD_DIV_NM',
+    sortable: true,
+    filter: true
+  },
+  {
     headerName: t('assembly.grid.committee', '소속위원회'),
     field: 'CMIT_NM',
     sortable: true,
     filter: true,
     valueGetter: (params) => params.data.CMIT_NM || params.data.BLNG_CMIT_NM
+  },
+  {
+    headerName: t('assembly.grid.experience', '당선차수'),
+    field: 'GTELT_ERACO',
+    sortable: true,
+    filter: true,
+    width: 100
   }
 ])
 
@@ -273,7 +308,8 @@ const filteredMembers = computed(() => {
   const search = searchText.value.toLowerCase()
   return members.value.filter(member => 
     member.NAAS_NM?.toLowerCase().includes(search) ||
-    member.PLPT_NM?.toLowerCase().includes(search)
+    member.PLPT_NM?.toLowerCase().includes(search) ||
+    member.GTELT_ERACO?.toLowerCase().includes(search)
   )
 })
 
@@ -281,13 +317,13 @@ const filteredMembers = computed(() => {
 const fetchMembers = async (page = 1, size = itemsPerPage.value) => {
   isLoading.value = true
   try {
-    const { data } = await apiAssembly.getMembers({
+    const data = await apiAssembly.getMembers({
       pIndex: page,
       pSize: size
     })
     
-    if (data.ALLNAMEMBER[0].head[0].RESULT.CODE !== 'INFO-000') {
-      throw new Error(data.ALLNAMEMBER[0].head[0].RESULT.MESSAGE)
+    if (data.ALLNAMEMBER[0].head[1].RESULT.CODE !== 'INFO-000') {
+      throw new Error(data.ALLNAMEMBER[0].head[1].RESULT.MESSAGE)
     }
     
     members.value = data.ALLNAMEMBER[1].row
@@ -335,9 +371,94 @@ watch(searchText, (newValue) => {
   }
 })
 
+// New refs for current members
+const currentMembers = ref([])
+const pageSize = ref(10)
+const totalCurrentItems = ref(0)
+
+// Column definitions for current members grid
+const memberColumnDefs = ref<ColDef[]>([
+  {
+    headerName: t('assembly.grid.number', '의원번호'),
+    field: 'num',
+    sortable: true,
+    filter: true,
+    width: 100
+  },
+  {
+    headerName: t('assembly.grid.name', '이름'),
+    field: 'empNm',
+    sortable: true,
+    filter: true
+  },
+  {
+    headerName: t('assembly.grid.englishName', '영문이름'),
+    field: 'engNm',
+    sortable: true,
+    filter: true
+  },
+  {
+    headerName: t('assembly.grid.chineseName', '한자이름'),
+    field: 'hjNm',
+    sortable: true,
+    filter: true
+  },
+  {
+    headerName: t('assembly.grid.district', '선거구'),
+    field: 'origNm',
+    sortable: true,
+    filter: true
+  },
+  {
+    headerName: t('assembly.grid.term', '당선횟수'),
+    field: 'reeleGbnNm',
+    sortable: true,
+    filter: true
+  },
+  {
+    headerName: t('assembly.grid.photo', '사진'),
+    field: 'jpgLink',
+    sortable: false,
+    filter: false,
+    cellRenderer: (params: any) => {
+      return params.value ? `<img src="${params.value}" style="width: 40px; height: 50px; object-fit: cover;">` : ''
+    }
+  }
+])
+
+// Function to fetch current members
+const fetchCurrentMembers = async () => {
+  try {
+    const response = await apiAssembly.getMemberList({
+      pIndex: currentPage.value,
+      pSize: pageSize.value
+    })
+    
+    currentMembers.value = response.items
+    totalCurrentItems.value = response.pageInfo.totalCount
+
+    // Update pagination if needed
+    if (response.pageInfo.pageNo !== currentPage.value) {
+      currentPage.value = response.pageInfo.pageNo
+    }
+  } catch (error) {
+    console.error('Error fetching current members:', error)
+    $q.notify({
+      type: 'negative',
+      message: t('assembly.error.fetch', '의원 목록을 불러오는데 실패했습니다.')
+    })
+  }
+}
+
+// Grid ready handler for current members
+const onMemberGridReady = (params: any) => {
+  params.api.sizeColumnsToFit()
+}
+
 // Lifecycle
 onMounted(() => {
   fetchMembers()
+  fetchCurrentMembers()
 })
 </script>
 
@@ -395,5 +516,10 @@ onMounted(() => {
       text-align: center;
     }
   }
+}
+
+h6 {
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 </style> 
