@@ -63,25 +63,7 @@ export default defineConfig({
     // @quasar/plugin-vite options list:
     // https://github.com/quasarframework/quasar/blob/dev/vite-plugin/index.d.ts
     quasar({
-      sassVariables: '@/assets/sass/quasar-variables.sass',
-      plugins: ['Notify', 'Dialog', 'Loading'],
-      config: {
-        brand: {
-          primary: '#1976D2',
-          secondary: '#26A69A',
-          accent: '#9C27B0',
-          dark: '#1D1D1D',
-          positive: '#21BA45',
-          negative: '#C10015',
-          info: '#31CCEC',
-          warning: '#F2C037'
-        },
-        notify: {
-          position: 'top',
-          timeout: 2500,
-          textColor: 'white'
-        }
-      }
+      sassVariables: '@/assets/sass/quasar-variables.sass'
     }),
     Components({
       resolvers: []
@@ -111,7 +93,7 @@ export default defineConfig({
     port: 3003, // 개발 서버 포트 설정
     open: true, // 브라우저 자동 열기
     host: true, // 네트워크에서 접근 가능하도록 설정
-    https: false, // HTTPS 사용 여부
+    // https: false, // HTTPS 사용 여부
     cors: true, // CORS 활성화
     proxy: {
       // API 프록시 설정

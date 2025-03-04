@@ -38,12 +38,27 @@ const apiAccount = {
     return service.postFile(`${baesURL}/${accountId}/image`, profileImage)
   },
 
-  login: (loginData) => {
-    return service.post('/auth/login', loginData)
+  login(data) {
+    return service({
+      url: '/auth/login',
+      method: 'post',
+      data: {
+        email: data.email,
+        password: data.password
+      }
+    })
   },
 
-  signup: (accountDTO) => {
-    return service.post('/auth/signup', accountDTO)
+  signup(data) {
+    return service({
+      url: '/auth/signup',
+      method: 'post',
+      data: {
+        email: data.email,
+        username: data.username,
+        password: data.password
+      }
+    })
   },
  
 }

@@ -16,18 +16,23 @@ const pinia = createPinia()
 
 app.use(i18n);
 app.use(pinia)
-app.use(router)
-app.use(Quasar)
-
-// Make Firebase available throughout the app
-app.config.globalProperties.$firebase = firebaseApp
+app.use(router) 
 
 app.use(Quasar, {
   plugins: { Notify }, // register Quasar plugins
   config: {
-    notify: {} // default configuration will be used from vite.config.ts
+    notify: {
+      /* Notify defaults */
+      position: 'top-right',
+      timeout: 2500,
+      textColor: 'white'
+    }
   }
 })
+
+
+// Make Firebase available throughout the app
+app.config.globalProperties.$firebase = firebaseApp 
 
 declare global {
   interface Window {

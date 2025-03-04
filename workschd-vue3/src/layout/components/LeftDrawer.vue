@@ -24,23 +24,15 @@
             <q-icon name="info" />
           </q-item-section>
           <q-item-section>{{ t('menu.about', '소개') }}</q-item-section>
-        </q-item>
-
-        <!-- Add Assembly menu item -->
-        <q-item to="/test/assembly" exact clickable v-ripple>
-          <q-item-section avatar>
-            <q-icon name="account_balance" />
-          </q-item-section>
-          <q-item-section>{{ t('menu.assembly', '국회의원') }}</q-item-section>
-        </q-item>
+        </q-item> 
 
         <!-- Rest of the menu items -->
-        <template v-for="route in filteredRoutes" :key="route.name">
-          <!-- Skip the info routes since we handle them separately -->
-          <template v-if="!['home', 'about', 'Assembly'].includes(route.name)">
+        <template v-for="route in filteredRoutes">
+          <template v-if="!['home', 'about'].includes(route.name)">
             <!-- Parent route with children -->
             <template v-if="route.children">
               <q-expansion-item
+                :key="route.name"
                 :label="formatRouteName(route.name)"
                 :default-opened="isRouteExpanded(route)"
               >
@@ -61,6 +53,7 @@
             <!-- Routes without children -->
             <q-item
               v-else
+              :key="route.name"
               :to="{ name: route.name }"
               clickable
               v-ripple
@@ -95,12 +88,6 @@ const filteredRoutes = computed(() => {
   return filterHiddenRoutes(router.options.routes)
 })
 
-// Helper function to check if user has required role
-function hasRequiredRole(routeMeta) {
-  if (!routeMeta?.roles) return true
-  return routeMeta.roles.includes(userStore.role)
-}
-
 // Updated helper function to filter hidden and role-based routes
 function filterHiddenRoutes(routes) {
   return routes.filter(route => {
@@ -108,12 +95,13 @@ function filterHiddenRoutes(routes) {
     if (route.hidden) return false
     
     // Check parent route roles
-    if (!hasRequiredRole(route.meta)) return false
+    if (route.meta?.roles && !route.meta.roles.includes(userStore.role)) return false
     
     // If route has children, check if at least one child is accessible
     if (route.children) {
       const accessibleChildren = route.children.filter(child => 
-        !child.hidden && hasRequiredRole(child.meta)
+        !child.hidden && 
+        (!child.meta?.roles || child.meta.roles.includes(userStore.role))
       )
       return accessibleChildren.length > 0
     }

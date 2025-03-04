@@ -69,27 +69,33 @@
 
       <!-- Email Login Form -->
       <div class="email-login-form q-pa-md">
-        <h5 class="text-center q-mb-md">{{ t('login.form.title', '이메일로 로그인') }}</h5>
+        <h5 class="text-center q-mb-md">{{ t('login.title', '로그인') }}</h5>
         <q-form @submit="handleLogin" class="q-gutter-md">
           <q-input
-            v-model="loginForm.username"
-            :label="t('login.placeholder.username', '아이디를 입력하세요')"
+            v-model="loginForm.email"
+            :label="t('login.email.label', '이메일')"
+            type="email"
             outlined
             class="login-input"
-            :rules="[val => !!val || t('login.validation.required', '필수 입력 항목입니다')]"
+            :rules="[
+              val => !!val || t('login.validation.required', '필수 입력 항목입니다'),
+              val => isValidEmail(val) || t('login.validation.email', '올바른 이메일 형식이 아닙니다')
+            ]"
           >
             <template v-slot:prepend>
-              <q-icon name="person" />
+              <q-icon name="email" />
             </template>
           </q-input>
 
           <q-input
             v-model="loginForm.password"
-            :label="t('login.placeholder.password', '비밀번호를 입력하세요')"
-            outlined
+            :label="t('login.password.label', '비밀번호')"
             type="password"
+            outlined
             class="login-input"
-            :rules="[val => !!val || t('login.validation.required', '필수 입력 항목입니다')]"
+            :rules="[
+              val => !!val || t('login.validation.required', '필수 입력 항목입니다')
+            ]"
           >
             <template v-slot:prepend>
               <q-icon name="lock" />
@@ -212,31 +218,48 @@ const callback = (response) => {
 
 // Add login form state
 const loginForm = ref({
-  username: '',
+  email: '',
   password: ''
 })
 const rememberMe = ref(false)
 
+function isValidEmail(email) {
+  const emailPattern = /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/
+  return emailPattern.test(email)
+}
+
 // Update login handler
 const handleLogin = async () => {
   try {
-    const response = await apiAccount.login(loginForm.value)
-    if (response.data && response.data.token) {
-      // Redirect to the redirect page with token
-      router.push({
-        path: '/redirect',
-        query: { token: response.data.token }
+    const response = await apiAccount.login({
+      email: loginForm.value.email,
+      password: loginForm.value.password
+    })
+
+    if (response.data) {
+      // Store user data and tokens
+      await userStore.login(response.data.accessToken)
+      
+      $q.notify({
+        type: 'positive',
+        message: t('login.success', '로그인되었습니다.')
       })
-    } else {
-      alert('로그인 실패: 토큰이 없습니다.')
+      
+      // Redirect to home or dashboard
+      router.push('/')
     }
   } catch (error) {
     console.error('Login error:', error)
+    let errorMessage = t('login.error.default', '로그인 중 오류가 발생했습니다.')
+    
     if (error.response?.status === 401) {
-      alert('아이디 또는 비밀번호가 올바르지 않습니다.')
-    } else {
-      alert('로그인 중 오류가 발생했습니다.')
+      errorMessage = t('login.error.invalid', '이메일 또는 비밀번호가 올바르지 않습니다.')
     }
+    
+    $q.notify({
+      type: 'negative',
+      message: errorMessage
+    })
   }
 }
 
