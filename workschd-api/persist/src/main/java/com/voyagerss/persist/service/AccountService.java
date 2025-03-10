@@ -48,6 +48,7 @@ public class AccountService {
         // Create new Account entity from DTO
         Account account = new Account();
         account.setEmail(accountDTO.getEmail());
+        account.setPassword(accountDTO.getPassword()); // Encrypt password
         account.setUsername(accountDTO.getUsername());
         account.setStatus(EnumMaster.AccountStatus.ACTIVE); // Set default status as ACTIVE
         account.setCreatedAt(LocalDateTime.now());

@@ -3,6 +3,7 @@ package com.voyagerss.api.oauth.service;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.entity.AccountRole;
 import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.repository.AccountRepository;
 import com.voyagerss.persist.repository.AccountSnsRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,7 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.voyagerss.api.repository.AccountRepository;
 import com.voyagerss.api.oauth.entity.UserPrincipal;
 
 import lombok.RequiredArgsConstructor;

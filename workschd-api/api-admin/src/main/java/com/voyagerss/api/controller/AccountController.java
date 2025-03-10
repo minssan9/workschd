@@ -52,13 +52,23 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity getUserByAuth(HttpServletRequest request) {
-        UserPrincipal userPrincipal;
         try {
-            userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } catch (ClassCastException e){
-            return new ResponseEntity<String>("token is " + request.getHeader("Authorization"), HttpStatus.UNAUTHORIZED);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+            
+            String userEmail;
+             if (principal instanceof String) {
+                // Handle JWT token case - extract user ID from token
+                String token = request.getHeader("Authorization").replace("Bearer ", "");
+                userEmail = tokenProvider.getUserEmail(token);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            
+            return ResponseEntity.ok(accountService.getAccountDtoByEmail(userEmail));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(accountService.getAccountDtoById(userPrincipal.getUserId()));
     }
 
     @GetMapping("/search")

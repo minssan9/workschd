@@ -95,7 +95,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             
             // Get user details from AccountService
-            accountDTO = accountService.getAccountDtoByEmail(accountDTO.getUsername());
+            accountDTO = accountService.getAccountDtoByEmail(accountDTO.getEmail());
             
             // Create token using JwtTokenProvider
             String token = tokenProvider.createAccessToken(

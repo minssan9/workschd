@@ -14,3 +14,6 @@ workschd-nextjs/.env
 workschd-nextjs/package-lock.json
 workschd-nextjs/package-lock.json
 workschd-vue3/.env
+*.cache
+		
+package-lock.json

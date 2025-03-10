@@ -236,9 +236,9 @@ const handleLogin = async () => {
       password: loginForm.value.password
     })
 
-    if (response.data) {
+    if (response) {
       // Store user data and tokens
-      await userStore.login(response.data.accessToken)
+      await userStore.login(response)
       
       $q.notify({
         type: 'positive',
