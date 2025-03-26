@@ -59,8 +59,8 @@ const router = createRouter({
           }
         },
         { path: '/manage', name: 'TeamManage', component: () => import('@/views/team/TeamManage.vue') },
-        { path: '/workplace', name: 'TeamWorkPlace', component: () => import('@/views/team/TeamWorkPlace.vue') },
-        { path: '/employee/schedule', name: 'TeamEmployeeSchedule', component: () => import('@/views/team/TeamScheduleConfig.vue') }        
+        // { path: '/workplace', name: 'TeamWorkPlace', component: () => import('@/views/team/TeamWorkPlace.vue') },
+        // { path: '/employee/schedule', name: 'TeamEmployeeSchedule', component: () => import('@/views/team/TeamScheduleConfig.vue') }        
       ]
     },
 

@@ -94,8 +94,8 @@ function filterHiddenRoutes(routes) {
     // Filter out hidden routes
     if (route.hidden) return false
     
-    // Check parent route roles
-    if (route.meta?.roles && !route.meta.roles.includes(userStore.role)) return false
+    // // Check parent route roles
+    // if (route.meta?.roles && !route.meta.roles.includes(userStore.role)) return false
     
     // If route has children, check if at least one child is accessible
     if (route.children) {

@@ -8,26 +8,47 @@
           color="primary" 
           @click="showRegistrationDialog = true"
           class="q-mr-sm"
-        />
-        <q-btn-toggle
-          v-model="role"
-          :options="[
-            {label: t('team.manage.worker', 'Worker'), value: 'worker'},
-            {label: t('team.manage.manager', 'Manager'), value: 'manager'}
-          ]"
-        />
+        />        
       </div>
     </div>
 
     <!-- Team Grid -->
-    <div class="ag-theme-alpine" style="height: 400px">
+    <div class="ag-theme-alpine" >
       <GridDefault
           style="width: 100%; height: 100%"
           :columnDefs="columnDefs"
           :rowData="teams"
           @grid-ready="onGridReady"
+          :gridOptions="gridOptions"
           class="ag-theme-alpine-dark"
       />
+    </div>
+
+    <!-- Team Details Section -->
+    <div v-if="selectedTeamForDetails" class="team-details q-mt-md">
+      <div class="row justify-between items-center q-mb-md">
+        <h5 class="q-my-none">{{ t('team.manage.teamDetails', 'Team Details') }}: {{ selectedTeamForDetails.name }}</h5>
+        <q-tabs
+          v-model="activeTab"
+          class="text-primary"
+          indicator-color="primary"
+          align="left"
+        >
+          <q-tab name="schedule" :label="t('team.manage.tabs.schedule', 'Schedule Config')" />
+          <q-tab name="workplace" :label="t('team.manage.tabs.workplace', 'Workplace')" />
+        </q-tabs>
+      </div>
+
+      <q-separator />
+
+      <q-tab-panels v-model="activeTab" animated>
+        <q-tab-panel name="schedule">
+          <TeamScheduleConfig :team-id="selectedTeamForDetails.id" />
+        </q-tab-panel>
+        <q-tab-panel name="workplace">
+          <TeamWorkPlace :team-id="selectedTeamForDetails.id" />
+        </q-tab-panel>
+      </q-tab-panels>
     </div>
 
     <!-- Registration Dialog -->
@@ -51,6 +72,8 @@ import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n' 
 import TeamApproveDialog from './dialog/TeamApproveDialog.vue'
 import TeamRegistrationDialog from './dialog/TeamRegistrationDialog.vue'
+import TeamScheduleConfig from './subpage/TeamManageScheduleConfig.vue'
+import TeamWorkPlace from './subpage/TeamManageWorkPlace.vue'
 import GridDefault from '@/components/grid/GridDefault.vue';
 import { useTeamStore } from '@/stores/modules/teamStore';
 import { Team, JoinRequest } from '@/interface/team';
@@ -59,10 +82,11 @@ import apiTeam from '@/api/modules/api-team'
 // State
 const $q = useQuasar()
 const { t } = useI18n()
-const role = ref('manager')
 const showRegistrationDialog = ref(false)
 const approvalDialog = ref(false)
 const selectedTeam = ref<Team | null>(null)
+const selectedTeamForDetails = ref<Team | null>(null)
+const activeTab = ref('schedule')
 
 const teamStore = useTeamStore();
 
@@ -88,7 +112,17 @@ const teams = ref<Team[]>([
 
 // Grid Configuration
 const columnDefs = ref([
-  { headerName: t('team.manage.grid.teamName', 'Team Name'), field: 'name' },
+  { 
+    headerName: t('team.manage.grid.teamName', 'Team Name'), 
+    field: 'name',
+    cellRenderer: (params: any) => {
+      return `<div class="clickable-cell">${params.value}</div>`;
+    },
+    onCellClicked: (params: any) => {
+      selectedTeamForDetails.value = params.data;
+      activeTab.value = 'schedule';
+    }
+  },
   { headerName: t('team.manage.grid.location', 'Location'), field: 'location' },
   { headerName: t('team.manage.grid.members', 'Members'), field: 'memberCount' },
   { headerName: t('team.manage.grid.pendingRequests', 'Pending Requests'), field: 'joinRequests', valueGetter: (params: any) => params.data.joinRequests.length },
@@ -114,6 +148,14 @@ const columnDefs = ref([
     }
   }
 ])
+
+const gridOptions = ref({
+  onRowClicked: (params: any) => {
+    console.log('Row clicked via gridOptions:', params);
+    selectedTeamForDetails.value = params.data;
+    activeTab.value = 'schedule';
+  }
+});
 
 // Methods
 const onGridReady = () => { 
@@ -156,5 +198,18 @@ onMounted(() => {
 <style scoped>
 .ag-theme-alpine {
   width: 100%;
+}
+
+.team-details {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
+.clickable-cell {
+  cursor: pointer;
+  color: var(--q-primary);
+  text-decoration: underline;
 }
 </style>

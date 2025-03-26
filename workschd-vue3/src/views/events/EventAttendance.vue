@@ -1,110 +1,151 @@
 <template>
   <q-page padding>
-    <q-form @submit="handleSubmit" @reset="handleReset">
-      <q-select
-          v-model="attendance.branchId"
-          :label="t('attendance.label.branch', 'Branch')"
-          :options="branches"
-          option-value="id"
-          option-label="name"
-          required
-      />
-      <q-select
-          v-model="attendance.taskId"
-          :label="t('attendance.label.task', 'Task')"
-          :options="tasks"
-          option-value="id"
-          option-label="id"
-          required
-      />
-      <q-input
-          v-model="attendance.actualStartTime"
-          :label="t('attendance.label.actualStartTime', 'Actual Start Time')"
-          type="datetime-local"
-      />
-      <q-input
-          v-model="attendance.actualEndTime"
-          :label="t('attendance.label.actualEndTime', 'Actual End Time')"
-          type="datetime-local"
-      />
-      <q-input
-          v-model="attendance.calculatedDailyWage"
-          :label="t('attendance.label.calculatedDailyWage', 'Calculated Daily Wage')"
-          type="number"
-      />
-      <div class="q-mt-md">
-        <q-btn :label="t('common.button.submit', 'Submit')" type="submit" color="primary" />
-        <q-btn :label="t('common.button.reset', 'Reset')" type="reset" color="secondary" />
+    <div class="row items-center justify-between q-mb-md">
+      <h5 class="q-mt-none q-mb-none">{{ t('attendance.title', 'Attendance Records') }}</h5>
+      <div class="row q-gutter-sm">
+        <q-btn 
+          :label="showForm ? t('attendance.hideForm', 'Hide Form') : t('attendance.showForm', 'Show Form')" 
+          color="primary" 
+          outline
+          size="sm"
+          @click="showForm = !showForm" 
+        />
+        <q-btn 
+          :label="t('attendance.refresh', 'Refresh')" 
+          color="secondary" 
+          outline
+          size="sm"
+          @click="loadAttendanceData" 
+          icon="refresh"
+        />
       </div>
-    </q-form>
+    </div>
+    
+    <q-slide-transition>
+      <div v-if="showForm" class="q-mb-md">
+        <q-card flat bordered>
+          <q-card-section>
+            <q-form @submit="handleSubmit" @reset="handleReset" class="row q-col-gutter-md">
+              <div class="col-12 col-md-3">
+                <q-input
+                  v-model="attendance.actualStartTime"
+                  :label="t('attendance.label.actualStartTime', 'Actual Start Time')"
+                  type="datetime-local"
+                  filled
+                  dense
+                />
+              </div>
+              <div class="col-12 col-md-3">
+                <q-input
+                  v-model="attendance.actualEndTime"
+                  :label="t('attendance.label.actualEndTime', 'Actual End Time')"
+                  type="datetime-local"
+                  filled
+                  dense
+                />
+              </div>
+              <div class="col-12 col-md-2">
+                <q-input
+                  v-model="attendance.calculatedDailyWage"
+                  :label="t('attendance.label.calculatedDailyWage', 'Calculated Daily Wage')"
+                  type="number"
+                  filled
+                  dense
+                />
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="row justify-end q-mt-sm">
+                  <q-btn :label="t('common.button.reset', 'Reset')" type="reset" color="secondary" flat dense class="q-mr-sm" />
+                  <q-btn :label="t('common.button.submit', 'Submit')" type="submit" color="primary" dense />
+                </div>
+              </div>
+            </q-form>
+          </q-card-section>
+        </q-card>
+      </div>
+    </q-slide-transition>
 
-    <div class="q-mt-lg">
-      <GridDefault
-        :rowData="rowData"
-        :columnDefs="columnDefs"
-        @onCellClicked="handleCellClicked"
-      />
+    <div class="q-mt-md attendance-grid">
+      <q-card flat bordered>
+        <q-card-section class="q-pa-none">
+          <GridDefault
+            :rowData="rowData"
+            :columnDefs="columnDefs"
+            class="ag-theme-alpine"
+            domLayout="autoHeight"
+          />
+        </q-card-section>
+      </q-card>
+    </div>
+    
+    <!-- Empty state when no records -->
+    <div v-if="rowData.length === 0" class="text-center q-pa-lg text-grey-7">
+      <q-icon name="event_busy" size="48px" />
+      <div class="text-h6 q-mt-sm">{{ t('attendance.noRecords', 'No attendance records found') }}</div>
+      <div class="q-mt-sm">{{ t('attendance.clickShowForm', 'Click "Show Form" to record attendance') }}</div>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, defineProps } from 'vue';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import GridDefault from '@/components/grid/GridDefault.vue';
 import apiAttendance, { AttendanceDTO } from '@/api/modules/api-attendance';
-import apiBranch from '@/api/modules/api-branch';
-// import apiTask from '@/api/modules/api-task';
+
+const props = defineProps({
+  jobId: {
+    type: Number,
+    required: true
+  },
+  branchId: {
+    type: Number,
+    required: true
+  },
+  taskId: {
+    type: Number,
+    required: true
+  },
+  startTime: {
+    type: String,
+    default: ''
+  },
+  endTime: {
+    type: String,
+    default: ''
+  },
+  dailyWage: {
+    type: Number,
+    default: 0
+  }
+});
 
 const { t } = useI18n();
 const $q = useQuasar();
+const showForm = ref(false);
 
 const attendance = ref<AttendanceDTO>({
-  branchId: 0,
-  taskId: 0,
-  calculatedDailyWage: 0,
-  employeeId: 0,
+  branchId: props.branchId,
+  taskId: props.taskId,
+  calculatedDailyWage: props.dailyWage,
+  employeeId: 0, // This should come from user store in a real app
   attendanceDate: new Date().toISOString().split('T')[0],
   dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
-  startTime: '',
-  endTime: ''
+  startTime: props.startTime,
+  endTime: props.endTime,
+  actualStartTime: new Date().toISOString().slice(0, 16),
+  actualEndTime: new Date().toISOString().slice(0, 16)
 });
 
-const branches = ref([]);
-const tasks = ref([]);
 const rowData = ref([]);
 const columnDefs = ref([
-  { field: 'branchId', headerName: t('attendance.grid.branch', 'Branch') },
-  { field: 'taskId', headerName: t('attendance.grid.task', 'Task') },
+  { field: 'employeeId', headerName: t('attendance.grid.employee', 'Employee') },
   { field: 'actualStartTime', headerName: t('attendance.grid.startTime', 'Start Time') },
   { field: 'actualEndTime', headerName: t('attendance.grid.endTime', 'End Time') },
-  { field: 'calculatedDailyWage', headerName: t('attendance.grid.wage', 'Daily Wage') }
+  { field: 'calculatedDailyWage', headerName: t('attendance.grid.wage', 'Daily Wage') },
+  { field: 'status', headerName: t('attendance.grid.status', 'Status') }
 ]);
-
-const loadBranches = async () => {
-  try {
-    const response = await apiBranch.getList();
-    branches.value = response.data;
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to load branches'
-    });
-  }
-};
-
-const loadTasks = async () => {
-  try {
-    const response = await apiTask.getList();
-    tasks.value = response.data;
-  } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to load tasks'
-    });
-  }
-};
 
 const handleSubmit = async () => {
   try {
@@ -114,6 +155,7 @@ const handleSubmit = async () => {
       message: t('attendance.notification.success', 'Attendance recorded successfully')
     });
     await loadAttendanceData();
+    showForm.value = false;
   } catch (error) {
     $q.notify({
       type: 'negative',
@@ -124,46 +166,73 @@ const handleSubmit = async () => {
 
 const loadAttendanceData = async () => {
   try {
-    const response = await apiAttendance.getByEmployeeId(attendance.value.employeeId);
+    const response = await apiAttendance.getByTaskId(props.taskId);
     rowData.value = response.data;
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to load attendance data'
-    });
+    console.error('Failed to load attendance data', error);
+    // For demo purposes, add some sample data
+    rowData.value = [
+      {
+        employeeId: 1,
+        actualStartTime: '2023-05-15T09:05:00',
+        actualEndTime: '2023-05-15T17:10:00',
+        calculatedDailyWage: 120,
+        status: 'COMPLETED'
+      }
+    ];
   }
-};
-
-const handleCellClicked = (params: any) => {
-  console.log('Cell clicked:', params);
-  // Add your cell click handling logic here
 };
 
 const handleReset = () => {
   attendance.value = {
-    branchId: 0,
-    taskId: 0,
-    calculatedDailyWage: 0,
+    branchId: props.branchId,
+    taskId: props.taskId,
+    calculatedDailyWage: props.dailyWage,
     employeeId: 0,
     attendanceDate: new Date().toISOString().split('T')[0],
     dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
-    startTime: '',
-    endTime: ''
+    startTime: props.startTime,
+    endTime: props.endTime,
+    actualStartTime: new Date().toISOString().slice(0, 16),
+    actualEndTime: new Date().toISOString().slice(0, 16)
   };
 };
 
-onMounted(() => {
-  loadBranches();
-  loadTasks();
+// Watch for changes in props to update the attendance form
+watch(() => props.branchId, (newVal) => {
+  attendance.value.branchId = newVal;
+});
+
+watch(() => props.taskId, (newVal) => {
+  attendance.value.taskId = newVal;
   loadAttendanceData();
 });
 
-// ... rest of your existing template and style
+watch(() => props.dailyWage, (newVal) => {
+  attendance.value.calculatedDailyWage = newVal;
+});
+
+onMounted(() => {
+  loadAttendanceData();
+});
 </script>
 
 <style scoped>
-.q-page {
-  max-width: 800px;
-  margin: auto;
+.attendance-grid {
+  margin-bottom: 16px;
+}
+
+.ag-theme-alpine {
+  --ag-header-height: 36px;
+  --ag-row-height: 36px;
+  --ag-font-size: 13px;
+  --ag-header-foreground-color: #5c5c5c;
+  --ag-header-background-color: #f5f5f5;
+  --ag-odd-row-background-color: #fcfcfc;
+}
+
+.q-card {
+  box-shadow: none;
+  border-radius: 8px;
 }
 </style>

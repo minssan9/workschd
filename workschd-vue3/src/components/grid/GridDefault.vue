@@ -5,7 +5,7 @@
 <!--      <button @click="gridApi?.redoCellEditing()">redo</button>-->
 <!--      <button @click="update">update</button>-->
 <!--    </div>-->
-    <div style="height: 50vh; overflow: auto">
+    <div style="height: 100%; overflow: auto">
 
       <AgGridVue
           style="width: 100%; height: 100%"
@@ -17,10 +17,10 @@
           @click="onCellClicked"
       />
     </div>
-    <div class="button">
+    <!-- <div class="button">
       <button @click="onAddRow">추가</button>
       <button @click="onRemoveSelected">삭제</button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -125,29 +125,29 @@ function clearSelectedNode() {
   gridApi.value?.clearRangeSelection()
   gridApi.value?.clearFocusedCell()
 }
-function onAddRow() {
-  // row추가
-  const newItem = [{ SB: 0, BB: 0, Ante: 0 }]
-  gridApi.value?.applyTransaction({ add: newItem })
-  clearSelectedNode()
-}
-function onRemoveSelected() {
-  // row 삭제
-  const id = gridApi.value?.getFocusedCell() //focus된 셀 가져오기
-  console.log(id)
-  let rows = getAllNode()
-  if (rows.length == 1) return
-  if (id) {
-    // 선택된 셀이 있으면 그 셀이 포함된 row 삭제
-    rows.splice(id.rowIndex, 1)
-  } else {
-    // 아닌경우 마지막 셀 삭제
-    rows.splice(rows.length - 1, 1)
-  }
-  gridApi.value?.setRowData(rows) // set row data
-  gridApi.value?.sizeColumnsToFit() //width 폭 맞춤
-  clearSelectedNode()
-}
+// function onAddRow() {
+//   // row추가
+//   const newItem = [{ SB: 0, BB: 0, Ante: 0 }]
+//   gridApi.value?.applyTransaction({ add: newItem })
+//   clearSelectedNode()
+// }
+// function onRemoveSelected() {
+//   // row 삭제
+//   const id = gridApi.value?.getFocusedCell() //focus된 셀 가져오기
+//   console.log(id)
+//   let rows = getAllNode()
+//   if (rows.length == 1) return
+//   if (id) {
+//     // 선택된 셀이 있으면 그 셀이 포함된 row 삭제
+//     rows.splice(id.rowIndex, 1)
+//   } else {
+//     // 아닌경우 마지막 셀 삭제
+//     rows.splice(rows.length - 1, 1)
+//   }
+//   gridApi.value?.setRowData(rows) // set row data
+//   gridApi.value?.sizeColumnsToFit() //width 폭 맞춤
+//   clearSelectedNode()
+// }
 
 function autoAddRows(params) {
   const emptyLastRow =

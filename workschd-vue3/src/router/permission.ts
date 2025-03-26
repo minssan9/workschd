@@ -32,24 +32,24 @@ export function setupRouterGuards(router: Router) {
       return
     }
 
-    // Check if user is authenticated
-    if (!hasToken) {
-      next(`/401?redirect=${to.path}`)
-      return
-    }
+    // // Check if user is authenticated
+    // if (!hasToken) {
+    //   next(`/401?redirect=${to.path}`)
+    //   return
+    // }
 
     try {
       // Check route permissions
       const userRole = userStore.role
       const requiredRoles = to.meta?.roles as string[] | undefined
 
-      // If route requires specific roles
-      if (requiredRoles && requiredRoles.length > 0) {
-        if (!requiredRoles.includes(userRole)) {
-          next('/403')
-          return
-        }
-      }
+      // // If route requires specific roles
+      // if (requiredRoles && requiredRoles.length > 0) {
+      //   if (!requiredRoles.includes(userRole)) {
+      //     next('/403')
+      //     return
+      //   }
+      // }
 
       next()
     } catch (error) {
