@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-md page-container">
     <div class="row q-mb-md justify-between items-center">
       <h5 class="q-my-none">{{ t('team.manage.title', 'Team Management') }}</h5>
       <div>
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Team Grid -->
-    <div class="ag-theme-alpine" >
+    <div class="content-section q-pa-md q-mb-md">
       <GridDefault
           style="width: 100%; height: 100%"
           :columnDefs="columnDefs"
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Team Details Section -->
-    <div v-if="selectedTeamForDetails" class="team-details q-mt-md">
+    <div v-if="selectedTeamForDetails" class="content-section q-pa-md q-mt-md">
       <div class="row justify-between items-center q-mb-md">
         <h5 class="q-my-none">{{ t('team.manage.teamDetails', 'Team Details') }}: {{ selectedTeamForDetails.name }}</h5>
         <q-tabs
@@ -34,19 +34,19 @@
           indicator-color="primary"
           align="left"
         >
-          <q-tab name="schedule" :label="t('team.manage.tabs.schedule', 'Schedule Config')" />
           <q-tab name="workplace" :label="t('team.manage.tabs.workplace', 'Workplace')" />
+          <q-tab name="schedule" :label="t('team.manage.tabs.schedule', 'Schedule Config')" />
         </q-tabs>
       </div>
 
       <q-separator />
 
       <q-tab-panels v-model="activeTab" animated>
-        <q-tab-panel name="schedule">
-          <TeamScheduleConfig :team-id="selectedTeamForDetails.id" />
-        </q-tab-panel>
         <q-tab-panel name="workplace">
           <TeamWorkPlace :team-id="selectedTeamForDetails.id" />
+        </q-tab-panel>
+        <q-tab-panel name="schedule">
+          <TeamScheduleConfig :team-id="selectedTeamForDetails.id" />
         </q-tab-panel>
       </q-tab-panels>
     </div>
@@ -198,13 +198,6 @@ onMounted(() => {
 <style scoped>
 .ag-theme-alpine {
   width: 100%;
-}
-
-.team-details {
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  padding: 16px;
-  background-color: #f9f9f9;
 }
 
 .clickable-cell {

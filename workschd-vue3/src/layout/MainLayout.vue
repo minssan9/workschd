@@ -46,7 +46,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-@import "@/scss/layout.scss";
+@import "@/assets/styles/index.scss";
 
 .drawer-side {
   height: calc(100vh - 200px);

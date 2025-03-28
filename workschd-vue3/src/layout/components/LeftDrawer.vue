@@ -5,12 +5,11 @@
     :breakpoint="700" 
     bordered
     @update:model-value="layoutStore.setLeftDrawer"
-  >
-    <div class="drawer-header">Menus</div>
+  > 
     <q-scroll-area class="drawer-side">
       <q-list>
         <!-- Info Section -->
-        <q-item-label header>{{ t('menu.info', '정보') }}</q-item-label>
+        <!-- <q-item-label header>{{ t('menu.info', '정보') }}</q-item-label> -->
         
         <q-item to="/" exact clickable v-ripple>
           <q-item-section avatar>

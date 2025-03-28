@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import request from '../axios-voyagerss';
+import request from "@/api/axios-voyagerss.js";
 
 export interface AttendanceDTO {
   id?: number;

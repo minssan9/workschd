@@ -1,17 +1,19 @@
 <template>
-  <q-page padding>
-    <div class="row justify-center">
-      <div class="col-12 col-md-8">
-        <h1 class="text-h4 q-mb-lg">{{ t('privacy.title', '개인정보처리방침') }}</h1>
-        
-        <div class="text-body1">
-          <!-- Privacy Policy Content -->
-          <section v-for="(section, index) in sections" :key="index" class="q-mb-xl">
-            <h2 class="text-h5 q-mb-md">{{ t(`privacy.sections.${index}.title`, section.title) }}</h2>
-            <p v-for="(content, idx) in section.content" :key="idx" class="q-mb-md">
-              {{ t(`privacy.sections.${index}.content.${idx}`, content) }}
-            </p>
-          </section>
+  <q-page padding class="page-container">
+    <div class="content-section q-pa-md">
+      <div class="row justify-center">
+        <div class="col-12 col-md-8">
+          <h1 class="text-h4 q-mb-lg">{{ t('privacy.title', '개인정보처리방침') }}</h1>
+          
+          <div class="text-body1">
+            <!-- Privacy Policy Content -->
+            <section v-for="(section, index) in sections" :key="index" class="q-mb-xl">
+              <h2 class="text-h5 q-mb-md">{{ t(`privacy.sections.${index}.title`, section.title) }}</h2>
+              <p v-for="(content, idx) in section.content" :key="idx" class="q-mb-md">
+                {{ t(`privacy.sections.${index}.content.${idx}`, content) }}
+              </p>
+            </section>
+          </div>
         </div>
       </div>
     </div>

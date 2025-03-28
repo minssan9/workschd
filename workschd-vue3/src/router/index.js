@@ -12,22 +12,15 @@ const router = createRouter({
     { path: '/subscription',            name: 'Subscription',             component: () => import('@/views/info/Subscription.vue') },
     { path: '/privacy-policy',          name: 'PrivacyPolicy',           component: () => import('@/views/info/PrivacyPolicy.vue'),          hidden: true  },
     { path: '/terms',                   name: 'Terms',                    component: () => import('@/views/info/Terms.vue'),                  hidden: true  },
-    
-    // Test routes
-    { path: '/test',                    name: 'Test',
-      children: [
-        { path: 'assembly',             name: 'Assembly',             component: () => import('@/views/assembly/Assembly.vue') }
-      ]
-    },
 
     // Auth
     { path: '/auth/login',              name: 'login',                    component: () => import('@/views/auth/Login.vue'),                  hidden: true },
-    { path: '/oauth/redirect',          name: 'redirect',                 component: () => import('@/views/auth/redirect.vue'),               hidden: true },
-    { path: '/auth/signup',             name: 'Signup',                   component: () => import('@/views/auth/Signup.vue'),      meta: { requiresAuth: false }
+    { path: '/auth/redirect',          name: 'redirect',                 component: () => import('@/views/auth/redirect.vue'),               hidden: true },
+    { path: '/auth/signup',             name: 'Signup',                   component: () => import('@/views/auth/Signup.vue'),                 hidden: true, meta: { requiresAuth: false }
     },
     // Account
-    { path: '/account/profile',         name: 'AccountProfile',           component: () => import('@/views/account/AccountProfile.vue'),    hidden: true },
-    { path: '/account/schedule',        name: 'AccountSchedule',          component: () => import('@/views/account/AccountSchedule.vue'),       hidden: true },
+    { path: '/account/profile',         name: 'AccountProfile',           component: () => import('@/views/account/AccountProfile.vue'),      hidden: true },
+    { path: '/account/schedule',        name: 'AccountSchedule',          component: () => import('@/views/account/AccountSchedule.vue'),     hidden: true },
 
     // Job
     { 
@@ -38,8 +31,8 @@ const router = createRouter({
         requiresAuth: true
       },
       children: [
-        { path: '/list', name: 'EventList', component: () => import('@/views/events/EventList.vue') },
-        { path: '/attendance', name: 'EventAttendance', component: () => import('@/views/events/EventAttendance.vue') },
+        { path: '/event/list', name: 'EventList', component: () => import('@/views/events/EventList.vue') },
+        { path: '/event/attendance', name: 'EventAttendance', component: () => import('@/views/events/EventAttendance.vue') },
       ]
     },
 
@@ -52,13 +45,13 @@ const router = createRouter({
         requiresAuth: true
       },
       children: [
-        { path: '/join/:token', name: 'TeamJoin', component: () => import('@/views/team/TeamJoin.vue'), hidden: true,
+        { path: '/team/join/:token', name: 'TeamJoin', component: () => import('@/views/team/TeamJoin.vue'), hidden: true,
           meta: {
             roles: ['WORKER', 'MANAGER', 'SCHEDULER'],
             requiresAuth: true
           }
         },
-        { path: '/manage', name: 'TeamManage', component: () => import('@/views/team/TeamManage.vue') },
+        { path: '/team/manage', name: 'TeamManage', component: () => import('@/views/team/TeamManage.vue') },
         // { path: '/workplace', name: 'TeamWorkPlace', component: () => import('@/views/team/TeamWorkPlace.vue') },
         // { path: '/employee/schedule', name: 'TeamEmployeeSchedule', component: () => import('@/views/team/TeamScheduleConfig.vue') }        
       ]

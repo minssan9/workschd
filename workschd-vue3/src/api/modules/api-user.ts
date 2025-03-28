@@ -1,12 +1,12 @@
-import axios from '@/utils/axios'
+import request from '@/api/axios-voyagerss'
 
 export default {
-  getCurrentUser: () => axios.get('/user/current'),
-  updateProfile: (data: any) => axios.put('/user/profile', data),
+  getCurrentUser: () => request.get('/user/current'),
+  updateProfile: (data: any) => request.put('/user/profile', data),
   
   // File upload helper
   uploadFile: (formData: FormData) => 
-    axios.post('/user/upload', formData, {
+    request.post('/user/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

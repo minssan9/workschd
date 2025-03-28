@@ -4,7 +4,7 @@ import router from "@/router"
 import Cookies from 'js-cookie'
 
 // create an axios instance
-const service = axios.create({
+const request = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
@@ -15,7 +15,7 @@ const service = axios.create({
 })
 
 // request interceptor
-service.interceptors.request.use(
+request.interceptors.request.use(
   config => {
     const userStore = useUserStore()
     let token = userStore.accessToken ?? Cookies.get('accessToken')
@@ -35,7 +35,7 @@ service.interceptors.request.use(
 )
 
 // response interceptor
-service.interceptors.response.use(
+request.interceptors.response.use(
   response => {
     if (response.headers.rtntoken) {
       window.sessionStorage.setItem('$accessToken', response.headers.rtntoken)
@@ -62,7 +62,7 @@ const MethodNotAllowed = 405
 const ServerError = 500
 
 export const requestFile = (method, url, data) => {
-  return service({
+  return request({
       method,
       url: url,
       data,
@@ -123,7 +123,7 @@ const apiError = {
   },
 }
 
-// Make sure to export service
-export { service }  // Named export
+// Make sure to export request
+export { request }  // Named export
 // or
-export default service  // Default export
+export default request  // Default export

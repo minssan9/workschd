@@ -122,8 +122,8 @@ function onCellClicked(params) {
 }
 function clearSelectedNode() {
   // 범위 지정된(선택된) 셀 clear
-  gridApi.value?.clearRangeSelection()
-  gridApi.value?.clearFocusedCell()
+  // gridApi.value?.clearRangeSelection()
+  // gridApi.value?.clearFocusedCell()
 }
 // function onAddRow() {
 //   // row추가
@@ -203,11 +203,11 @@ onMounted(() => {
   const body = document.body
   body.addEventListener('mouseup', function (e: Event) {
     // out focus event
-    let gridDiv = document.querySelector('#gridDiv')
-    if (!gridDiv.contains(e.target as HTMLDivElement)) {
-      //grid 외부 선택시
-      clearSelectedNode()
-    }
+    // let gridDiv = document.querySelector('#gridDiv')
+    // if (!gridDiv.contains(e.target as HTMLDivElement)) {
+    //   //grid 외부 선택시
+    //   clearSelectedNode()
+    // }
   })
 })
 </script>

@@ -1,11 +1,11 @@
 <template>
-  <q-page padding>
+  <q-page padding class="page-container">
     <div class="row justify-between items-center q-mb-md">
       <h5 class="q-my-none">Job List of Today</h5>
       <q-btn color="primary" label="Add New Job" @click="showAddDialog = true" />
     </div>
 
-    <div class="q-mt-md">
+    <div class="content-section q-pa-md q-mb-md">
       <GridDefault
         :rowData="rowData"
         :columnDefs="columnDefs"
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Job Details Section -->
-    <div v-if="selectedJob" class="job-details q-mt-md">
+    <div v-if="selectedJob" class="content-section q-pa-md q-mt-md">
       <div class="row justify-between items-center q-mb-md">
         <h5 class="q-my-none">{{ t('events.jobDetails', 'Job Details') }}</h5>
         <div>
@@ -113,131 +113,29 @@
       </div>
     </div>
 
-    <!-- Attendance Form Dialog -->
-    <q-dialog v-model="showAttendanceForm">
-      <q-card style="min-width: 350px">
-        <q-card-section>
-          <div class="text-h6">{{ t('events.recordAttendance', 'Record Attendance') }}</div>
-        </q-card-section>
-
-        <q-card-section>
-          <q-form @submit="submitAttendance" class="q-gutter-md">
-            <q-input
-              v-model="attendanceForm.actualStartTime"
-              :label="t('attendance.label.actualStartTime', 'Actual Start Time')"
-              type="datetime-local"
-              required
-            />
-            <q-input
-              v-model="attendanceForm.actualEndTime"
-              :label="t('attendance.label.actualEndTime', 'Actual End Time')"
-              type="datetime-local"
-              required
-            />
-            <q-input
-              v-model.number="attendanceForm.calculatedDailyWage"
-              :label="t('attendance.label.calculatedDailyWage', 'Calculated Daily Wage')"
-              type="number"
-              required
-            />
-            <div class="row justify-end q-mt-md">
-              <q-btn label="Cancel" color="negative" v-close-popup class="q-mr-sm" />
-              <q-btn label="Submit" type="submit" color="primary" />
-            </div>
-          </q-form>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <!-- Replace the attendance form dialog with the new component -->
+    <AttendanceFormDialog
+      v-model="showAttendanceForm"
+      :initial-data="attendanceForm"
+      :job-id="selectedJob?.id"
+      :branch-id="selectedJob?.branch_id"
+      @submit="submitAttendance"
+    />
 
     <!-- Add Job Dialog -->
-    <q-dialog v-model="showAddDialog">
-      <q-card style="min-width: 350px">
-        <q-card-section>
-          <div class="text-h6">Register New Job</div>
-        </q-card-section>
-
-        <q-card-section>
-          <q-form @submit="onSubmit" class="q-gutter-md">
-            <q-select
-              v-model="newJob.branch_id"
-              label="Branch"
-              :options="branches"
-              option-value="id"
-              option-label="name"
-              required
-            />
-            <q-select
-              v-model="newJob.store_id"
-              label="Store"
-              :options="stores"
-              option-value="id"
-              option-label="name"
-              required
-            />
-            <q-input
-              v-model="newJob.additional_info"
-              label="Additional Info"
-            />
-            <q-input
-              v-model="newJob.task_datetime"
-              label="Task DateTime"
-              type="datetime-local"
-              required
-            />
-            <q-input
-              v-model="newJob.start_time"
-              label="Start Time"
-              type="time"
-              required
-            />
-            <q-input
-              v-model="newJob.end_time"
-              label="End Time"
-              type="time"
-              required
-            />
-            <q-input
-              v-model.number="newJob.daily_wage"
-              label="Daily Wage"
-              type="number"
-              required
-            />
-            <div class="row justify-end q-mt-md">
-              <q-btn label="Cancel" color="negative" v-close-popup class="q-mr-sm" />
-              <q-btn label="Reset" type="reset" color="warning" @click="handleReset" class="q-mr-sm" />
-              <q-btn label="Submit" type="submit" color="primary" />
-            </div>
-          </q-form>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <AddJobDialog
+      v-model="showAddDialog"
+      :branches="branches"
+      :stores="stores"
+      @submit="handleJobSubmit"
+    />
 
     <!-- Approval Dialog -->
-    <q-dialog v-model="approvalDialogVisible">
-      <q-card style="min-width: 350px">
-        <q-card-section>
-          <div class="text-h6">Approve Join Requests</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <q-list dense>
-            <q-item v-for="request in selectedJobRequests" :key="request.id">
-              <q-item-section>
-                <q-item-label>{{ request.workerName }}</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-btn
-                  label="Approve"
-                  color="positive"
-                  dense
-                  @click="handleApproveRequest(request)"
-                />
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <ApprovalDialog
+      v-model="approvalDialogVisible"
+      :requests="selectedJobRequests"
+      @approve="handleApproveRequest"
+    />
   </q-page>
 </template>
 
@@ -246,7 +144,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import GridDefault from '@/components/grid/GridDefault.vue'
-import EventAttendance from './EventAttendance.vue'
+import EventAttendance from '@/views/events/EventAttendance.vue'
+import AttendanceFormDialog from '@/views/events/dialog/AttendanceFormDialog.vue'
+import AddJobDialog from '@/views/events/dialog/AddJobDialog.vue'
+import ApprovalDialog from '@/views/events/dialog/ApprovalDialog.vue'
 import apiAttendance from '@/api/modules/api-attendance'
 import { useUserStore } from '@/stores/modules/store_user'
 
@@ -397,10 +298,6 @@ const gridOptions = ref({
   rowStyle: { cursor: 'pointer' }
 })
 
-const handleCellClicked = (params: any) => {
-  console.log('Cell clicked:', params)
-  // Add your cell click handling logic here
-}
 
 const onSubmit = async () => {
   try {
@@ -428,16 +325,16 @@ const onSubmit = async () => {
   }
 }
 
-const submitAttendance = async () => {
+const submitAttendance = async (formData) => {
   if (!selectedJob.value) return;
   
   try {
     await apiAttendance.create({
       branchId: selectedJob.value.branch_id,
       taskId: selectedJob.value.id,
-      actualStartTime: attendanceForm.value.actualStartTime,
-      actualEndTime: attendanceForm.value.actualEndTime,
-      calculatedDailyWage: attendanceForm.value.calculatedDailyWage,
+      actualStartTime: formData.actualStartTime,
+      actualEndTime: formData.actualEndTime,
+      calculatedDailyWage: formData.calculatedDailyWage,
       employeeId: 1, // Assuming current user ID or get from store
       attendanceDate: new Date().toISOString().split('T')[0],
       dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
@@ -445,7 +342,6 @@ const submitAttendance = async () => {
       endTime: selectedJob.value.end_time
     });
     
-    showAttendanceForm.value = false;
     activeTab.value = 'attendance';
     
     $q.notify({
@@ -529,21 +425,37 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
+const handleJobSubmit = async (newJobData: NewJob) => {
+  try {
+    await fetch('/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newJobData)
+    })
+
+    await loadGridData()
+    showAddDialog.value = false
+    
+    $q.notify({
+      type: 'positive',
+      message: 'Job registered successfully'
+    })
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Failed to register job'
+    })
+  }
+}
+
 onMounted(() => {
   loadGridData()
 })
 </script>
 
-<style scoped> 
-
-.job-details {
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  padding: 16px;
-  background-color: #f9f9f9;
-  margin-top: 24px;
-}
-
+<style scoped>
 .detail-card {
   height: 100%;
   transition: all 0.3s ease;
@@ -572,6 +484,24 @@ onMounted(() => {
   cursor: pointer;
   color: var(--q-primary);
   text-decoration: underline;
+}
+
+/* Make the form elements more visually appealing */
+:deep(.q-field) {
+  margin-bottom: 16px;
+}
+
+:deep(.q-field__label) {
+  font-weight: 500;
+}
+
+:deep(.q-field--filled .q-field__control) {
+  border-radius: 8px;
+}
+
+:deep(.q-btn) {
+  border-radius: 8px;
+  padding: 8px 24px;
 }
 </style>
 

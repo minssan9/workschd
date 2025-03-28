@@ -1,18 +1,5 @@
-<script setup>
-import { useI18n } from 'vue-i18n'
-import { computed } from 'vue'
-
-const { t } = useI18n()
-
-// Add computed property for URLs
-const webUrl = computed(() => import.meta.env.VITE_API_WEB)
-const privacyUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/privacy-policy`)
-const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-term`)
-
-</script>
-
 <template>
-  <q-page class="home-container">
+  <q-page padding class="page-container">
     <div class="background-pattern absolute-full"></div>
 
     <!-- Header Section -->
@@ -47,7 +34,7 @@ const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-ter
       <div class="row q-col-gutter-lg">
         <!-- Service Overview -->
         <div class="col-12 col-md-4">
-          <q-card class="q-pa-md">
+          <q-card class="content-section q-pa-md">
             <h2 class="text-h5 q-mb-md">{{ t('home.overview.title', '서비스 개요') }}</h2>
             <q-list>
               <q-item v-for="i in 3" :key="`feature${i}`">
@@ -65,7 +52,7 @@ const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-ter
 
         <!-- Features -->
         <div class="col-12 col-md-4">
-          <q-card class="q-pa-md">
+          <q-card class="content-section q-pa-md">
             <h2 class="text-h5 q-mb-md">{{ t('home.features.title', '주요 기능') }}</h2>
             <q-list>
               <q-item v-for="i in 3" :key="`description${i}`">
@@ -83,7 +70,7 @@ const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-ter
 
         <!-- Usage Guide -->
         <div class="col-12 col-md-4">
-          <q-card class="q-pa-md">
+          <q-card class="content-section q-pa-md">
             <h2 class="text-h5 q-mb-md">{{ t('home.usage.title', '사용 방법') }}</h2>
             <q-list>
               <q-item v-for="i in 3" :key="`step${i}`">
@@ -106,6 +93,18 @@ const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-ter
  
   </q-page>
 </template>
+<script setup>
+import { useI18n } from 'vue-i18n'
+import { computed } from 'vue'
+
+const { t } = useI18n()
+
+// Add computed property for URLs
+const webUrl = computed(() => import.meta.env.VITE_API_WEB)
+const privacyUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/privacy-policy`)
+const termsUrl = computed(() => `${import.meta.env.VITE_API_WEB}/company/use-term`)
+
+</script>
 
 <style lang="scss">
 .q-footer {

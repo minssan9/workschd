@@ -6,34 +6,34 @@ import request from '@/api/axios-voyagerss';
 
 // TeamApproveDialog APIs
 const approveRequest = (teamId: number, joinRequest: JoinRequest): Promise<AxiosResponse> => {
-  return request.post(`/teams/${teamId}/approve`, joinRequest);
+  return request.post(`/team/${teamId}/approve`, joinRequest);
 };
 
 // TeamRegistrationDialog APIs
 const registerTeam = (teamData: Partial<Team>): Promise<AxiosResponse> => {
-  return request.post('/teams', teamData);
+  return request.post('/team', teamData);
 };
 
 const generateInviteLink = (teamData: { teamName: string; location: string }): Promise<AxiosResponse> => {
-  return request.post('/teams/generate-invite', teamData);
+  return request.post('/team/generate-invite', teamData);
 };
 
 const getTeamMembers = (teamName: string): Promise<AxiosResponse> => {
-  return request.get(`/teams/${teamName}/members`);
+  return request.get(`/team/${teamName}/members`);
 };
 
 // TeamManage APIs
 const getTeams = (): Promise<AxiosResponse<Team[]>> => {
-  return request.get('/teams');
+  return request.get('/team');
 };
 
 // TeamJoin APIs
 const getTeamInfo = (token: string): Promise<AxiosResponse<Team>> => {
-  return request.get(`/teams/invite/${token}`);
+  return request.get(`/team/invite/${token}`);
 };
 
 const joinTeam = (teamId: number, data: { accountId: string; inviteToken: string }): Promise<AxiosResponse> => {
-  return request.post(`/teams/${teamId}/join`, data);
+  return request.post(`/team/${teamId}/join`, data);
 };
 
 // TeamScheduleConfig APIs

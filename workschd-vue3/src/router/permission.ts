@@ -7,7 +7,7 @@ const whiteList = [
   '/',
   '/auth/login',
   '/auth/signup',
-  '/oauth/redirect',
+  '/auth/redirect',
   '/about',
   '/subscription',
   '/privacy-policy',

@@ -1,6 +1,6 @@
 <template>
-  <q-page class="bg-white">
-    <div class="q-pa-md">
+  <q-page class="page-container">
+    <div class="content-section q-pa-md">
       <div class="q-px-lg">
         <!-- Header -->
         <div class="text-h5 q-mb-lg">Subscription</div>

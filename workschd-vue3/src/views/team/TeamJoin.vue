@@ -1,8 +1,8 @@
 <template>
-  <q-page padding>
+  <q-page padding class="page-container">
     <div class="row justify-center">
       <div class="col-12 col-md-6">
-        <q-card class="join-team-card">
+        <q-card class="content-section">
           <q-card-section>
             <div class="text-h6">{{ t('team.join.title', 'Join Team') }}</div>
             <div v-if="loading" class="text-center q-pa-md">
@@ -146,7 +146,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.join-team-card {
-  margin-top: 2rem;
-}
+/* No additional styles needed as we're using global styles */
 </style> 

@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import request from '../axios-voyagerss';
+import request from '@/api/axios-voyagerss';
 
 export interface AccountSnsDTO {
   accountSnsId?: number;
