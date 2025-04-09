@@ -1,6 +1,6 @@
 package com.voyagerss.api.controller;
 
-import com.voyagerss.persist.dto.BranchDTO;
+import com.voyagerss.persist.dto.TeamDTO;
 import com.voyagerss.persist.dto.TeamMemberDTO;
 import com.voyagerss.persist.entity.Team;
 import com.voyagerss.persist.repository.TeamRepository;
@@ -13,13 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.security.MessageDigest;
-import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 
 @Validated
 @RestController
@@ -32,8 +32,8 @@ public class TeamController {
     private TeamRepository teamRepository;
 
     @PostMapping
-    public String save(@Valid @RequestBody BranchDTO vO) {
-        return teamService.save(vO).toString();
+    public TeamDTO save(@Valid @RequestBody TeamDTO vO) {
+        return teamService.createTeam(vO) ;
     }
 
     @DeleteMapping("/{id}")
@@ -43,17 +43,17 @@ public class TeamController {
 
     @PutMapping("/{id}")
     public void update(@Valid @NotNull @PathVariable("id") Long id,
-                       @Valid @RequestBody BranchDTO vO) {
+                       @Valid @RequestBody TeamDTO vO) {
         teamService.update(id, vO);
     }
 
     @GetMapping("/{id}")
-    public BranchDTO getById(@Valid @NotNull @PathVariable("id") Long id) {
+    public TeamDTO getById(@Valid @NotNull @PathVariable("id") Long id) {
         return teamService.getById(id);
     }
 
     @GetMapping
-    public Page<BranchDTO> query(@Valid BranchDTO vO) {
+    public Page<TeamDTO> query(@Valid TeamDTO vO) {
         return teamService.query(vO);
     }
 

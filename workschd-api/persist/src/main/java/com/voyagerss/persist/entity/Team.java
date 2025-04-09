@@ -33,6 +33,8 @@ public class Team extends BaseEntity implements Serializable {
 
     private LocalDateTime invitationCreatedAt;
 
+    private LocalDateTime invitationExpireAt;
+
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     private List<TeamMember> teamMembers;
 

@@ -1,6 +1,6 @@
 package com.voyagerss.api.oauth.handler;
 
-import com.voyagerss.api.component.properties.AppProperties;
+import com.voyagerss.api.component.properties.AuthProperties;
 import com.voyagerss.api.component.util.CookieUtil;
 import com.voyagerss.api.oauth.info.OAuth2UserInfo;
 import com.voyagerss.api.oauth.info.OAuth2UserInfoFactory;
@@ -13,10 +13,9 @@ import com.voyagerss.persist.repository.AccountRepository;
 import com.voyagerss.persist.repository.AccountRoleRepository;
 import com.voyagerss.persist.repository.AccountSnsRepository;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -47,7 +46,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Autowired    private AccountRepository accountRepository;
     @Autowired    private AccountRoleRepository accountRoleRepository;
     @Autowired    private AccountSnsRepository accountSnsRepository;
-    private final AppProperties appProperties;
+    private final AuthProperties authProperties;
     private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
 
     @Override
@@ -124,7 +123,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private boolean isAuthorizedRedirectUri(String uri) {
         URI clientRedirectUri = URI.create(uri);
 
-        return appProperties.getOauth2().getAuthorizedRedirectUris()
+        return authProperties.getOauth2().getAuthorizedRedirectUris()
                 .stream()
                 .anyMatch(authorizedRedirectUri -> {
                     // Only validate host and port. Let the clients use different paths if they want to

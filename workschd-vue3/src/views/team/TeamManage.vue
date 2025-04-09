@@ -15,12 +15,20 @@
     <!-- Team Grid -->
     <div class="content-section q-pa-md q-mb-md">
       <GridDefault
-          style="width: 100%; height: 100%"
+          style="width: 100%; height: 400px"
           :columnDefs="columnDefs"
           :rowData="teams"
           @grid-ready="onGridReady"
           :gridOptions="gridOptions"
           class="ag-theme-alpine-dark"
+      />
+      
+      <!-- Team Pagination -->
+      <Pagination
+        :total-items="teamsTotalCount"
+        :initial-page="1"
+        :initial-page-size="10"
+        @page-change="onTeamPageChange"
       />
     </div>
 
@@ -34,6 +42,7 @@
           indicator-color="primary"
           align="left"
         >
+          <q-tab name="members" :label="t('team.manage.tabs.members', 'Members')" />
           <q-tab name="workplace" :label="t('team.manage.tabs.workplace', 'Workplace')" />
           <q-tab name="schedule" :label="t('team.manage.tabs.schedule', 'Schedule Config')" />
         </q-tabs>
@@ -42,6 +51,28 @@
       <q-separator />
 
       <q-tab-panels v-model="activeTab" animated>
+        <q-tab-panel name="members">
+          <!-- Team Members Grid -->
+          <div class="q-mb-md">
+            <div class="text-h6">{{ t('team.manage.teamMembers', 'Team Members') }}</div>
+            <div class="ag-theme-alpine" style="height: 400px; width: 100%;">
+              <GridDefault
+                :columnDefs="memberColumnDefs"
+                :rowData="teamMembers"
+                @grid-ready="onMemberGridReady"
+                class="ag-theme-alpine-dark"
+              />
+              
+              <!-- Members Pagination -->
+              <Pagination
+                :total-items="membersTotalCount"
+                :initial-page="1"
+                :initial-page-size="10"
+                @page-change="onMemberPageChange"
+              />
+            </div>
+          </div>
+        </q-tab-panel>
         <q-tab-panel name="workplace">
           <TeamWorkPlace :team-id="selectedTeamForDetails.id" />
         </q-tab-panel>
@@ -67,48 +98,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useQuasar } from 'quasar'
-import { useI18n } from 'vue-i18n' 
+import {onMounted, ref} from 'vue'
+import {useQuasar} from 'quasar'
+import {useI18n} from 'vue-i18n'
 import TeamApproveDialog from './dialog/TeamApproveDialog.vue'
 import TeamRegistrationDialog from './dialog/TeamRegistrationDialog.vue'
 import TeamScheduleConfig from './subpage/TeamManageScheduleConfig.vue'
 import TeamWorkPlace from './subpage/TeamManageWorkPlace.vue'
-import GridDefault from '@/components/grid/GridDefault.vue';
-import { useTeamStore } from '@/stores/modules/teamStore';
-import { Team, JoinRequest } from '@/interface/team';
-import apiTeam from '@/api/modules/api-team'
+import GridDefault from '@/components/grid/GridDefault.vue'
+import Pagination from '@/components/common/Pagination.vue'
+import {TeamDTO} from '@/interface/team'
+import apiTeam, {PageRequest, TeamListParams, TeamMemberParams} from '@/api/modules/api-team'
 
 // State
 const $q = useQuasar()
 const { t } = useI18n()
 const showRegistrationDialog = ref(false)
 const approvalDialog = ref(false)
-const selectedTeam = ref<Team | null>(null)
-const selectedTeamForDetails = ref<Team | null>(null)
-const activeTab = ref('schedule')
+const selectedTeam = ref<TeamDTO | null>(null)
+const selectedTeamForDetails = ref<TeamDTO | null>(null)
+const activeTab = ref('members')
+const teamMembers = ref<TeamDTO[]>([])
+const teams = ref<TeamDTO[]>([])
 
-const teamStore = useTeamStore();
+// Pagination state
+const teamsTotalCount = ref(0)
+const membersTotalCount = ref(0)
+const teamsPageRequest = ref<PageRequest>({
+  page: 0,
+  size: 10,
+  sort: 'id,desc'
+})
+const membersPageRequest = ref<PageRequest>({
+  page: 0,
+  size: 10,
+  sort: 'id,desc'
+})
 
-const teams = ref<Team[]>([
-  {
-    id: 1,
-    name: "Team A",
-    location: "Location A",
-    memberCount: 12,
-    createdAt: new Date().toISOString(),
-    joinRequests: [new JoinRequest(1, "emp A", "KR Incheon"), new JoinRequest(2, "emp B", "KR Incheon")],
-  },
-  {
-    id: 2,
-    name: "Team B",
-    location: "Location C",
-    memberCount: 8,
-    createdAt: new Date().toISOString(),
-    joinRequests: [new JoinRequest(1, "emp A", "KR Incheon"), new JoinRequest(2, "emp B", "KR Incheon")],
-  },
+// Team Members Grid Configuration
+const memberColumnDefs = ref([
+  { headerName: 'Name', field: 'name', sortable: true, filter: true },
+  { headerName: 'Email', field: 'email', sortable: true, filter: true },
+  { headerName: 'Join Date', field: 'joinDate', sortable: true, filter: true },
+  { headerName: 'Status', field: 'status', sortable: true, filter: true,
+    cellRenderer: (params: any) => {
+      const status = params.value
+      const color = status === 'Active' ? 'green' : 'orange'
+      return `<span style="color: ${color}">${status}</span>`
+    }
+  }
 ])
-
 
 // Grid Configuration
 const columnDefs = ref([
@@ -120,17 +159,24 @@ const columnDefs = ref([
     },
     onCellClicked: (params: any) => {
       selectedTeamForDetails.value = params.data;
-      activeTab.value = 'schedule';
+      activeTab.value = 'members';
+      // Reset members pagination when selecting a new team
+      membersPageRequest.value = {
+        page: 0,
+        size: 10,
+        sort: 'id,desc'
+      };
+      onMemberGridReady();
     }
   },
-  { headerName: t('team.manage.grid.location', 'Location'), field: 'location' },
+  { headerName: t('team.manage.grid.region', 'Region'), field: 'region' },
+  { headerName: t('team.manage.grid.scheduleType', 'Schedule Type'), field: 'scheduleType' },
   { headerName: t('team.manage.grid.members', 'Members'), field: 'memberCount' },
-  { headerName: t('team.manage.grid.pendingRequests', 'Pending Requests'), field: 'joinRequests', valueGetter: (params: any) => params.data.joinRequests.length },
+  { headerName: t('team.manage.grid.pendingRequests', 'Pending Requests'), field: 'joinRequests', valueGetter: (params: any) => params.data.joinRequests?.length || 0 },
   { headerName: t('team.manage.grid.createdAt', 'Created At'), field: 'createdAt' },
-  { 
-    headerName: t('team.manage.grid.actions', 'Actions'),
+  { headerName: t('team.manage.grid.actions', 'Actions'),
     cellRenderer: (params: any) => {
-      const hasRequests = params.data.joinRequests.length > 0
+      const hasRequests = params.data.joinRequests?.length > 0
       return `
         <button
           class="q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle text-primary q-btn--actionable q-focusable q-hoverable"
@@ -141,7 +187,7 @@ const columnDefs = ref([
       `
     },
     onCellClicked: (params: any) => {
-      if (params.data.joinRequests.length > 0) {
+      if (params.data.joinRequests?.length > 0) {
         selectedTeam.value = params.data
         approvalDialog.value = true
       }
@@ -149,39 +195,110 @@ const columnDefs = ref([
   }
 ])
 
+// Grid options
 const gridOptions = ref({
-  onRowClicked: (params: any) => {
-    console.log('Row clicked via gridOptions:', params);
-    selectedTeamForDetails.value = params.data;
-    activeTab.value = 'schedule';
-  }
-});
+  pagination: false,
+  rowSelection: 'single'
+})
 
 // Methods
 const onGridReady = () => { 
-  apiTeam.getTeams() 
+  fetchTeams({
+    pageable: teamsPageRequest.value
+  });
+}
+
+const fetchTeams = (params: TeamListParams) => {
+  apiTeam.getTeams(params) 
     .then(response => {
-      teams.value = response.data;
+      if (response.data && response.data.content) {
+        teams.value = response.data.content;
+        teamsTotalCount.value = response.data.totalElements;
+      }
+    })
+    .catch(error => $q.notify({ type: 'negative', message: 'Failed to fetch teams' }));
+}
+
+const onTeamPageChange = (pageRequest: PageRequest) => {
+  teamsPageRequest.value = pageRequest;
+  fetchTeams({
+    pageable: pageRequest
+  });
+}
+
+const onMemberGridReady = () => {
+  if (!selectedTeamForDetails.value) return;
+  
+  fetchTeamMembers({
+    pageable: membersPageRequest.value
+  });
+}
+
+const fetchTeamMembers = (params: TeamMemberParams) => {
+  if (!selectedTeamForDetails.value) return;
+  
+  // Load team members for the selected team
+  apiTeam.getTeamMembers(selectedTeamForDetails.value.name, params)
+    .then(response => {
+      if (response.data && response.data.content && response.data.content.length > 0) {
+        teamMembers.value = response.data.content;
+        membersTotalCount.value = response.data.totalElements;
+      } else {
+        // If no members, show sample data
+        teamMembers.value = [
+          { id: 1, name: 'John Doe', email: 'john@example.com', joinDate: '2023-01-15', status: 'Active' },
+          { id: 2, name: 'Jane Smith', email: 'jane@example.com', joinDate: '2023-02-20', status: 'Pending' }
+        ];
+        membersTotalCount.value = 2;
+      }
     })
     .catch(error => {
-      $q.notify({ type: 'negative', message: 'Failed to fetch teams' })
-    }) 
+      console.error('Failed to fetch team members:', error);
+      // Show sample data on error
+      teamMembers.value = [
+        { id: 1, name: 'John Doe', email: 'john@example.com', joinDate: '2023-01-15', status: 'Active' },
+        { id: 2, name: 'Jane Smith', email: 'jane@example.com', joinDate: '2023-02-20', status: 'Pending' }
+      ];
+      membersTotalCount.value = 2;
+    });
 }
 
-const onTeamRegistered = (team: Team) => {
-  teams.value.push(team)
+const onMemberPageChange = (pageRequest: PageRequest) => {
+  membersPageRequest.value = pageRequest;
+  fetchTeamMembers({
+    pageable: pageRequest
+  });
 }
 
-const handleRequestApproved = ({ teamId, request }: { teamId: number, request: JoinRequest }) => {
+const onTeamRegistered = (team: TeamDTO) => {
+  // Refresh the teams list to include the new team
+  fetchTeams({
+    pageable: teamsPageRequest.value
+  });
+  
+  // Select the newly registered team and show its details
+  selectedTeamForDetails.value = team;
+  activeTab.value = 'members';
+  
+  // Reset members pagination
+  membersPageRequest.value = {
+    page: 0,
+    size: 10,
+    sort: 'id,desc'
+  };
+  onMemberGridReady();
+}
+
+const handleRequestApproved = ({ teamId, request }: { teamId: number, request: TeamDTO }) => {
   try {
     // Remove request from the list
     const teamIndex = teams.value.findIndex(t => t.id === teamId)
     if (teamIndex !== -1) {
-      const requestIndex = teams.value[teamIndex].joinRequests.findIndex(
+      const requestIndex = teams.value[teamIndex].joinRequests?.findIndex(
         r => r.id === request.id
-      )
-      if (requestIndex !== -1) {
-        teams.value[teamIndex].joinRequests.splice(requestIndex, 1)
+      ) ?? -1;
+      if (requestIndex !== -1 && teams.value[teamIndex].joinRequests) {
+        teams.value[teamIndex].joinRequests?.splice(requestIndex, 1)
       }
     }
   } catch (error) {

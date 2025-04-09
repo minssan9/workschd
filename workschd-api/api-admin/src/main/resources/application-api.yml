@@ -44,7 +44,8 @@ logging:
 spring.config.activate.on-profile: local
 server:
   port: 24000
-
+app:
+  web-address: https://localhost:3003
 baseUrl: http://localhost:24000
 
 ---

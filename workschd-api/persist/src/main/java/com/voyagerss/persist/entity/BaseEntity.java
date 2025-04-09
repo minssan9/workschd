@@ -3,6 +3,7 @@ package com.voyagerss.persist.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,6 +39,22 @@ public abstract class BaseEntity {
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime lastModifiedAt;
 
-
-
+    @PrePersist
+    public void prePersist() {
+        if (active == null) {
+            active = true;
+        }
+        if (createdBy == null) {
+            createdBy = "SYSTEM";
+        }
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (lastModifiedBy == null) {
+            lastModifiedBy = createdBy;
+        }
+        if (lastModifiedAt == null) {
+            lastModifiedAt = createdAt;
+        }
+    }
 }

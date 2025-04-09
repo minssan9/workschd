@@ -1,34 +1,76 @@
-import { Team, JoinRequest, TeamMember } from '@/interface/team';
-import { ScheduleConfig } from '@/interface/schedule';
-import { Store } from '@/interface/workplace';
-import { AxiosResponse } from 'axios';
+import {TeamDTO} from '@/interface/team';
+import {ScheduleConfig} from '@/interface/schedule';
+import {Store} from '@/interface/workplace';
+import {AxiosResponse} from 'axios';
 import request from '@/api/axios-voyagerss';
 
+// Pagination interface
+export interface PageRequest {
+  page: number;
+  size: number;
+  sort?: string;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
+// Default pagination parameters
+const DEFAULT_PAGE_REQUEST: PageRequest = {
+  page: 0,
+  size: 10,
+  sort: 'id,desc'
+};
+
+// Request parameter interfaces
+export interface TeamListParams {
+  pageable: PageRequest;
+  name?: string;
+  region?: string;
+  scheduleType?: string;
+  fromDate?: string;
+  toDate?: string;
+}
+
+export interface TeamMemberParams {
+  pageable: PageRequest;
+  name?: string;
+  email?: string;
+  status?: string;
+}
+
 // TeamApproveDialog APIs
-const approveRequest = (teamId: number, joinRequest: JoinRequest): Promise<AxiosResponse> => {
+const approveRequest = (teamId: number, joinRequest: TeamDTO): Promise<AxiosResponse> => {
   return request.post(`/team/${teamId}/approve`, joinRequest);
 };
 
 // TeamRegistrationDialog APIs
-const registerTeam = (teamData: Partial<Team>): Promise<AxiosResponse> => {
+const registerTeam = (teamData: TeamDTO): Promise<AxiosResponse<TeamDTO>> => {
   return request.post('/team', teamData);
 };
 
-const generateInviteLink = (teamData: { teamName: string; location: string }): Promise<AxiosResponse> => {
+const generateInviteLink = (teamData: { teamName: string; region: string }): Promise<AxiosResponse> => {
   return request.post('/team/generate-invite', teamData);
 };
 
-const getTeamMembers = (teamName: string): Promise<AxiosResponse> => {
-  return request.get(`/team/${teamName}/members`);
+const getTeamMembers = (teamName: string, params: TeamMemberParams = { pageable: DEFAULT_PAGE_REQUEST }): Promise<AxiosResponse<PageResponse<TeamDTO>>> => {
+  return request.get(`/team/${teamName}/members`, { params });
 };
 
 // TeamManage APIs
-const getTeams = (): Promise<AxiosResponse<Team[]>> => {
-  return request.get('/team');
+const getTeams = (params: TeamListParams = { pageable: DEFAULT_PAGE_REQUEST }): Promise<AxiosResponse<PageResponse<TeamDTO>>> => {
+  return request.get('/team',  params );
 };
 
 // TeamJoin APIs
-const getTeamInfo = (token: string): Promise<AxiosResponse<Team>> => {
+const getTeamInfo = (token: string): Promise<AxiosResponse<TeamDTO>> => {
   return request.get(`/team/invite/${token}`);
 };
 
@@ -48,6 +90,10 @@ const getStores = (): Promise<AxiosResponse> => {
 
 const createStore = (store: Store): Promise<AxiosResponse> => {
   return request.post('/stores', store);
+};
+
+const approveJoinRequest = (teamId: number, requestId: number): Promise<AxiosResponse<any>> => {
+  return request.post(`/team/${teamId}/approve/${requestId}`);
 };
 
 export default {
@@ -71,5 +117,7 @@ export default {
 
   // TeamWorkPlace
   getStores,
-  createStore
+  createStore,
+
+  approveJoinRequest
 }; 

@@ -15,14 +15,14 @@
           <q-item-section avatar>
             <q-icon name="home" />
           </q-item-section>
-          <q-item-section>{{ t('menu.home', '홈') }}</q-item-section>
+          <q-item-section>{{ t('menu.home', 'Home') }}</q-item-section>
         </q-item>
 
         <q-item to="/about" exact clickable v-ripple>
           <q-item-section avatar>
             <q-icon name="info" />
           </q-item-section>
-          <q-item-section>{{ t('menu.about', '소개') }}</q-item-section>
+          <q-item-section>{{ t('menu.about', 'Introduction') }}</q-item-section>
         </q-item> 
 
         <!-- Rest of the menu items -->
@@ -34,6 +34,7 @@
                 :key="route.name"
                 :label="formatRouteName(route.name)"
                 :default-opened="isRouteExpanded(route)"
+                :icon="route.meta?.icon || 'folder'"
               >
                 <q-list>
                   <q-item
@@ -43,6 +44,9 @@
                     clickable
                     v-ripple
                   >
+                    <q-item-section avatar>
+                      <q-icon :name="child.meta?.icon || 'label'" />
+                    </q-item-section>
                     <q-item-section>{{ formatRouteName(child.name) }}</q-item-section>
                   </q-item>
                 </q-list>
@@ -57,6 +61,9 @@
               clickable
               v-ripple
             >
+              <q-item-section avatar>
+                <q-icon :name="route.meta?.icon || 'label'" />
+              </q-item-section>
               <q-item-section>{{ formatRouteName(route.name) }}</q-item-section>
             </q-item>
           </template>
@@ -68,12 +75,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useLayoutStore } from '@/stores/modules/store_layout'
-import { useUserStore } from '@/stores/modules/store_user'
-import { storeToRefs } from 'pinia'
-import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+import {computed, onMounted} from 'vue';
+import {useLayoutStore} from '@/stores/modules/store_layout'
+import {useUserStore} from '@/stores/modules/store_user'
+import {storeToRefs} from 'pinia'
+import {useRoute, useRouter} from 'vue-router'
+import {useI18n} from 'vue-i18n'
 
 const { t } = useI18n()
 const layoutStore = useLayoutStore()

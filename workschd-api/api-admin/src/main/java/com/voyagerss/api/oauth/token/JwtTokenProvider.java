@@ -1,6 +1,6 @@
 package com.voyagerss.api.oauth.token;
 
-import com.voyagerss.api.component.properties.AppProperties;
+import com.voyagerss.api.component.properties.AuthProperties;
 import com.voyagerss.api.oauth.entity.UserPrincipal;
 import com.voyagerss.api.oauth.service.CustomUserDetailsService;
 import com.voyagerss.persist.repository.AccountRepository;
@@ -37,7 +37,7 @@ public class JwtTokenProvider {
     private final static String HEADER_REFRESH_TOKEN = "refreshToken";
     private final static String TOKEN_PREFIX = "Bearer ";
 
-    private final AppProperties appProperties;
+    private final AuthProperties authProperties;
     private final CustomUserDetailsService customUserDetailsService;
     private final AccountRepository accountRepository;
 
@@ -46,8 +46,8 @@ public class JwtTokenProvider {
     @PostConstruct
     protected void init() {
         secretKey = Keys.hmacShaKeyFor(secret.getBytes());
-        accessTokenValidTime = appProperties.getAuth().getTokenExpiry() * 60 * 1000L ;
-        refreshTokenValidTime = appProperties.getAuth().getRefreshTokenExpiry() * 60 * 1000L ;
+        accessTokenValidTime = authProperties.getAuth().getTokenExpiry() * 60 * 1000L ;
+        refreshTokenValidTime = authProperties.getAuth().getRefreshTokenExpiry() * 60 * 1000L ;
     }
 
     // Access Token 생성.

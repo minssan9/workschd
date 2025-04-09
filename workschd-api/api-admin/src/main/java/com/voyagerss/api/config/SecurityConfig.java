@@ -1,7 +1,17 @@
 package com.voyagerss.api.config;
 
-import java.util.Arrays;
-
+import com.voyagerss.api.component.filter.CustomTokenFilter;
+import com.voyagerss.api.component.properties.AuthProperties;
+import com.voyagerss.api.oauth.exception.RestAuthenticationEntryPoint;
+import com.voyagerss.api.oauth.filter.TokenAuthenticationFilter;
+import com.voyagerss.api.oauth.handler.OAuth2AuthenticationFailureHandler;
+import com.voyagerss.api.oauth.handler.OAuth2AuthenticationSuccessHandler;
+import com.voyagerss.api.oauth.handler.TokenAccessDeniedHandler;
+import com.voyagerss.api.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
+import com.voyagerss.api.oauth.service.CustomOAuth2UserService;
+import com.voyagerss.api.oauth.service.CustomUserDetailsService;
+import com.voyagerss.api.oauth.token.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,19 +27,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.voyagerss.api.component.filter.CustomTokenFilter;
-import com.voyagerss.api.component.properties.AppProperties;
-import com.voyagerss.api.oauth.exception.RestAuthenticationEntryPoint;
-import com.voyagerss.api.oauth.filter.TokenAuthenticationFilter;
-import com.voyagerss.api.oauth.handler.OAuth2AuthenticationFailureHandler;
-import com.voyagerss.api.oauth.handler.OAuth2AuthenticationSuccessHandler;
-import com.voyagerss.api.oauth.handler.TokenAccessDeniedHandler;
-import com.voyagerss.api.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
-import com.voyagerss.api.oauth.service.CustomOAuth2UserService;
-import com.voyagerss.api.oauth.service.CustomUserDetailsService;
-import com.voyagerss.api.oauth.token.JwtTokenProvider;
-
-import lombok.RequiredArgsConstructor;
+import java.util.Arrays;
 
 
 @Configuration
@@ -37,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AppProperties appProperties;
+    private final AuthProperties authProperties;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomTokenFilter customTokenFilter;
@@ -127,7 +125,7 @@ public class SecurityConfig {
     @Bean
     public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
         return new OAuth2AuthenticationSuccessHandler(
-                appProperties,
+                authProperties,
                 oAuth2AuthorizationRequestBasedOnCookieRepository()
         );
     }
@@ -144,9 +142,9 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource corsConfigSource = new UrlBasedCorsConfigurationSource();
 
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedHeaders(Arrays.asList(appProperties.getCors().getAllowedHeaders().split(",")));
-        corsConfig.setAllowedMethods(Arrays.asList(appProperties.getCors().getAllowedMethods().split(",")));
-        corsConfig.setAllowedOrigins(Arrays.asList(appProperties.getCors().getAllowedOrigins().split(",")));
+        corsConfig.setAllowedHeaders(Arrays.asList(authProperties.getCors().getAllowedHeaders().split(",")));
+        corsConfig.setAllowedMethods(Arrays.asList(authProperties.getCors().getAllowedMethods().split(",")));
+        corsConfig.setAllowedOrigins(Arrays.asList(authProperties.getCors().getAllowedOrigins().split(",")));
         corsConfig.setAllowCredentials(true);
         corsConfig.setMaxAge(corsConfig.getMaxAge());
 
