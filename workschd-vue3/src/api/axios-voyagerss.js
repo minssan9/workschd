@@ -123,7 +123,4 @@ const apiError = {
   },
 }
 
-// Make sure to export request
-export { request }  // Named export
-// or
 export default request  // Default export

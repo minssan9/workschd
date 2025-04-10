@@ -1,27 +1,7 @@
 package com.voyagerss.api.controller;
 
-import com.voyagerss.api.oauth.entity.UserPrincipal;
-import com.voyagerss.api.oauth.token.JwtTokenProvider;
-import com.voyagerss.persist.component.exception.CommonException;
-import com.voyagerss.persist.component.exception.CommonExceptionType;
-import com.voyagerss.persist.dto.AccountDTO;
-import com.voyagerss.persist.dto.AccountInfoDTO;
-import com.voyagerss.persist.dto.AccountRoleDTO;
-import com.voyagerss.persist.dto.QueryDTO;
-import com.voyagerss.persist.entity.Account;
-import com.voyagerss.persist.service.AccountInfoService;
-import com.voyagerss.persist.service.AccountService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,9 +9,25 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import com.voyagerss.api.oauth.entity.UserPrincipal;
+import com.voyagerss.api.oauth.token.JwtTokenProvider;
+import com.voyagerss.persist.component.exception.CommonException;
+import com.voyagerss.persist.component.exception.CommonExceptionType;
+import com.voyagerss.persist.dto.AccountDTO;
+import com.voyagerss.persist.dto.AccountInfoDTO;
+import com.voyagerss.persist.dto.AccountRoleDTO;
+import com.voyagerss.persist.entity.Account;
+import com.voyagerss.persist.service.AccountInfoService;
+import com.voyagerss.persist.service.AccountService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @Validated
 @RequiredArgsConstructor
@@ -45,25 +41,26 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping
-    public ResponseEntity getUserByAuth(HttpServletRequest request) {
-        UserPrincipal userPrincipal;
+    public ResponseEntity<AccountDTO> getUserByAuth(HttpServletRequest request) {
         try {
-            userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } catch (ClassCastException e){
-            return new ResponseEntity<String>("token is " + request.getHeader("Authorization"), HttpStatus.UNAUTHORIZED);
+            UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            AccountDTO account = accountService.getAccountDtoById(userPrincipal.getUserId());
+            return ResponseEntity.ok(account);
+        } catch (ClassCastException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok(accountService.getAccountDtoById(userPrincipal.getUserId()));
     }
 
-    // SignUp method
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody AccountDTO accountDTO) {
+    public ResponseEntity<Account> registerUser(@RequestBody AccountDTO accountDTO) {
         try {
             if (accountService.existsByEmail(accountDTO.getEmail())) {
                 throw new CommonException(CommonExceptionType.EMAIL_ALREADY_EXISTS);
             }
 
-            accountDTO.setPassword(passwordEncoder.encode(accountDTO.getPassword())); // Encrypt password
+            accountDTO.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
 
             Account account = accountService.save(accountDTO);
             AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
@@ -72,18 +69,14 @@ public class AuthController {
 
             return ResponseEntity.ok(account);
         } catch (CommonException ce) {
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ce);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new CommonException(CommonExceptionType.INTERNAL_SERVER_ERROR, e));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody AccountDTO accountDTO) {
+    public ResponseEntity<String> authenticateUser(@RequestBody AccountDTO accountDTO) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -94,10 +87,8 @@ public class AuthController {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             
-            // Get user details from AccountService
             accountDTO = accountService.getAccountDtoByEmail(accountDTO.getEmail());
             
-            // Create token using JwtTokenProvider
             String token = tokenProvider.createAccessToken(
                 accountDTO.getAccountId(),
                 accountDTO.getEmail(),
@@ -106,9 +97,9 @@ public class AuthController {
 
             return ResponseEntity.ok(token);
         } catch (AuthenticationException e) {
-            return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(new CommonException(CommonExceptionType.INVALID_CREDENTIALS));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

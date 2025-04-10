@@ -1,4 +1,4 @@
-import service from "@/api/axios-voyagerss.js";
+import request from "@/api/axios-voyagerss.js";
  
 const baesURL = `account` 
 const apiAccount = {
@@ -39,7 +39,7 @@ const apiAccount = {
   },
 
   login(data) {
-    return service({
+    return request({
       url: '/auth/login',
       method: 'post',
       data: {
@@ -50,7 +50,7 @@ const apiAccount = {
   },
 
   signup(data) {
-    return service({
+    return request({
       url: '/auth/signup',
       method: 'post',
       data: {

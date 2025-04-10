@@ -280,10 +280,7 @@ const handleGoogleSignIn = async () => {
       token: idToken
     })
 
-    $q.notify({
-      type: 'positive',
-      message: t('auth.login.success', '로그인 성공')
-    })
+    $q.notify({type: 'positive',message: t('auth.login.success', '로그인 성공')})
 
     // Redirect to home or intended page
     router.push({ name: 'home' })

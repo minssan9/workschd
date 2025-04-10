@@ -9,6 +9,13 @@
           @click="showRegistrationDialog = true"
           class="q-mr-sm"
         />        
+        <q-btn
+          :label="t('team.manage.refreshTeams', 'Refresh')"
+          color="secondary"
+          icon="refresh"
+          @click="fetchTeams"
+          flat
+        />
       </div>
     </div>
 
@@ -135,20 +142,6 @@ const membersPageRequest = ref<PageRequest>({
   sort: 'id,desc'
 })
 
-// Team Members Grid Configuration
-const memberColumnDefs = ref([
-  { headerName: 'Name', field: 'name', sortable: true, filter: true },
-  { headerName: 'Email', field: 'email', sortable: true, filter: true },
-  { headerName: 'Join Date', field: 'joinDate', sortable: true, filter: true },
-  { headerName: 'Status', field: 'status', sortable: true, filter: true,
-    cellRenderer: (params: any) => {
-      const status = params.value
-      const color = status === 'Active' ? 'green' : 'orange'
-      return `<span style="color: ${color}">${status}</span>`
-    }
-  }
-])
-
 // Grid Configuration
 const columnDefs = ref([
   { 
@@ -174,6 +167,23 @@ const columnDefs = ref([
   { headerName: t('team.manage.grid.members', 'Members'), field: 'memberCount' },
   { headerName: t('team.manage.grid.pendingRequests', 'Pending Requests'), field: 'joinRequests', valueGetter: (params: any) => params.data.joinRequests?.length || 0 },
   { headerName: t('team.manage.grid.createdAt', 'Created At'), field: 'createdAt' },
+  { 
+    headerName: t('team.manage.grid.inviteLink', 'Invite Link'), 
+    field: 'id',
+    cellRenderer: (params: any) => {
+      return `
+        <button
+          class="q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle text-primary q-btn--actionable q-focusable q-hoverable"
+        >
+          <i class="material-icons q-icon">content_copy</i>
+          ${t('team.manage.grid.copyInvite', 'Copy Invite Link')}
+        </button>
+      `;
+    },
+    onCellClicked: (params: any) => {
+      generateAndCopyInviteLink(params.data);
+    }
+  },
   { headerName: t('team.manage.grid.actions', 'Actions'),
     cellRenderer: (params: any) => {
       const hasRequests = params.data.joinRequests?.length > 0
@@ -195,6 +205,21 @@ const columnDefs = ref([
   }
 ])
 
+
+// Team Members Grid Configuration
+const memberColumnDefs = ref([
+  { headerName: 'Name', field: 'name', sortable: true, filter: true },
+  { headerName: 'Email', field: 'email', sortable: true, filter: true },
+  { headerName: 'Join Date', field: 'joinDate', sortable: true, filter: true },
+  { headerName: 'Status', field: 'status', sortable: true, filter: true,
+    cellRenderer: (params: any) => {
+      const status = params.value
+      const color = status === 'Active' ? 'green' : 'orange'
+      return `<span style="color: ${color}">${status}</span>`
+    }
+  }
+])
+
 // Grid options
 const gridOptions = ref({
   pagination: false,
@@ -202,18 +227,36 @@ const gridOptions = ref({
 })
 
 // Methods
-const onGridReady = () => { 
-  fetchTeams({
-    pageable: teamsPageRequest.value
-  });
+const onGridReady = () => {  
+  teamsPageRequest.value.page = 0
+  teamsPageRequest.value.size = 10
+  teamsPageRequest.value.sort = 'id,desc'
+
+  fetchTeams();
 }
 
-const fetchTeams = (params: TeamListParams) => {
-  apiTeam.getTeams(params) 
+const fetchTeams = (params?: TeamDTO) => {
+  // Create a new params object if one wasn't provided
+  const requestParams: TeamDTO = params || {};
+  
+  // Set pagination properties
+  requestParams.page = teamsPageRequest.value.page;
+  requestParams.size = teamsPageRequest.value.size;
+  
+  // Handle sort parameter in the format expected by Spring's Pageable
+  // Spring expects: sort=property,direction
+  if (teamsPageRequest.value.sort) {
+    const sortParts = teamsPageRequest.value.sort.split(',');
+    if (sortParts.length === 2) {
+      requestParams.sort = `${sortParts[0]},${sortParts[1]}`;
+    }
+  }
+
+  apiTeam.getTeams(requestParams) 
     .then(response => {
-      if (response.data && response.data.content) {
-        teams.value = response.data.content;
-        teamsTotalCount.value = response.data.totalElements;
+      if (response.content) {
+        teams.value = response.content;
+        teamsTotalCount.value = response.totalElements;
       }
     })
     .catch(error => $q.notify({ type: 'negative', message: 'Failed to fetch teams' }));
@@ -221,60 +264,52 @@ const fetchTeams = (params: TeamListParams) => {
 
 const onTeamPageChange = (pageRequest: PageRequest) => {
   teamsPageRequest.value = pageRequest;
-  fetchTeams({
-    pageable: pageRequest
-  });
+  fetchTeams();
 }
 
 const onMemberGridReady = () => {
   if (!selectedTeamForDetails.value) return;
   
-  fetchTeamMembers({
-    pageable: membersPageRequest.value
-  });
+  fetchTeamMembers();
 }
 
-const fetchTeamMembers = (params: TeamMemberParams) => {
+const fetchTeamMembers = (params?: TeamMemberParams) => {
   if (!selectedTeamForDetails.value) return;
   
+  // Create a new params object if one wasn't provided
+  const requestParams: TeamMemberParams = params || {};
+  
+  // Set pagination properties
+  requestParams.page = membersPageRequest.value.page;
+  requestParams.size = membersPageRequest.value.size;
+  
+  // Handle sort parameter in the format expected by Spring's Pageable
+  if (membersPageRequest.value.sort) {
+    const sortParts = membersPageRequest.value.sort.split(',');
+    if (sortParts.length === 2) {
+      requestParams.sort = `${sortParts[0]},${sortParts[1]}`;
+    }
+  }
+  
   // Load team members for the selected team
-  apiTeam.getTeamMembers(selectedTeamForDetails.value.name, params)
+  apiTeam.getTeamMembers(selectedTeamForDetails.value.name, requestParams)
     .then(response => {
-      if (response.data && response.data.content && response.data.content.length > 0) {
-        teamMembers.value = response.data.content;
-        membersTotalCount.value = response.data.totalElements;
-      } else {
-        // If no members, show sample data
-        teamMembers.value = [
-          { id: 1, name: 'John Doe', email: 'john@example.com', joinDate: '2023-01-15', status: 'Active' },
-          { id: 2, name: 'Jane Smith', email: 'jane@example.com', joinDate: '2023-02-20', status: 'Pending' }
-        ];
-        membersTotalCount.value = 2;
-      }
+      if (response && response.content && response.content.length > 0) {
+        teamMembers.value = response.content;
+        membersTotalCount.value = response.totalElements;
+      }  
     })
-    .catch(error => {
-      console.error('Failed to fetch team members:', error);
-      // Show sample data on error
-      teamMembers.value = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', joinDate: '2023-01-15', status: 'Active' },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com', joinDate: '2023-02-20', status: 'Pending' }
-      ];
-      membersTotalCount.value = 2;
-    });
+    .catch(error => console.error('Failed to fetch team members:', error));
 }
 
 const onMemberPageChange = (pageRequest: PageRequest) => {
   membersPageRequest.value = pageRequest;
-  fetchTeamMembers({
-    pageable: pageRequest
-  });
+  fetchTeamMembers();
 }
 
 const onTeamRegistered = (team: TeamDTO) => {
   // Refresh the teams list to include the new team
-  fetchTeams({
-    pageable: teamsPageRequest.value
-  });
+  fetchTeams();
   
   // Select the newly registered team and show its details
   selectedTeamForDetails.value = team;
@@ -304,6 +339,17 @@ const handleRequestApproved = ({ teamId, request }: { teamId: number, request: T
   } catch (error) {
     $q.notify({ type: 'negative', message: 'Failed to approve request'})
   }
+}
+
+// Function to generate and copy invite link
+const generateAndCopyInviteLink = async (team: TeamDTO) => {  
+  const inviteLink = `${window.location.origin}/team/join/${team.invitationHash}`;
+  
+  // Copy to clipboard
+  await navigator.clipboard.writeText(inviteLink);
+  
+  // Show success notification
+  $q.notify({ type: 'positive', message: t('team.manage.inviteLinkCopied', 'Invite link copied to clipboard'), timeout: 2000 });  
 }
 
 // Lifecycle

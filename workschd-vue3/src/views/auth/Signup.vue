@@ -124,11 +124,8 @@ const handleSignup = async () => {
       password: signupForm.value.password
     })
 
-    if (response.data) {
-      $q.notify({
-        type: 'positive',
-        message: t('signup.success', '회원가입이 완료되었습니다. 로그인해주세요.')
-      })
+    if (response) {
+      $q.notify({type: 'positive', message: t('signup.success', '회원가입이 완료되었습니다. 로그인해주세요.') })
       router.push('/auth/login')
     }
   } catch (error) {
@@ -139,10 +136,7 @@ const handleSignup = async () => {
       errorMessage = t('signup.error.emailExists', '이미 존재하는 이메일입니다.')
     }
     
-    $q.notify({
-      type: 'negative',
-      message: errorMessage
-    })
+    $q.notify({ type: 'negative', message: errorMessage })
   }
 }
 </script>

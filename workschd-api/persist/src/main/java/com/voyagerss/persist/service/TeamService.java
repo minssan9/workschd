@@ -118,6 +118,9 @@ public class TeamService {
         Team team = teamRepository.findByName(teamName)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
 
+        if (team.getTeamMembers().isEmpty()) {
+            throw new RuntimeException("No members found for this team");
+        }
         return team.getTeamMembers().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

@@ -74,7 +74,7 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/health",
                                 "/login/**",
-                                "/api/auth/**",
+                                "/auth/**",
                                 "/oauth2/**",
                                 "/common/**",
                                 "/ed/common/**",

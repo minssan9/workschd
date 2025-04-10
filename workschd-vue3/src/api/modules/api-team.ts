@@ -1,46 +1,13 @@
-import {TeamDTO} from '@/interface/team';
+import {TeamDTO, DEFAULT_PAGE_REQUEST, PageRequest, PageResponse} from '@/interface/team';
 import {ScheduleConfig} from '@/interface/schedule';
 import {Store} from '@/interface/workplace';
 import {AxiosResponse} from 'axios';
 import request from '@/api/axios-voyagerss';
 
-// Pagination interface
-export interface PageRequest {
-  page: number;
-  size: number;
-  sort?: string;
-}
-
-export interface PageResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-  first: boolean;
-  last: boolean;
-  empty: boolean;
-}
-
-// Default pagination parameters
-const DEFAULT_PAGE_REQUEST: PageRequest = {
-  page: 0,
-  size: 10,
-  sort: 'id,desc'
-};
-
-// Request parameter interfaces
-export interface TeamListParams {
-  pageable: PageRequest;
-  name?: string;
-  region?: string;
-  scheduleType?: string;
-  fromDate?: string;
-  toDate?: string;
-}
-
 export interface TeamMemberParams {
-  pageable: PageRequest;
+  page?: number;
+  size?: number;
+  sort?: string;
   name?: string;
   email?: string;
   status?: string;
@@ -60,13 +27,33 @@ const generateInviteLink = (teamData: { teamName: string; region: string }): Pro
   return request.post('/team/generate-invite', teamData);
 };
 
-const getTeamMembers = (teamName: string, params: TeamMemberParams = { pageable: DEFAULT_PAGE_REQUEST }): Promise<AxiosResponse<PageResponse<TeamDTO>>> => {
+const getTeamMembers = (teamName: string, params: TeamMemberParams = {
+  page: DEFAULT_PAGE_REQUEST.page, 
+  size: DEFAULT_PAGE_REQUEST.size,
+  sort: DEFAULT_PAGE_REQUEST.sort
+}): Promise<AxiosResponse<PageResponse<TeamDTO>>> => {
   return request.get(`/team/${teamName}/members`, { params });
 };
 
 // TeamManage APIs
-const getTeams = (params: TeamListParams = { pageable: DEFAULT_PAGE_REQUEST }): Promise<AxiosResponse<PageResponse<TeamDTO>>> => {
-  return request.get('/team',  params );
+const getTeams = (params: TeamDTO = { page: DEFAULT_PAGE_REQUEST.page, size: DEFAULT_PAGE_REQUEST.size }): Promise<AxiosResponse<PageResponse<TeamDTO>>> => {
+  // Create query parameters in the format expected by Spring
+  const queryParams = {
+    page: params.page,
+    size: params.size
+  };
+  
+  // Add sort parameter if provided
+  if (params.sort) {
+    queryParams['sort'] = params.sort;
+  }
+  
+  // Add any other filter parameters
+  if (params.name) queryParams['name'] = params.name;
+  if (params.region) queryParams['region'] = params.region;
+  if (params.scheduleType) queryParams['scheduleType'] = params.scheduleType;
+  
+  return request.get('/team', { params: queryParams });
 };
 
 // TeamJoin APIs
