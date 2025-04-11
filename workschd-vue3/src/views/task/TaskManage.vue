@@ -1,8 +1,8 @@
 <template>
   <q-page padding class="page-container">
     <div class="row justify-between items-center q-mb-md">
-      <h5 class="q-my-none">Job List of Today</h5>
-      <q-btn color="primary" label="Add New Job" @click="showAddDialog = true" />
+      <h5 class="q-my-none">Task List of Today</h5>
+      <q-btn color="primary" label="Add New Task" @click="showAddDialog = true" />
     </div>
 
     <div class="content-section q-pa-md q-mb-md">
@@ -14,10 +14,10 @@
       />
     </div>
 
-    <!-- Job Details Section -->
-    <div v-if="selectedJob" class="content-section q-pa-md q-mt-md">
+    <!-- Task Details Section -->
+    <div v-if="selectedTask" class="content-section q-pa-md q-mt-md">
       <div class="row justify-between items-center q-mb-md">
-        <h5 class="q-my-none">{{ t('events.jobDetails', 'Job Details') }}</h5>
+        <h5 class="q-my-none">{{ t('events.taskDetails', 'Task Details') }}</h5>
         <div>
           <q-btn 
             v-if="isWorker"
@@ -42,19 +42,19 @@
                 <div class="col-12 col-sm-6">
                   <div class="detail-item">
                     <div class="detail-label">{{ t('events.branch', 'Branch') }}</div>
-                    <div class="detail-value">{{ selectedJob.branch_id }}</div>
+                    <div class="detail-value">{{ selectedTask.branch_id }}</div>
                   </div>
                 </div>
                 <div class="col-12 col-sm-6">
                   <div class="detail-item">
                     <div class="detail-label">{{ t('events.store', 'Store') }}</div>
-                    <div class="detail-value">{{ selectedJob.store_id }}</div>
+                    <div class="detail-value">{{ selectedTask.store_id }}</div>
                   </div>
                 </div>
                 <div class="col-12">
                   <div class="detail-item">
                     <div class="detail-label">{{ t('events.additionalInfo', 'Additional Info') }}</div>
-                    <div class="detail-value">{{ selectedJob.additional_info || 'N/A' }}</div>
+                    <div class="detail-value">{{ selectedTask.additional_info || 'N/A' }}</div>
                   </div>
                 </div>
               </div>
@@ -72,25 +72,25 @@
                 <div class="col-12 col-sm-6">
                   <div class="detail-item">
                     <div class="detail-label">{{ t('events.taskDate', 'Task Date') }}</div>
-                    <div class="detail-value">{{ formatDate(selectedJob.task_datetime) }}</div>
+                    <div class="detail-value">{{ formatDate(selectedTask.task_datetime) }}</div>
                   </div>
                 </div>
                 <div class="col-12 col-sm-6">
                   <div class="detail-item">
                     <div class="detail-label">{{ t('events.startTime', 'Start Time') }}</div>
-                    <div class="detail-value">{{ selectedJob.start_time }}</div>
+                    <div class="detail-value">{{ selectedTask.start_time }}</div>
                   </div>
                 </div>
                 <div class="col-12 col-sm-6">
                   <div class="detail-item">
                     <div class="detail-label">{{ t('events.endTime', 'End Time') }}</div>
-                    <div class="detail-value">{{ selectedJob.end_time }}</div>
+                    <div class="detail-value">{{ selectedTask.end_time }}</div>
                   </div>
                 </div>
                 <div class="col-12 col-sm-6">
                   <div class="detail-item">
                     <div class="detail-label">{{ t('events.dailyWage', 'Daily Wage') }}</div>
-                    <div class="detail-value">{{ formatCurrency(selectedJob.daily_wage) }}</div>
+                    <div class="detail-value">{{ formatCurrency(selectedTask.daily_wage) }}</div>
                   </div>
                 </div>
               </div>
@@ -101,14 +101,13 @@
       
       <!-- Attendance Records Section -->
       <div class="q-mt-md">
-        <EventAttendance 
-          v-if="selectedJob" 
-          :job-id="selectedJob.id" 
-          :branch-id="selectedJob.branch_id"
-          :task-id="selectedJob.id"
-          :start-time="selectedJob.start_time"
-          :end-time="selectedJob.end_time"
-          :daily-wage="selectedJob.daily_wage"
+        <TaskAttendance 
+          v-if="selectedTask" 
+          :task-id="selectedTask.id" 
+          :branch-id="selectedTask.branch_id"
+          :start-time="selectedTask.start_time"
+          :end-time="selectedTask.end_time"
+          :daily-wage="selectedTask.daily_wage"
         />
       </div>
     </div>
@@ -117,23 +116,23 @@
     <AttendanceFormDialog
       v-model="showAttendanceForm"
       :initial-data="attendanceForm"
-      :job-id="selectedJob?.id"
-      :branch-id="selectedJob?.branch_id"
+      :task-id="selectedTask?.id"
+      :branch-id="selectedTask?.branch_id"
       @submit="submitAttendance"
     />
 
-    <!-- Add Job Dialog -->
-    <AddJobDialog
+    <!-- Add Task Dialog -->
+    <AddTaskDialog
       v-model="showAddDialog"
       :branches="branches"
       :stores="stores"
-      @submit="handleJobSubmit"
+      @submit="handleTaskSubmit"
     />
 
     <!-- Approval Dialog -->
     <ApprovalDialog
       v-model="approvalDialogVisible"
-      :requests="selectedJobRequests"
+      :requests="selectedTaskRequests"
       @approve="handleApproveRequest"
     />
   </q-page>
@@ -144,11 +143,12 @@ import { ref, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import GridDefault from '@/components/grid/GridDefault.vue'
-import EventAttendance from '@/views/events/EventAttendance.vue'
-import AttendanceFormDialog from '@/views/events/dialog/AttendanceFormDialog.vue'
-import AddJobDialog from '@/views/events/dialog/AddJobDialog.vue'
-import ApprovalDialog from '@/views/events/dialog/ApprovalDialog.vue'
+import TaskAttendance from '@/views/task/TaskAttendance.vue'
+import AttendanceFormDialog from '@/views/task/dialog/AttendanceFormDialog.vue'
+import AddTaskDialog from '@/views/task/dialog/AddTaskDialog.vue'
+import ApprovalDialog from '@/views/task/dialog/ApprovalTaskDialog.vue'
 import apiAttendance from '@/api/modules/api-attendance'
+import apiTask, { Task, JoinRequest, AttendanceForm, Branch, Store } from '@/api/modules/api-task'
 import { useUserStore } from '@/stores/modules/store_user'
 
 const $q = useQuasar()
@@ -158,62 +158,8 @@ const userStore = useUserStore()
 // Check if user is a worker
 const isWorker = computed(() => userStore.isWorker)
 
-interface Job {
-  id: number
-  branch_id: number
-  store_id: number
-  additional_info: string
-  task_datetime: string
-  start_time: string
-  end_time: string
-  daily_wage: number
-}
-
-interface NewJob {
-  branch_id: number | null
-  store_id: number | null
-  additional_info: string
-  task_datetime: string
-  start_time: string
-  end_time: string
-  daily_wage: number
-}
-
-interface JoinRequest {
-  id: number
-  workerName: string
-}
-
-interface AttendanceForm {
-  actualStartTime: string
-  actualEndTime: string
-  calculatedDailyWage: number
-}
-
-const jobs = ref<Job[]>([
-  { 
-    id: 1, 
-    branch_id: 1, 
-    store_id: 1, 
-    additional_info: 'Regular shift', 
-    task_datetime: '2023-05-15T09:00', 
-    start_time: '09:00', 
-    end_time: '17:00',
-    daily_wage: 120
-  },
-  { 
-    id: 2, 
-    branch_id: 2, 
-    store_id: 2, 
-    additional_info: 'Inventory check', 
-    task_datetime: '2023-05-16T10:00', 
-    start_time: '10:00', 
-    end_time: '18:00',
-    daily_wage: 130
-  },
-])
-
-const newJob = ref<NewJob>({
+const tasks = ref<Task[]>([])
+const newTask = ref<Task>({
   branch_id: null,
   store_id: null,
   additional_info: '',
@@ -229,15 +175,8 @@ const attendanceForm = ref<AttendanceForm>({
   calculatedDailyWage: 0
 })
 
-const branches = ref([
-  { id: 1, name: 'Branch 1' },
-  { id: 2, name: 'Branch 2' }
-])
-
-const stores = ref([
-  { id: 1, name: 'Store 1' },
-  { id: 2, name: 'Store 2' }
-])
+const branches = ref<Branch[]>([])
+const stores = ref<Store[]>([])
 
 const rowData = ref([])
 const columnDefs = ref([
@@ -248,16 +187,16 @@ const columnDefs = ref([
       return `<div class="clickable-cell">${params.value}</div>`;
     },
     onCellClicked: (params) => {
-      selectedJob.value = params.data;
+      selectedTask.value = params.data;
       activeTab.value = 'details';
       
       // Pre-fill attendance form
-      if (selectedJob.value) {
+      if (selectedTask.value) {
         const now = new Date().toISOString().slice(0, 16);
         attendanceForm.value = {
           actualStartTime: now,
           actualEndTime: now,
-          calculatedDailyWage: selectedJob.value.daily_wage
+          calculatedDailyWage: selectedTask.value.daily_wage
         };
       }
     }
@@ -273,24 +212,24 @@ const columnDefs = ref([
 const showAddDialog = ref(false)
 const showAttendanceForm = ref(false)
 const approvalDialogVisible = ref(false)
-const selectedJobRequests = ref<JoinRequest[]>([])
-const selectedJob = ref<Job | null>(null)
+const selectedTaskRequests = ref<JoinRequest[]>([])
+const selectedTask = ref<Task | null>(null)
 const activeTab = ref('details')
 
 // Grid options with row click handler
 const gridOptions = ref({
   onRowClicked: (params) => {
     console.log('Row clicked via gridOptions:', params);
-    selectedJob.value = params.data;
+    selectedTask.value = params.data;
     activeTab.value = 'details';
     
-    // Pre-fill attendance form with job data
-    if (selectedJob.value) {
+    // Pre-fill attendance form with task data
+    if (selectedTask.value) {
       const now = new Date().toISOString().slice(0, 16);
       attendanceForm.value = {
         actualStartTime: now,
         actualEndTime: now,
-        calculatedDailyWage: selectedJob.value.daily_wage
+        calculatedDailyWage: selectedTask.value.daily_wage
       };
     }
   },
@@ -298,90 +237,62 @@ const gridOptions = ref({
   rowStyle: { cursor: 'pointer' }
 })
 
-
 const onSubmit = async () => {
   try {
-    await fetch('/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newJob.value)
-    })
-
+    await apiTask.createTask(newTask.value)
     await loadGridData()
     handleReset()
     showAddDialog.value = false
     
-    $q.notify({
-      type: 'positive',
-      message: 'Job registered successfully'
-    })
+    $q.notify({type: 'positive', message: 'Task registered successfully'})
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to register job'
-    })
+    $q.notify({type: 'negative', message: 'Failed to register task'})
   }
 }
 
-const submitAttendance = async (formData) => {
-  if (!selectedJob.value) return;
+const submitAttendance = async (formData: AttendanceForm) => {
+  if (!selectedTask.value) return;
   
   try {
     await apiAttendance.create({
-      branchId: selectedJob.value.branch_id,
-      taskId: selectedJob.value.id,
+      branchId: selectedTask.value.branch_id,
+      taskId: selectedTask.value.id,
       actualStartTime: formData.actualStartTime,
       actualEndTime: formData.actualEndTime,
       calculatedDailyWage: formData.calculatedDailyWage,
-      employeeId: 1, // Assuming current user ID or get from store
+      employeeId: userStore.user.accountId,
       attendanceDate: new Date().toISOString().split('T')[0],
       dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
-      startTime: selectedJob.value.start_time,
-      endTime: selectedJob.value.end_time
+      startTime: selectedTask.value.start_time,
+      endTime: selectedTask.value.end_time
     });
     
     activeTab.value = 'attendance';
     
-    $q.notify({
-      type: 'positive',
-      message: t('attendance.notification.success', 'Attendance recorded successfully')
-    });
+    $q.notify({type: 'positive', message: t('attendance.notification.success', 'Attendance recorded successfully')});
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: t('attendance.notification.error', 'Failed to record attendance')
-    });
+    $q.notify({type: 'negative', message: t('attendance.notification.error', 'Failed to record attendance')});
   }
 };
 
 const handleApproveRequest = async (request: JoinRequest) => {
   try {
-    await fetch(`/requests/${request.id}/approve`, {
-      method: 'POST'
-    })
+    await apiTask.approveJoinRequest(request.id)
     
-    $q.notify({
-      type: 'positive',
-      message: 'Request approved successfully'
-    })
+    $q.notify({type: 'positive', message: 'Request approved successfully'})
     
-    selectedJobRequests.value = selectedJobRequests.value.filter(r => r.id !== request.id)
+    selectedTaskRequests.value = selectedTaskRequests.value.filter(r => r.id !== request.id)
     
-    if (selectedJobRequests.value.length === 0) {
+    if (selectedTaskRequests.value.length === 0) {
       approvalDialogVisible.value = false
     }
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to approve request'
-    })
+    $q.notify({type: 'negative', message: 'Failed to approve request'})
   }
 }
 
 const handleReset = () => {
-  newJob.value = {
+  newTask.value = {
     branch_id: null,
     store_id: null,
     additional_info: '',
@@ -394,20 +305,10 @@ const handleReset = () => {
 
 const loadGridData = async () => {
   try {
-    // For demo purposes, use the jobs array
-    rowData.value = jobs.value;
-    
-    // In a real app, uncomment this:
-    /*
-    const response = await fetch('/tasks')
-    const data = await response.json()
-    rowData.value = data
-    */
+    const response = await apiTask.fetchTasks()
+    rowData.value = response.data
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to fetch tasks'
-    })
+    $q.notify({type: 'negative', message: 'Failed to fetch tasks'})
   }
 }
 
@@ -425,33 +326,34 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-const handleJobSubmit = async (newJobData: NewJob) => {
+const handleTaskSubmit = async (newTaskData: Task) => {
   try {
-    await fetch('/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newJobData)
-    })
-
+    await apiTask.createTask(newTaskData)
     await loadGridData()
     showAddDialog.value = false
     
-    $q.notify({
-      type: 'positive',
-      message: 'Job registered successfully'
-    })
+    $q.notify({type: 'positive', message: 'Task registered successfully'})
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to register job'
-    })
+    $q.notify({type: 'negative', message: 'Failed to register task'})
   }
 }
 
-onMounted(() => {
-  loadGridData()
+const fetchBranchesAndStores = async () => {
+  try {
+    const [branchesResponse, storesResponse] = await Promise.all([
+      apiTask.fetchBranches(),
+      apiTask.fetchStores()
+    ])
+    
+    branches.value = branchesResponse.data
+    stores.value = storesResponse.data
+  } catch (error) {
+    $q.notify({type: 'negative', message: 'Failed to fetch branches and stores'})
+  }
+}
+
+onMounted(async () => {
+  await Promise.all([loadGridData(), fetchBranchesAndStores()])
 })
 </script>
 

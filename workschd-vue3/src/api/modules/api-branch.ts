@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
 import request from "@/api/axios-voyagerss.js";
+import { PageResponseDTO } from '@/api/modules/api-common';
 
 export interface BranchDTO {
   id?: number;
@@ -25,7 +26,7 @@ export default {
     return request.get(`/branch/${id}`);
   },
 
-  getList(): Promise<AxiosResponse> {
+  getList(): Promise<AxiosResponse<PageResponseDTO<BranchDTO>>> {
     return request.get('/branch');
   }
 }; 

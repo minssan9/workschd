@@ -160,7 +160,7 @@ onMounted(() => {
 }
 
 .drawer-side {
-  height: calc(100vh - 190px);
+  height: calc(100vh - 250px);
 }
 
 .drawer-footer {

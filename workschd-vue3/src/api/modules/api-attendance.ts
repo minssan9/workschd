@@ -1,5 +1,7 @@
 import { AxiosResponse } from 'axios';
 import request from "@/api/axios-voyagerss.js";
+import { AttendanceRecord } from '@/api/modules/api-task'
+import { PageResponseDTO } from '@/api/modules/api-common'
 
 export interface AttendanceDTO {
   id?: number;
@@ -15,28 +17,33 @@ export interface AttendanceDTO {
   actualEndTime?: string;
 }
 
+interface CreateAttendanceParams {
+  branchId: number
+  taskId: number
+  actualStartTime: string
+  actualEndTime: string
+  calculatedDailyWage: number
+  employeeId: string | number
+  attendanceDate: string
+  dayOfWeek: string
+  startTime: string
+  endTime: string
+}
+
+const create = (params: CreateAttendanceParams): Promise<AxiosResponse<AttendanceRecord>> => {
+  return request.post('/attendance', params)
+}
+
+const getAttendanceByTaskId = (taskId: number): Promise<AxiosResponse<PageResponseDTO<AttendanceRecord>>> => {
+  return request.get(`/attendance/task/${taskId}`)
+}
+
+const update = (id: number, params: Partial<CreateAttendanceParams>): Promise<AxiosResponse<AttendanceRecord>> => {
+  return request.put(`/attendance/${id}`, params)
+}
+
 export default {
-  create(data: AttendanceDTO): Promise<AxiosResponse> {
-    return request.post('/attendance', data);
-  },
-
-  update(id: number, data: AttendanceDTO): Promise<AxiosResponse> {
-    return request.put(`/attendance/${id}`, data);
-  },
-
-  delete(id: number): Promise<AxiosResponse> {
-    return request.delete(`/attendance/${id}`);
-  },
-
-  getById(id: number): Promise<AxiosResponse> {
-    return request.get(`/attendance/${id}`);
-  },
-
-  getByEmployeeId(employeeId: number): Promise<AxiosResponse> {
-    return request.get(`/attendance/employee/${employeeId}`);
-  },
-
-  getByDateRange(startDate: string, endDate: string): Promise<AxiosResponse> {
-    return request.get(`/attendance/range?start=${startDate}&end=${endDate}`);
-  }
+  create,
+  getAttendanceByTaskId,
+  update
 }; 

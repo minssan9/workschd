@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Team, JoinRequest, TeamMember, TeamForm } from '@/interface/team';
+import { TeamDTO as Team, JoinRequest, TeamMember, TeamForm } from '@/api/modules/api-team';
 import { ScheduleConfig, DayConfig, MonthConfig } from '@/interface/schedule';
 import { Store, Branch } from '@/interface/workplace';
 

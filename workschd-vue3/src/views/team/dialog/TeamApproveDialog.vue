@@ -1,16 +1,16 @@
 <template>
   <q-dialog v-model="isOpen">
-    <q-card style="min-width: 350px">
-      <q-card-section>
+    <q-card class="dialog-card medium">
+      <q-card-section class="dialog-title">
         <div class="text-h6">Approve Join Requests</div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
+      <q-card-section class="dialog-content">
         <q-list dense>
-          <q-item v-for="request in selectedTeam?.joinRequests" :key="request.id">
+          <q-item v-for="request in selectedTeam?.joinRequests" :key="request.id" class="dialog-list-item">
             <q-item-section>
-              <q-item-label>{{ request.name }}</q-item-label>
-              <q-item-label caption>{{ request.location }}</q-item-label>
+              <q-item-label>{{ request.userName }}</q-item-label>
+              <q-item-label caption>{{ request.email }}</q-item-label>
             </q-item-section>
             <q-item-section side>
               <q-btn
@@ -24,7 +24,7 @@
         </q-list>
       </q-card-section>
 
-      <q-card-actions align="right">
+      <q-card-actions class="dialog-actions">
         <q-btn flat label="Close" color="primary" v-close-popup />
       </q-card-actions>
     </q-card>
@@ -33,9 +33,8 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import apiTeam from '@/api/modules/api-team'
+import apiTeam, { TeamDTO as Team, JoinRequest } from '@/api/modules/api-team'
 import { useTeamStore } from '@/stores/modules/teamStore'
-import { Team, JoinRequest } from '@/interface/team'
 
 const $q = useQuasar()
 const emit = defineEmits(['request-approved'])

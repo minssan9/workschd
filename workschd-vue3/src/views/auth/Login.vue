@@ -238,7 +238,7 @@ const handleLogin = async () => {
 
     if (response) {
       // Store user data and tokens
-      await userStore.login(response)
+      await userStore.login(response.data)
       
       $q.notify({
         type: 'positive',

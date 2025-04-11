@@ -21,6 +21,10 @@ request.interceptors.request.use(
     let token = userStore.accessToken ?? Cookies.get('accessToken')
     let refreshToken = userStore.refreshToken ?? Cookies.get('refreshToken')
 
+    if (config.url === '/reissue') {
+      return config;
+    }
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
       config.headers.refreshToken = `${refreshToken}`
@@ -28,8 +32,7 @@ request.interceptors.request.use(
     }
     return config
   },
-  error => {
-    console.log(error)
+  error => { 
     return Promise.reject(error)
   }
 )
@@ -41,15 +44,13 @@ request.interceptors.response.use(
       window.sessionStorage.setItem('$accessToken', response.headers.rtntoken)
     }
 
-    if (response.status !== 200) {
-      // Use Vue 3 notification system or your preferred toast/notification library
+    if (response.status !== 200) { 
       return Promise.reject(new Error(response.statusText || 'Error'))
     } else {
-      return response.data
+      return response
     }
   },
-  error => {
-    console.log('err' + error)
+  error => { 
     return Promise.reject(error)
   }
 )

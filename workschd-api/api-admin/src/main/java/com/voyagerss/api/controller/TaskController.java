@@ -11,15 +11,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.voyagerss.persist.dto.TaskDTO;
 import com.voyagerss.persist.service.TaskService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/task")
@@ -28,12 +35,21 @@ public class TaskController {
 
     private final TaskService taskService;
 
+    /**
+     * Create a new task
+     * Mapped to: const createTask = (task: Task): Promise<AxiosResponse<Task>> => {
+     *   return request.post('/task', task)
+     * }
+     */
     @PostMapping
-    public ResponseEntity<Long> save(@Valid @RequestBody TaskDTO vO) {
+    public ResponseEntity<TaskDTO> save(@Valid @RequestBody TaskDTO taskDTO) {
         try {
-            Long id = taskService.save(vO);
-            return ResponseEntity.ok(id);
+            log.info("Creating new task: {}", taskDTO);
+            Long id = taskService.save(taskDTO);
+            TaskDTO createdTask = taskService.getById(id);
+            return ResponseEntity.ok(createdTask);
         } catch (Exception e) {
+            log.error("Error creating task: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -69,12 +85,65 @@ public class TaskController {
         }
     }
 
+    /**
+     * Get all tasks
+     * Mapped to: const fetchTasks = (): Promise<AxiosResponse<Task[]>> => {
+     *   return request.get('/task')
+     * }
+     */
     @GetMapping
-    public ResponseEntity<Page<TaskDTO>> query(@Valid TaskDTO vO) {
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
         try {
-            Page<TaskDTO> tasks = taskService.query(vO);
+            log.info("Fetching all tasks");
+            List<TaskDTO> tasks = taskService.getAllTasks();
             return ResponseEntity.ok(tasks);
         } catch (Exception e) {
+            log.error("Error fetching tasks: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
+     * Approve a join request
+     * Mapped to: const approveJoinRequest = (requestId: number): Promise<AxiosResponse<void>> => {
+     *   return request.post(`/task/request/${requestId}/approve`)
+     * }
+     */
+    @PostMapping("/request/{requestId}/approve")
+    @Transactional
+    public ResponseEntity<Void> approveJoinRequest(@PathVariable Long requestId) {
+        try {
+            log.info("Approving join request with ID: {}", requestId);
+            taskService.approveJoinRequest(requestId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Error approving join request: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
+     * Create a join request for a task
+     */
+    @PostMapping("/{taskId}/request")
+    @Transactional
+    public ResponseEntity<TaskDTO> createJoinRequest(
+            @PathVariable Long taskId,
+            @RequestParam Integer accountId) {
+        try {
+            log.info("Creating join request for task ID: {} and account ID: {}", taskId, accountId);
+            TaskDTO request = taskService.createJoinRequest(taskId, accountId);
+            return ResponseEntity.ok(request);
+        } catch (IllegalStateException e) {
+            // Request already exists
+            log.warn("Join request already exists: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (NoSuchElementException e) {
+            // Task or account not found
+            log.error("Error creating join request: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Error creating join request: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

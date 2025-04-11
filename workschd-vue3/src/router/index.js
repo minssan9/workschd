@@ -24,10 +24,10 @@ const router = createRouter({
 
     // Job
     { 
-      path: '/event',                   name: 'Event',                    meta: { roles: ['WORKER','MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'event' },
+      path: '/task',                   name: 'Task',                    meta: { roles: ['WORKER','MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'event' },
       children: [
-        { path: '/event/list',          name: 'EventList',                component: () => import('@/views/events/EventList.vue'),            meta: { icon: 'list' } },
-        { path: '/event/attendance',    name: 'EventAttendance',          component: () => import('@/views/events/EventAttendance.vue'),      meta: { icon: 'how_to_reg' } },
+        { path: '/task/manage',          name: 'TaskManage',                component: () => import('@/views/task/TaskManage.vue'),            meta: { icon: 'list' } },
+        { path: '/task/attendance',    name: 'TaskAttendance',          component: () => import('@/views/task/TaskAttendance.vue'),      meta: { icon: 'how_to_reg' } },
       ]
     },
 

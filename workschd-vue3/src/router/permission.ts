@@ -11,8 +11,7 @@ const whiteList = [
   '/about',
   '/subscription',
   '/privacy-policy',
-  '/terms', 
-  '/test/*',
+  '/terms',  
   '/401',
   '/403',
   '/404'

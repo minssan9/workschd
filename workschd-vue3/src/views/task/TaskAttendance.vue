@@ -23,7 +23,7 @@
       <div v-else-if="attendanceRecords.length === 0" class="text-center q-pa-lg">
         <q-icon name="event_busy" size="4em" color="grey-6" />
         <div class="text-h6 q-mt-md text-grey-8">No Attendance Records</div>
-        <p class="text-grey-7">No attendance has been recorded for this job yet.</p>
+        <p class="text-grey-7">No attendance has been recorded for this task yet.</p>
       </div>
 
       <div v-else>
@@ -62,6 +62,8 @@
 import { ref, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useUserStore } from '@/stores/modules/store_user'
+import apiAttendance from '@/api/modules/api-attendance'
+import { AttendanceRecord } from '@/api/modules/api-task'
 
 const $q = useQuasar()
 const userStore = useUserStore()
@@ -69,19 +71,9 @@ const userStore = useUserStore()
 // Check if user is an admin
 const isAdmin = computed(() => userStore.isAdmin)
 
-interface AttendanceRecord {
-  id: number
-  employeeName: string
-  actualStartTime: string
-  actualEndTime: string
-  calculatedDailyWage: number
-  status: string
-}
-
 const props = defineProps<{
-  jobId: number
-  branchId: number
   taskId: number
+  branchId: number
   startTime: string
   endTime: string
   dailyWage: number
@@ -92,12 +84,12 @@ const showManageDialog = ref(false)
 const attendanceRecords = ref<AttendanceRecord[]>([])
 
 const columns = [
-  { name: 'employeeName', align: 'left', label: 'Employee', field: 'employeeName', sortable: true },
-  { name: 'actualStartTime', align: 'left', label: 'Start Time', field: 'actualStartTime', sortable: true },
-  { name: 'actualEndTime', align: 'left', label: 'End Time', field: 'actualEndTime', sortable: true },
-  { name: 'calculatedDailyWage', align: 'left', label: 'Wage', field: 'calculatedDailyWage', sortable: true },
-  { name: 'status', align: 'left', label: 'Status', field: 'status', sortable: true },
-  { name: 'actions', align: 'center', label: 'Actions', field: 'actions' }
+  { name: 'employeeName', align: 'left' as 'left', label: 'Employee', field: 'employeeName', sortable: true },
+  { name: 'actualStartTime', align: 'left' as 'left', label: 'Start Time', field: 'actualStartTime', sortable: true },
+  { name: 'actualEndTime', align: 'left' as 'left', label: 'End Time', field: 'actualEndTime', sortable: true },
+  { name: 'calculatedDailyWage', align: 'left' as 'left', label: 'Wage', field: 'calculatedDailyWage', sortable: true },
+  { name: 'status', align: 'left' as 'left', label: 'Status', field: 'status', sortable: true },
+  { name: 'actions', align: 'center' as 'center', label: 'Actions', field: 'actions' }
 ]
 
 // Load attendance records
@@ -105,37 +97,11 @@ const loadAttendanceRecords = async () => {
   loading.value = true
   
   try {
-    // In a real app, this would be an API call
-    // const response = await fetch(`/api/attendance/${props.jobId}`)
-    // attendanceRecords.value = await response.json()
-    
-    // For demo purposes, use mock data
-    setTimeout(() => {
-      attendanceRecords.value = [
-        {
-          id: 1,
-          employeeName: 'John Doe',
-          actualStartTime: '2023-05-15 09:15',
-          actualEndTime: '2023-05-15 17:30',
-          calculatedDailyWage: 125,
-          status: 'COMPLETED'
-        },
-        {
-          id: 2,
-          employeeName: 'Jane Smith',
-          actualStartTime: '2023-05-15 09:05',
-          actualEndTime: '2023-05-15 17:10',
-          calculatedDailyWage: 120,
-          status: 'COMPLETED'
-        }
-      ]
-      loading.value = false
-    }, 1000)
+    const response = await apiAttendance.getAttendanceByTaskId(props.taskId)
+    attendanceRecords.value = response.data
+    loading.value = false
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: 'Failed to load attendance records'
-    })
+    $q.notify({type: 'negative', message: 'Failed to load attendance records'})
     loading.value = false
   }
 }
@@ -172,10 +138,7 @@ const viewDetails = (record: AttendanceRecord) => {
 // Edit attendance record
 const editRecord = (record: AttendanceRecord) => {
   // In a real app, this would open an edit dialog
-  $q.notify({
-    type: 'info',
-    message: `Editing record for ${record.employeeName}`
-  })
+  $q.notify({type: 'info', message: `Editing record for ${record.employeeName}`})
 }
 
 onMounted(() => {

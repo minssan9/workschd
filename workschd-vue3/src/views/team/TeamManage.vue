@@ -114,8 +114,8 @@ import TeamScheduleConfig from './subpage/TeamManageScheduleConfig.vue'
 import TeamWorkPlace from './subpage/TeamManageWorkPlace.vue'
 import GridDefault from '@/components/grid/GridDefault.vue'
 import Pagination from '@/components/common/Pagination.vue'
-import {TeamDTO} from '@/interface/team'
-import apiTeam, {PageRequest, TeamListParams, TeamMemberParams} from '@/api/modules/api-team'
+import apiTeam, {TeamDTO, TeamMemberParams} from '@/api/modules/api-team'
+import { PageDTO, DEFAULT_PAGE_DTO } from '@/api/modules/api-common'
 
 // State
 const $q = useQuasar()
@@ -131,12 +131,12 @@ const teams = ref<TeamDTO[]>([])
 // Pagination state
 const teamsTotalCount = ref(0)
 const membersTotalCount = ref(0)
-const teamsPageRequest = ref<PageRequest>({
+const teamsPageRequest = ref<PageDTO>({
   page: 0,
   size: 10,
   sort: 'id,desc'
 })
-const membersPageRequest = ref<PageRequest>({
+const membersPageRequest = ref<PageDTO>({
   page: 0,
   size: 10,
   sort: 'id,desc'
@@ -235,13 +235,12 @@ const onGridReady = () => {
   fetchTeams();
 }
 
-const fetchTeams = (params?: TeamDTO) => {
-  // Create a new params object if one wasn't provided
-  const requestParams: TeamDTO = params || {};
-  
-  // Set pagination properties
-  requestParams.page = teamsPageRequest.value.page;
-  requestParams.size = teamsPageRequest.value.size;
+const fetchTeams = (params?: Partial<TeamDTO>) => { 
+  const requestParams: TeamDTO = { 
+    page: teamsPageRequest.value.page,
+    size: teamsPageRequest.value.size,
+    ...params 
+  };
   
   // Handle sort parameter in the format expected by Spring's Pageable
   // Spring expects: sort=property,direction
@@ -254,15 +253,15 @@ const fetchTeams = (params?: TeamDTO) => {
 
   apiTeam.getTeams(requestParams) 
     .then(response => {
-      if (response.content) {
-        teams.value = response.content;
-        teamsTotalCount.value = response.totalElements;
+      if (response.data.content) {
+        teams.value = response.data.content;
+        teamsTotalCount.value = response.data.totalElements;
       }
     })
     .catch(error => $q.notify({ type: 'negative', message: 'Failed to fetch teams' }));
 }
 
-const onTeamPageChange = (pageRequest: PageRequest) => {
+const onTeamPageChange = (pageRequest: PageDTO) => {
   teamsPageRequest.value = pageRequest;
   fetchTeams();
 }
@@ -302,7 +301,7 @@ const fetchTeamMembers = (params?: TeamMemberParams) => {
     .catch(error => console.error('Failed to fetch team members:', error));
 }
 
-const onMemberPageChange = (pageRequest: PageRequest) => {
+const onMemberPageChange = (pageRequest: PageDTO) => {
   membersPageRequest.value = pageRequest;
   fetchTeamMembers();
 }

@@ -1,8 +1,42 @@
-import {TeamDTO, DEFAULT_PAGE_REQUEST, PageRequest, PageResponse} from '@/interface/team';
 import {ScheduleConfig} from '@/interface/schedule';
 import {Store} from '@/interface/workplace';
 import {AxiosResponse} from 'axios';
 import request from '@/api/axios-voyagerss';
+import { PageDTO, PageResponseDTO, DEFAULT_PAGE_DTO, parseSortParam } from '@/api/modules/api-common';
+
+// Team related interfaces
+export interface TeamDTO {
+  // Core properties
+  id?: number;
+  name?: string;
+  region?: string;
+  scheduleType?: string;
+  invitationHash?: string;
+  
+  // Optional properties
+  location?: string;
+  memberCount?: number;
+  joinRequests?: JoinRequest[];
+  createdAt?: string;
+  managerName?: string;
+  preferredPlaces?: string[];
+  
+  // Team member properties (when used as a team member)
+  email?: string;
+  joinDate?: string;
+  status?: string;
+  userId?: number;
+  userName?: string;
+  requestDate?: string; 
+  page: number;
+  size: number;
+  sort?: string;
+}
+
+// For backward compatibility and type safety in specific contexts
+export type JoinRequest = Pick<TeamDTO, 'id' | 'userId' | 'userName' | 'email' | 'requestDate' | 'status'>;
+export type TeamMember = Pick<TeamDTO, 'id' | 'name' | 'email' | 'joinDate' | 'status'>;
+export type TeamForm = Pick<TeamDTO, 'name' | 'region' | 'scheduleType' | 'preferredPlaces'>;
 
 export interface TeamMemberParams {
   page?: number;
@@ -12,6 +46,10 @@ export interface TeamMemberParams {
   email?: string;
   status?: string;
 }
+
+// Re-export common DTOs
+export { DEFAULT_PAGE_DTO };
+export type { PageDTO, PageResponseDTO };
 
 // TeamApproveDialog APIs
 const approveRequest = (teamId: number, joinRequest: TeamDTO): Promise<AxiosResponse> => {
@@ -28,15 +66,15 @@ const generateInviteLink = (teamData: { teamName: string; region: string }): Pro
 };
 
 const getTeamMembers = (teamName: string, params: TeamMemberParams = {
-  page: DEFAULT_PAGE_REQUEST.page, 
-  size: DEFAULT_PAGE_REQUEST.size,
-  sort: DEFAULT_PAGE_REQUEST.sort
-}): Promise<AxiosResponse<PageResponse<TeamDTO>>> => {
+  page: DEFAULT_PAGE_DTO.page, 
+  size: DEFAULT_PAGE_DTO.size,
+  sort: DEFAULT_PAGE_DTO.sort
+}): Promise<AxiosResponse<PageResponseDTO<TeamDTO>>> => {
   return request.get(`/team/${teamName}/members`, { params });
 };
 
 // TeamManage APIs
-const getTeams = (params: TeamDTO = { page: DEFAULT_PAGE_REQUEST.page, size: DEFAULT_PAGE_REQUEST.size }): Promise<AxiosResponse<PageResponse<TeamDTO>>> => {
+const getTeams = (params: TeamDTO = { page: DEFAULT_PAGE_DTO.page, size: DEFAULT_PAGE_DTO.size }): Promise<AxiosResponse<PageResponseDTO<TeamDTO>>> => {
   // Create query parameters in the format expected by Spring
   const queryParams = {
     page: params.page,
@@ -45,7 +83,7 @@ const getTeams = (params: TeamDTO = { page: DEFAULT_PAGE_REQUEST.page, size: DEF
   
   // Add sort parameter if provided
   if (params.sort) {
-    queryParams['sort'] = params.sort;
+    queryParams['sort'] = parseSortParam(params.sort);
   }
   
   // Add any other filter parameters
@@ -57,12 +95,8 @@ const getTeams = (params: TeamDTO = { page: DEFAULT_PAGE_REQUEST.page, size: DEF
 };
 
 // TeamJoin APIs
-const getTeamInfo = (token: string): Promise<AxiosResponse<TeamDTO>> => {
-  return request.get(`/team/invite/${token}`);
-};
-
-const joinTeam = (teamId: number, data: { accountId: string; inviteToken: string }): Promise<AxiosResponse> => {
-  return request.post(`/team/${teamId}/join`, data);
+const joinTeamByInvitation = (invitationHash: string, accountId: string): Promise<AxiosResponse<TeamDTO>> => {
+  return request.get(`/team/join/${invitationHash}`, { accountId });
 };
 
 // TeamScheduleConfig APIs
@@ -96,8 +130,7 @@ export default {
   getTeams,
 
   // TeamJoin
-  getTeamInfo,
-  joinTeam,
+  joinTeamByInvitation,
 
   // TeamScheduleConfig
   saveScheduleConfig,

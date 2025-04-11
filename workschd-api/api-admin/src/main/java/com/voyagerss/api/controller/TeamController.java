@@ -27,14 +27,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.voyagerss.persist.dto.TeamDTO;
 import com.voyagerss.persist.dto.TeamMemberDTO;
+import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.entity.Team;
+import com.voyagerss.persist.entity.TeamMember;
+import com.voyagerss.persist.repository.AccountRepository;
 import com.voyagerss.persist.repository.TeamRepository;
 import com.voyagerss.persist.service.TeamService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/team")
@@ -43,6 +49,7 @@ public class TeamController {
 
     private final TeamService teamService;
     private final TeamRepository teamRepository;
+    private final AccountRepository accountRepository;
 
     @PostMapping
     public ResponseEntity<TeamDTO> save(@Valid @RequestBody TeamDTO vO) {
@@ -98,30 +105,70 @@ public class TeamController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    @PostMapping("/team/join")
-    public ResponseEntity<Void> joinTeam(@RequestParam Long teamId, @RequestParam String username) {
+  
+    /**
+     * Join team by invitation hash - combines fetching and joining in one step
+     * 
+     * @param hash The invitation hash from the URL
+     * @param accountId The ID of the account to add to the team
+     * @return Response with the team information
+     */
+    @GetMapping("/join/{hash}")
+    @Transactional
+    public ResponseEntity<TeamDTO> joinTeamByInvitationHash(
+            @PathVariable String hash, 
+            @RequestParam Integer accountId) {
+        
         try {
-            teamService.joinTeam(teamId, username);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @GetMapping("/team/join/{hash}")
-    public ResponseEntity<Team> handleInvite(@PathVariable String hash) {
-        try {
+            log.info("Processing join request for hash: {} and accountId: {}", hash, accountId);
+            
+            // Find team by invitation hash
             Team team = teamRepository.findByInvitationHash(hash)
                     .orElseThrow(() -> new RuntimeException("Invalid or expired invitation link"));
 
+            // Check if invitation has expired (7 days)
             if (team.getInvitationCreatedAt().isBefore(LocalDateTime.now().minusDays(7))) {
                 throw new RuntimeException("Invitation link has expired");
             }
-
-            return ResponseEntity.ok(team);
+            
+            // Find account by accountId
+            Account account = accountRepository.findById(accountId)
+                    .orElseThrow(() -> new RuntimeException("Account not found"));
+            
+            // Check if user is already a member
+            boolean isMember = team.getTeamMembers().stream()
+                    .anyMatch(member -> member.getAccount() != null && 
+                             member.getAccount().getAccountId().equals(accountId));
+            
+            if (!isMember) {
+                // Create new team member
+                TeamMember newMember = new TeamMember();
+                newMember.setTeam(team);
+                newMember.setAccount(account);
+                newMember.setJoinDate(LocalDateTime.now());
+                newMember.setStatus("Active");
+                
+                // Add to team members
+                if (team.getTeamMembers() == null) {
+                    team.setTeamMembers(List.of(newMember));
+                } else {
+                    team.getTeamMembers().add(newMember);
+                }
+                
+                // Save team
+                team = teamRepository.save(team);
+                log.info("Successfully added account {} to team {}", accountId, team.getId());
+            } else {
+                log.info("Account {} is already a member of team {}", accountId, team.getId());
+            }
+            
+            // Convert to DTO and return
+            TeamDTO teamDTO = teamService.getById(team.getId());
+            return ResponseEntity.ok(teamDTO);
+                
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+            log.error("Error joining team with hash {}: {}", hash, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

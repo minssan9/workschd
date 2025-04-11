@@ -1,12 +1,12 @@
 <template>
   <q-dialog v-model="dialogVisible" @hide="onHide">
-    <q-card style="width: 80vw; max-width: 1000px">
-      <q-card-section class="bg-primary text-white">
+    <q-card class="dialog-card large">
+      <q-card-section class="dialog-title">
         <div class="text-h6">Record Attendance</div>
       </q-card-section>
 
-      <q-card-section class="q-pa-md">
-        <q-form @submit="onSubmit" class="q-gutter-md">
+      <q-card-section class="dialog-content">
+        <q-form @submit="onSubmit" class="dialog-form q-gutter-md">
           <div class="row q-col-gutter-md">
             <!-- First row -->
             <div class="col-12 col-md-6">
@@ -45,8 +45,6 @@
             </div>
           </div>
 
-          <q-separator class="q-my-md" />
-
           <div class="row justify-end q-mt-md">
             <q-btn label="Cancel" color="negative" flat v-close-popup class="q-mr-sm" />
             <q-btn label="Submit" type="submit" color="primary" unelevated />
@@ -72,7 +70,7 @@ interface AttendanceFormData {
 const props = defineProps<{
   modelValue: boolean
   initialData: AttendanceFormData
-  jobId?: number
+  taskId?: number
   branchId?: number
 }>()
 
@@ -129,27 +127,4 @@ const onSubmit = () => {
 const onHide = () => {
   emit('update:modelValue', false)
 }
-</script>
-
-<style scoped>
-.q-card {
-  border-radius: 8px;
-}
-
-:deep(.q-field) {
-  margin-bottom: 8px;
-}
-
-:deep(.q-field--filled .q-field__control) {
-  border-radius: 8px;
-  background-color: #f5f5f5;
-}
-
-:deep(.q-field--filled .q-field__control:hover) {
-  background-color: #eeeeee;
-}
-
-:deep(.q-field--filled.q-field--focused .q-field__control) {
-  background-color: #e0e0e0;
-}
-</style> 
+</script> 

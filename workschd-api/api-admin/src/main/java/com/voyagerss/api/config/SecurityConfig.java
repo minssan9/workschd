@@ -1,17 +1,7 @@
 package com.voyagerss.api.config;
 
-import com.voyagerss.api.component.filter.CustomTokenFilter;
-import com.voyagerss.api.component.properties.AuthProperties;
-import com.voyagerss.api.oauth.exception.RestAuthenticationEntryPoint;
-import com.voyagerss.api.oauth.filter.TokenAuthenticationFilter;
-import com.voyagerss.api.oauth.handler.OAuth2AuthenticationFailureHandler;
-import com.voyagerss.api.oauth.handler.OAuth2AuthenticationSuccessHandler;
-import com.voyagerss.api.oauth.handler.TokenAccessDeniedHandler;
-import com.voyagerss.api.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
-import com.voyagerss.api.oauth.service.CustomOAuth2UserService;
-import com.voyagerss.api.oauth.service.CustomUserDetailsService;
-import com.voyagerss.api.oauth.token.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,7 +17,19 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import com.voyagerss.api.component.filter.CustomTokenFilter;
+import com.voyagerss.api.component.properties.AuthProperties;
+import com.voyagerss.api.oauth.exception.RestAuthenticationEntryPoint;
+import com.voyagerss.api.oauth.filter.TokenAuthenticationFilter;
+import com.voyagerss.api.oauth.handler.OAuth2AuthenticationFailureHandler;
+import com.voyagerss.api.oauth.handler.OAuth2AuthenticationSuccessHandler;
+import com.voyagerss.api.oauth.handler.TokenAccessDeniedHandler;
+import com.voyagerss.api.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
+import com.voyagerss.api.oauth.service.CustomOAuth2UserService;
+import com.voyagerss.api.oauth.service.CustomUserDetailsService;
+import com.voyagerss.api.oauth.token.JwtTokenProvider;
+
+import lombok.RequiredArgsConstructor;
 
 
 @Configuration
@@ -75,6 +77,7 @@ public class SecurityConfig {
                                 "/health",
                                 "/login/**",
                                 "/auth/**",
+                                "/team/join/**",
                                 "/oauth2/**",
                                 "/common/**",
                                 "/ed/common/**",

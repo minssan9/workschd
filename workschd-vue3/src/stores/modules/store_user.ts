@@ -95,18 +95,18 @@ export const useUserStore = defineStore('user', {
       if (!this.user.accountId) {
         try {
           const res = await apiAccount.getUser()
-          Cookies.set('refreshToken', res.refreshToken, { expires: 7 })
-          Cookies.set('accountId', res.accountId, { expires: 7 })
-          Cookies.set('username', res.username, { expires: 7 })
-          Cookies.set('email', res.email, { expires: 7 })
-          Cookies.set('role', res.accountRoles, { expires: 7 })
-          this.user = res
+          Cookies.set('refreshToken', res.data.refreshToken, { expires: 7 })
+          Cookies.set('accountId',    res.data.accountId, { expires: 7 })
+          Cookies.set('username',     res.data.username, { expires: 7 })
+          Cookies.set('email',        res.data.email, { expires: 7 })
+          Cookies.set('role',         res.data.accountRoles, { expires: 7 })
+          this.user = res.data
 
-          const accountInfo = await apiAccount.getAccountInfo(res.accountId)
+          const accountInfo = await apiAccount.getAccountInfo(res.data.accountId)
           if (accountInfo.accountId) {
             this.user = { ...this.user, ...accountInfo }
           }
-          return res
+          return res.data
         } catch (error) {
           console.error('Error fetching user:', error)
           throw error
@@ -157,14 +157,14 @@ export const useUserStore = defineStore('user', {
         if (!this.user.accountId) {
           try {
             const res = await apiAccount.getUser()
-            Cookies.set('refreshToken', res.refreshToken)
-            Cookies.set('accountId', res.accountId)
-            Cookies.set('username', res.username)
-            Cookies.set('email', res.email)
-            Cookies.set('role', res.accountRoles)
-            this.user = res
+            Cookies.set('refreshToken', res.data.refreshToken)
+            Cookies.set('accountId',    res.data.accountId)
+            Cookies.set('username',     res.data.username)
+            Cookies.set('email',        res.data.email)
+            Cookies.set('role',         res.data.accountRoles)
+            this.user = res.data
 
-            const accountInfo = await apiAccount.getAccountInfo(res.accountId)
+            const accountInfo = await apiAccount.getAccountInfo(res.data.accountId)
             if (accountInfo.accountId) {
               this.user.accountInfo = accountInfo
             }

@@ -1,20 +1,20 @@
 <template>
   <q-dialog v-model="dialogVisible" @hide="onHide">
-    <q-card style="width: 80vw; max-width: 800px">
-      <q-card-section class="bg-primary text-white">
+    <q-card class="dialog-card medium">
+      <q-card-section class="dialog-title">
         <div class="text-h6">Approve Join Requests</div>
       </q-card-section>
 
-      <q-card-section v-if="requests.length === 0" class="text-center q-pa-lg">
+      <q-card-section v-if="requests.length === 0" class="dialog-content empty-state">
         <q-icon name="info" size="48px" color="grey-7" />
-        <p class="text-grey-7 q-mt-md">No pending requests to approve</p>
+        <p>No pending requests to approve</p>
       </q-card-section>
 
-      <q-card-section v-else class="q-pa-md">
+      <q-card-section v-else class="dialog-content">
         <q-list separator>
-          <q-item v-for="request in requests" :key="request.id" class="q-py-md">
+          <q-item v-for="request in requests" :key="request.id" class="dialog-list-item q-py-md">
             <q-item-section avatar>
-              <q-avatar color="primary" text-color="white">
+              <q-avatar color="primary" text-color="white" class="dialog-list-item__avatar">
                 {{ getInitials(request.workerName) }}
               </q-avatar>
             </q-item-section>
@@ -36,7 +36,7 @@
         </q-list>
       </q-card-section>
       
-      <q-card-actions align="right" class="bg-grey-1">
+      <q-card-actions class="dialog-actions">
         <q-btn flat label="Close" color="primary" v-close-popup />
       </q-card-actions>
     </q-card>
@@ -89,19 +89,4 @@ const getInitials = (name: string): string => {
     .slice(0, 2)
     .join('')
 }
-</script>
-
-<style scoped>
-.q-card {
-  border-radius: 8px;
-}
-
-.q-item {
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-.q-item:hover {
-  background-color: #f5f5f5;
-}
-</style> 
+</script> 

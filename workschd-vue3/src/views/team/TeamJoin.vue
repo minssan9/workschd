@@ -7,42 +7,33 @@
             <div class="text-h6">{{ t('team.join.title', 'Join Team') }}</div>
             <div v-if="loading" class="text-center q-pa-md">
               <q-spinner color="primary" size="3em" />
-              <div class="q-mt-sm">{{ t('team.join.verifying', 'Verifying invitation...') }}</div>
+              <div class="q-mt-sm">{{ t('team.join.processing', 'Processing invitation...') }}</div>
             </div>
             
             <div v-else-if="error" class="text-center q-pa-md">
               <q-icon name="error" color="negative" size="3em" />
               <div class="text-negative q-mt-sm">{{ error }}</div>
+              <q-btn
+                flat
+                color="primary"
+                class="q-mt-md"
+                :label="t('common.backToHome', 'Back to Home')"
+                @click="router.push({ name: 'home' })"
+              />
             </div>
             
-            <div v-else-if="teamInfo" class="q-pa-md">
-              <div class="text-h6">{{ teamInfo.name }}</div>
-              <div class="text-subtitle2">{{ teamInfo.location }}</div>
-              
-              <q-list bordered class="rounded-borders q-mt-md">
-                <q-item>
-                  <q-item-section>
-                    <q-item-label>{{ t('team.join.teamManager', 'Team Manager') }}</q-item-label>
-                    <q-item-label caption>{{ teamInfo.managerName }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                
-                <q-item>
-                  <q-item-section>
-                    <q-item-label>{{ t('team.join.memberCount', 'Member Count') }}</q-item-label>
-                    <q-item-label caption>{{ t('team.join.membersCount', '{count} members', { count: teamInfo.memberCount }) }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-
-              <div class="text-center q-mt-lg">
-                <q-btn
-                  :label="t('team.join.joinTeam', 'Join Team')"
-                  color="primary"
-                  :loading="joining"
-                  @click="joinTeam"
-                />
+            <div v-else-if="success" class="text-center q-pa-md">
+              <q-icon name="check_circle" color="positive" size="3em" />
+              <div class="text-positive q-mt-sm">
+                {{ t('team.join.success', 'Successfully joined the team!') }}
               </div>
+              <q-btn
+                flat
+                color="primary"
+                class="q-mt-md"
+                :label="t('team.manage.viewTeam', 'View Team')"
+                @click="router.push({ name: 'TeamManage' })"
+              />
             </div>
           </q-card-section>
         </q-card>
@@ -57,82 +48,23 @@ import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useUserStore } from '@/stores/modules/store_user'
 import { useI18n } from 'vue-i18n'
-import { useTeamStore } from '@/stores/modules/teamStore'
-import { Team } from '@/interface/team'
+import apiTeam from '@/api/modules/api-team'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const $q = useQuasar()
 const userStore = useUserStore()
-const teamStore = useTeamStore()
 
 const loading = ref(true)
-const joining = ref(false)
 const error = ref('')
-const teamInfo = ref<Team | null>(null)
+const success = ref(false)
 
-const fetchTeamInfo = async () => {
-  const token = route.params.token as string
+const processInvitation = async () => {
+  const invitationHash = route.params.token as string
+  const accountId = userStore.user.accountId
   
-  try {
-    const response = await fetch(`/teams/invite/${token}`)
-    if (!response.ok) {
-      throw new Error('Invalid or expired invitation link')
-    }
-    
-    teamInfo.value = response
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to fetch team information'
-  } finally {
-    loading.value = false
-  }
-}
-
-const joinTeam = async () => {
-  if (!teamInfo.value || !userStore.user.accountId) {
-    return
-  }
-
-  joining.value = true
-  const token = route.params.token as string
-
-  try {
-    const response = await fetch(`/teams/${teamInfo.value.id}/join`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        accountId: userStore.user.accountId,
-        inviteToken: token
-      })
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to join team')
-    }
-
-    $q.notify({
-      type: 'positive',
-      message: 'Successfully joined the team!'
-    })
-
-    // Redirect to team page or dashboard
-    router.push({ name: 'TeamManage' })
-  } catch (err) {
-    $q.notify({
-      type: 'negative',
-      message: err instanceof Error ? err.message : 'Failed to join team'
-    })
-  } finally {
-    joining.value = false
-  }
-}
-
-onMounted(() => {
-  if (!userStore.user.accountId) {
-    // Save the current URL to redirect back after login
+  if (!accountId) {
     const returnUrl = window.location.pathname
     router.push({ 
       name: 'login', 
@@ -141,7 +73,22 @@ onMounted(() => {
     return
   }
 
-  fetchTeamInfo()
+  try {
+    await apiTeam.joinTeamByInvitation(invitationHash, accountId)
+    success.value = true
+    $q.notify({type: 'positive',message: t('team.join.success', 'Successfully joined the team!')})
+  } catch (err) {
+    error.value = err instanceof Error 
+      ? err.message 
+      : t('team.join.error', 'Failed to process invitation')
+    $q.notify({type: 'negative',message: error.value})
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  processInvitation()
 })
 </script>
 
