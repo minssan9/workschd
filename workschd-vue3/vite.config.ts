@@ -92,7 +92,7 @@ export default defineConfig({
   server: {
     port: 3003, // 개발 서버 포트 설정
     open: true, // 브라우저 자동 열기
-    host: true, // 네트워크에서 접근 가능하도록 설정
+    host: 'localhost',
     // https: false, // HTTPS 사용 여부
     cors: true, // CORS 활성화
     proxy: {

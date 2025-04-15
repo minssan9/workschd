@@ -35,19 +35,21 @@ export interface AttendanceRecord {
   status: string
 }
 
-export interface Branch {
-  id: number
+export interface Shop {
+  id?: number
   name: string
+  teamId?: number
+  region?: string
+  active?: boolean
 }
 
-export interface Store {
+export interface ShopDTO extends Shop {
   id: number
-  name: string
 }
 
 // Task APIs
 const fetchTasks = (): Promise<AxiosResponse<PageResponseDTO<Task>>> => {
-  return request.get('/tasks')
+  return request.get('/task')
 }
 
 const createTask = (task: Task): Promise<AxiosResponse<Task>> => {
@@ -58,17 +60,46 @@ const approveJoinRequest = (requestId: number): Promise<AxiosResponse<void>> => 
   return request.post(`/task/request/${requestId}/approve`)
 }
 
-const fetchBranches = (): Promise<AxiosResponse<Branch[]>> => {
-  return request.get('/branches')
+
+// Store APIs
+const createStore = (teamId: number, store: Shop): Promise<AxiosResponse<StoreDTO>> => {
+  return request.post(`/team/${teamId}/shop`, store)
 }
 
-const fetchStores = (): Promise<AxiosResponse<Store[]>> => {
-  return request.get('/stores')
+const updateStore = (teamId: number, storeId: number, store: Shop): Promise<AxiosResponse<void>> => {
+  return request.put(`/team/${teamId}/shop/${storeId}`, store)
 }
+
+const deleteStore = (teamId: number, storeId: number): Promise<AxiosResponse<void>> => {
+  return request.delete(`/team/${teamId}/shop/${storeId}`)
+}
+
+const getStoreById = (teamId: number, storeId: number): Promise<AxiosResponse<StoreDTO>> => {
+  return request.get(`/team/${teamId}/shop/${storeId}`)
+}
+
+const getStoresByTeamId = (teamId: number, region?: string): Promise<AxiosResponse<StoreDTO[]>> => {
+  const params = region ? { region } : {}
+  return request.get(`/team/${teamId}/shop`, { params })
+}
+
+const getActiveShopsByTeamId = (teamId: number): Promise<AxiosResponse<StoreDTO[]>> => {
+  return request.get(`/team/${teamId}/shop/active`)
+}
+
+const fetchShops = (): Promise<AxiosResponse<Shop[]>> => {
+  return request.get('/shop')
+}
+
 export default {
   fetchTasks,
-  createTask,
-  fetchBranches,
-  fetchStores,
-  approveJoinRequest
+  createTask, 
+  fetchShops,
+  approveJoinRequest,
+  createStore,
+  updateStore,
+  deleteStore,
+  getStoreById,
+  getStoresByTeamId,
+  getActiveShopsByTeamId
 } 

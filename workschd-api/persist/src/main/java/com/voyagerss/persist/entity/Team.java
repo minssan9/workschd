@@ -1,12 +1,19 @@
 package com.voyagerss.persist.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -37,6 +44,9 @@ public class Team extends BaseEntity implements Serializable {
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     private List<TeamMember> teamMembers;
+    
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private List<Shop> shops;
 
     private String location;
 

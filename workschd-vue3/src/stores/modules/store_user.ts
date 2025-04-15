@@ -1,6 +1,13 @@
 import apiAccount from '@/api/modules/api-account'
+import apiTeam from '@/api/modules/api-team'
 import Cookies from 'js-cookie'
 import { defineStore } from 'pinia'
+
+interface Team {
+  id: number
+  name: string
+  region?: string
+}
 
 interface AccountRole {
   roleType: string
@@ -28,6 +35,8 @@ interface User {
   profileImageUrl: string
   profileVideoUrl: string
   accountInfo?: any // Type this based on your accountInfo structure
+
+  teamId: number | null
 }
 
 interface UserState {
@@ -38,6 +47,7 @@ interface UserState {
   user: User
   accountInfo: any[] // Type this based on your accountInfo structure
   isAuthPhone: boolean
+  teams: Team[]
 }
 
 export const useUserStore = defineStore('user', {
@@ -72,9 +82,12 @@ export const useUserStore = defineStore('user', {
       username: null,
       profileImageUrl: '',
       profileVideoUrl: '',
+
+      teamId: null
     },
     accountInfo: [],
     isAuthPhone: false,
+    teams: []
   }),
 
   getters: {
@@ -88,6 +101,10 @@ export const useUserStore = defineStore('user', {
       state.user.accountRoles?.map(ar => ar.roleType).includes('OWNER') ?? false,
     isManager: (state): boolean => 
       state.user.accountRoles?.map(ar => ar.roleType).includes('MANAGER') ?? false,
+    teamOptions: (state) => state.teams.map(team => ({
+      label: team.name,
+      value: team.id
+    }))
   },
 
   actions: {
@@ -106,6 +123,12 @@ export const useUserStore = defineStore('user', {
           if (accountInfo.accountId) {
             this.user = { ...this.user, ...accountInfo }
           }
+
+          // Fetch teams after user data is loaded
+          if (this.user.accountId) {
+            await this.fetchTeams()
+          }
+
           return res.data
         } catch (error) {
           console.error('Error fetching user:', error)
@@ -113,6 +136,18 @@ export const useUserStore = defineStore('user', {
         }
       }
       return this.user
+    },
+
+    async fetchTeams(): Promise<void> {
+      if (!this.user.accountId) return
+      
+      try {
+        const response = await apiAccount.getTeamsByAccountId(this.user.accountId)
+        this.teams = response.data
+      } catch (error) {
+        console.error('Error fetching teams:', error)
+        throw error
+      }
     },
 
     async updateUser(): Promise<User> {
@@ -209,6 +244,10 @@ export const useUserStore = defineStore('user', {
       }
       // Reset any other state properties if needed
       this.accountInfo = []
+    },
+
+    setTeam(teamId: number | null): void {
+      this.user.teamId = teamId
     }
   }
 }) 

@@ -32,6 +32,7 @@ import com.voyagerss.persist.entity.Team;
 import com.voyagerss.persist.entity.TeamMember;
 import com.voyagerss.persist.repository.AccountRepository;
 import com.voyagerss.persist.repository.TeamRepository;
+import com.voyagerss.persist.service.ShopService;
 import com.voyagerss.persist.service.TeamService;
 
 import jakarta.transaction.Transactional;
@@ -50,6 +51,7 @@ public class TeamController {
     private final TeamService teamService;
     private final TeamRepository teamRepository;
     private final AccountRepository accountRepository;
+    private final ShopService shopService;
 
     @PostMapping
     public ResponseEntity<TeamDTO> save(@Valid @RequestBody TeamDTO vO) {
@@ -205,6 +207,7 @@ public class TeamController {
         List<TeamMemberDTO> members = teamService.getTeamMembers(teamName);
         return ResponseEntity.ok(members);
     }
+    
 
     private String generateUniqueHash(String teamName, String location) {
         String input = teamName + location + System.currentTimeMillis();

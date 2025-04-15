@@ -96,7 +96,6 @@ public class TeamService {
         teamRepository.save(team);
     }
 
-
     public String generateInvitationLink(Long teamId) {
         // UUID를 이용한 랜덤 해시값 생성
         String hash = UUID.randomUUID().toString();

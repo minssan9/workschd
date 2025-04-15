@@ -3,14 +3,15 @@ package com.voyagerss.persist.service;
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.QueryDTO;
+import com.voyagerss.persist.dto.TeamDTO;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.entity.AccountRole;
 import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.entity.TeamMember;
 import com.voyagerss.persist.querydsl.AccountRepositorySupport;
-import com.voyagerss.persist.repository.AccountInfoRepository;
-import com.voyagerss.persist.repository.AccountRepository;
-import com.voyagerss.persist.repository.AccountRoleRepository;
-import com.voyagerss.persist.repository.AccountSnsRepository;
+import com.voyagerss.persist.repository.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,9 @@ public class AccountService {
     private final AccountSnsRepository accountSnsRepository;
     private final AccountInfoRepository accountInfoRepository;
     private final AccountRepositorySupport accountRepositorySupport;
+
+    private final TeamService teamService;
+    private final TeamMemberRepository teamMemberRepository;
 
     public Account signin(AccountDTO vO) {
         Account account = new Account(vO);
@@ -166,4 +170,13 @@ public class AccountService {
         return accountRepository.existsByEmail(email);
     }
 
+  public List<TeamDTO> getTeamByAccountId(@Valid @NotNull Integer accountId) {
+        Account account = requireOne(accountId);
+        List<TeamMember> teamMembers = teamMemberRepository.findByAccount_AccountId(accountId);
+
+        List<TeamDTO> teamDTOList = teamMembers.stream()
+                .map(teamMember -> new TeamDTO(teamMember.getTeam()))
+                .collect(Collectors.toList());
+        return teamDTOList;
+    }
 }

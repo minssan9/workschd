@@ -10,7 +10,7 @@ $q.notify({type: 'positive',message: t('attendance.notification.success', 'Atten
 - replace sample json data to API call response data 
 - use related api-x.ts API call class file on @/api/modules 
 
----
+---  
 
 - integrate all dialog layout design to one style 
 - extract used scss to 1 file @/styles 

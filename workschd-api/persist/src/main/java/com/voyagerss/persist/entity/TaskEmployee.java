@@ -1,10 +1,12 @@
 package com.voyagerss.persist.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,18 +16,39 @@ public class TaskEmployee extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne( fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", nullable = false)
-    private Task taskId;
+    private Task task;
 
-
-    @ManyToOne( fetch = FetchType.LAZY)
+    @NotNull
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
+    @NotNull
+    @Column(name = "status", nullable = false)
+    private String status;  // "PENDING", "APPROVED", "REJECTED", "ACTIVE", "INACTIVE"
 
+    @Column(name = "request_date")
+    private LocalDateTime requestDate;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
+
+    @Column(name = "rejected_at")
+    private LocalDateTime rejectedAt;
+
+    @Column(name = "rejection_reason")
+    private String rejectionReason;
+
+    @Column(name = "joined_at")
+    private LocalDateTime joinedAt;
+
+    @Column(name = "left_at")
+    private LocalDateTime leftAt;
 }

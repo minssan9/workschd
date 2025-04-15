@@ -21,7 +21,7 @@ public class TaskEmployeeService {
         TaskEmployee bean = new TaskEmployee();
         BeanUtils.copyProperties(vO, bean);
         bean = taskEmployeeRepository.save(bean);
-        return bean.getTaskId();
+        return bean.getTask();
     }
 
     public void delete(Long id) {

@@ -47,8 +47,8 @@
                 </div>
                 <div class="col-12 col-sm-6">
                   <div class="detail-item">
-                    <div class="detail-label">{{ t('events.store', 'Store') }}</div>
-                    <div class="detail-value">{{ selectedTask.store_id }}</div>
+                    <div class="detail-label">{{ t('events.shop', 'Shop') }}</div>
+                    <div class="detail-value">{{ selectedTask.shop_id }}</div>
                   </div>
                 </div>
                 <div class="col-12">
@@ -123,9 +123,8 @@
 
     <!-- Add Task Dialog -->
     <AddTaskDialog
-      v-model="showAddDialog"
-      :branches="branches"
-      :stores="stores"
+      v-model="showAddDialog" 
+      :shops="shops"
       @submit="handleTaskSubmit"
     />
 
@@ -148,7 +147,7 @@ import AttendanceFormDialog from '@/views/task/dialog/AttendanceFormDialog.vue'
 import AddTaskDialog from '@/views/task/dialog/AddTaskDialog.vue'
 import ApprovalDialog from '@/views/task/dialog/ApprovalTaskDialog.vue'
 import apiAttendance from '@/api/modules/api-attendance'
-import apiTask, { Task, JoinRequest, AttendanceForm, Branch, Store } from '@/api/modules/api-task'
+import apiTask, { Task, JoinRequest, AttendanceForm, Shop } from '@/api/modules/api-task'
 import { useUserStore } from '@/stores/modules/store_user'
 
 const $q = useQuasar()
@@ -175,8 +174,7 @@ const attendanceForm = ref<AttendanceForm>({
   calculatedDailyWage: 0
 })
 
-const branches = ref<Branch[]>([])
-const stores = ref<Store[]>([])
+const shops = ref<Shop[]>([])
 
 const rowData = ref([])
 const columnDefs = ref([
@@ -201,7 +199,7 @@ const columnDefs = ref([
       }
     }
   },
-  { field: 'store_id', headerName: 'Store' },
+  { field: 'shop_id', headerName: 'Shop' },
   { field: 'additional_info', headerName: 'Additional Info' },
   { field: 'task_datetime', headerName: 'Task DateTime' },
   { field: 'start_time', headerName: 'Start Time' },
@@ -294,7 +292,7 @@ const handleApproveRequest = async (request: JoinRequest) => {
 const handleReset = () => {
   newTask.value = {
     branch_id: null,
-    store_id: null,
+    shop_id: null,
     additional_info: '',
     task_datetime: '',
     start_time: '',
@@ -338,22 +336,18 @@ const handleTaskSubmit = async (newTaskData: Task) => {
   }
 }
 
-const fetchBranchesAndStores = async () => {
+const fetchBranchesAndShops = async () => {
   try {
-    const [branchesResponse, storesResponse] = await Promise.all([
-      apiTask.fetchBranches(),
-      apiTask.fetchStores()
-    ])
+    const shopsResponse = await apiTask.getActiveShopsByTeamId(userStore.user.teamId)
     
-    branches.value = branchesResponse.data
-    stores.value = storesResponse.data
+    shops.value = shopsResponse.data
   } catch (error) {
-    $q.notify({type: 'negative', message: 'Failed to fetch branches and stores'})
+    $q.notify({type: 'negative', message: 'Failed to fetch branches and shops'})
   }
 }
 
 onMounted(async () => {
-  await Promise.all([loadGridData(), fetchBranchesAndStores()])
+  await Promise.all([loadGridData(), fetchBranchesAndShops()])
 })
 </script>
 

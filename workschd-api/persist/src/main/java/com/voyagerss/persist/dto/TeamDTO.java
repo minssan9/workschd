@@ -1,5 +1,6 @@
 package com.voyagerss.persist.dto;
 
+import com.voyagerss.persist.entity.Team;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,18 @@ public class TeamDTO {
     String location;
     List<TeamMemberDTO> teamMembers;
     LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    LocalDateTime lastModifiedBy;
     Pageable pageable;
 
+    public TeamDTO(Team team) {
+        this.id = team.getId();
+        this.name = team.getName();
+        this.region = team.getRegion();
+        this.scheduleType = team.getScheduleType();
+        this.invitationHash = team.getInvitationHash();
+        this.invitationCreatedAt = team.getInvitationCreatedAt();
+        this.location = team.getLocation();
+        this.createdAt = team.getCreatedAt();
+        this.lastModifiedBy = team.getLastModifiedAt();
+    }
 }

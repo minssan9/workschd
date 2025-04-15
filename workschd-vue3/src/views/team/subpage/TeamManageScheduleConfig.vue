@@ -125,7 +125,7 @@
 import { ref, onMounted, watch, defineProps } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
-import { useTeamStore } from '@/stores/modules/teamStore'
+import { useTeamStore } from '@/stores/modules/store_team'
 import { ScheduleConfig, DayConfig, MonthConfig } from '@/interface/schedule'
 
 const props = defineProps({

@@ -25,7 +25,6 @@ public class Schedule extends BaseEntity {
     private String employeeName;
     private LocalDate date;
     private String shift;
-
     // Getters, Setters, Constructors
 
     public Schedule(ScheduleDto scheduleDto) {

@@ -1,5 +1,5 @@
 import {ScheduleConfig} from '@/interface/schedule';
-import {Store} from '@/interface/workplace';
+import {Shop} from '@/interface/workplace';
 import {AxiosResponse} from 'axios';
 import request from '@/api/axios-voyagerss';
 import { PageDTO, PageResponseDTO, DEFAULT_PAGE_DTO, parseSortParam } from '@/api/modules/api-common';
@@ -46,6 +46,16 @@ export interface TeamMemberParams {
   email?: string;
   status?: string;
 }
+
+export interface Shop {
+  id?: number;
+  isActive?: boolean; 
+  address?: string;
+  branchId?: number;
+  name: string;
+  region?: string;
+}
+
 
 // Re-export common DTOs
 export { DEFAULT_PAGE_DTO };
@@ -103,21 +113,21 @@ const joinTeamByInvitation = (invitationHash: string, accountId: string): Promis
 const saveScheduleConfig = (config: ScheduleConfig): Promise<AxiosResponse> => {
   return request.post('/schedule-config', config);
 };
-
-// TeamWorkPlace APIs
-const getStores = (): Promise<AxiosResponse> => {
-  return request.get('/stores');
-};
-
-const createStore = (store: Store): Promise<AxiosResponse> => {
-  return request.post('/stores', store);
-};
-
+ 
 const approveJoinRequest = (teamId: number, requestId: number): Promise<AxiosResponse<any>> => {
   return request.post(`/team/${teamId}/approve/${requestId}`);
 };
 
+// Shop APIs
+const getShopsByTeamId = (teamId: number): Promise<AxiosResponse<Shop[]>> => {
+  return request.get(`/team/${teamId}/shop`);
+};
+
 export default {
+  // Remove type exports
+  // TeamDTO,
+  // Shop,
+  
   // TeamApproveDialog
   approveRequest,
 
@@ -135,9 +145,8 @@ export default {
   // TeamScheduleConfig
   saveScheduleConfig,
 
-  // TeamWorkPlace
-  getStores,
-  createStore,
+  // Shop APIs
+  getShopsByTeamId,
 
   approveJoinRequest
 }; 

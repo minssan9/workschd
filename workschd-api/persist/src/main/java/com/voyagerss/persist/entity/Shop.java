@@ -17,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "store")
+@Table(name = "shop")
 public class Shop extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

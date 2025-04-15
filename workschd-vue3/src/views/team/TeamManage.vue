@@ -111,11 +111,11 @@ import {useI18n} from 'vue-i18n'
 import TeamApproveDialog from './dialog/TeamApproveDialog.vue'
 import TeamRegistrationDialog from './dialog/TeamRegistrationDialog.vue'
 import TeamScheduleConfig from './subpage/TeamManageScheduleConfig.vue'
-import TeamWorkPlace from './subpage/TeamManageWorkPlace.vue'
+import TeamWorkPlace from './subpage/TeamManageShop.vue'
 import GridDefault from '@/components/grid/GridDefault.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import apiTeam, {TeamDTO, TeamMemberParams} from '@/api/modules/api-team'
-import { PageDTO, DEFAULT_PAGE_DTO } from '@/api/modules/api-common'
+import { PageDTO } from '@/api/modules/api-common'
 
 // State
 const $q = useQuasar()

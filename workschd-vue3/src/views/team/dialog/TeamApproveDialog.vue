@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import apiTeam, { TeamDTO as Team, JoinRequest } from '@/api/modules/api-team'
-import { useTeamStore } from '@/stores/modules/teamStore'
+import { useTeamStore } from '@/stores/modules/store_team'
 
 const $q = useQuasar()
 const emit = defineEmits(['request-approved'])

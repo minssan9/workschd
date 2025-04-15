@@ -3,9 +3,9 @@ package com.voyagerss.persist.service;
 import com.voyagerss.persist.dto.TaskDTO;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.entity.Task;
-import com.voyagerss.persist.entity.TaskJoinRequest;
+import com.voyagerss.persist.entity.TaskEmployee;
 import com.voyagerss.persist.repository.AccountRepository;
-import com.voyagerss.persist.repository.TaskJoinRequestRepository;
+import com.voyagerss.persist.repository.TaskEmployeeRepository;
 import com.voyagerss.persist.repository.TaskRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class TaskService {
     private TaskRepository taskRepository;
     
     @Autowired
-    private TaskJoinRequestRepository taskJoinRequestRepository;
+    private TaskEmployeeRepository taskEmployeeRepository;
     
     @Autowired
     private AccountRepository accountRepository;
@@ -52,7 +52,7 @@ public class TaskService {
         TaskDTO dto = toDTO(original);
         
         // Load join requests for this task
-        List<TaskJoinRequest> joinRequests = taskJoinRequestRepository.findByTask_Id(id);
+        List<TaskEmployee> joinRequests = taskEmployeeRepository.findByTask_Id(id);
         if (joinRequests != null && !joinRequests.isEmpty()) {
             dto.setJoinRequests(joinRequests.stream()
                     .map(this::toJoinRequestDTO)
@@ -83,7 +83,7 @@ public class TaskService {
      */
     @Transactional
     public void approveJoinRequest(Long requestId) {
-        TaskJoinRequest request = taskJoinRequestRepository.findById(requestId)
+        TaskEmployee request = taskEmployeeRepository.findById(requestId)
                 .orElseThrow(() -> new NoSuchElementException("Join request not found: " + requestId));
         
         // Update request status
@@ -91,7 +91,7 @@ public class TaskService {
         request.setApprovedAt(LocalDateTime.now());
         
         // Save the updated request
-        taskJoinRequestRepository.save(request);
+        taskEmployeeRepository.save(request);
     }
     
     /**
@@ -111,7 +111,7 @@ public class TaskService {
                 .orElseThrow(() -> new NoSuchElementException("Account not found: " + accountId));
         
         // Check if request already exists
-        List<TaskJoinRequest> existingRequests = taskJoinRequestRepository
+        List<TaskEmployee> existingRequests = taskEmployeeRepository
                 .findByTask_IdAndAccount_AccountId(taskId, accountId);
         
         if (!existingRequests.isEmpty()) {
@@ -119,14 +119,14 @@ public class TaskService {
         }
         
         // Create new request
-        TaskJoinRequest request = new TaskJoinRequest();
+        TaskEmployee request = new TaskEmployee();
         request.setTask(task);
         request.setAccount(account);
         request.setStatus("PENDING");
         request.setRequestDate(LocalDateTime.now());
         
         // Save the request
-        request = taskJoinRequestRepository.save(request);
+        request = taskEmployeeRepository.save(request);
         
         // Return DTO
         return toJoinRequestDTO(request);
@@ -138,7 +138,7 @@ public class TaskService {
         return bean;
     }
     
-    private TaskDTO toJoinRequestDTO(TaskJoinRequest request) {
+    private TaskDTO toJoinRequestDTO(TaskEmployee request) {
         TaskDTO dto = new TaskDTO();
         
         // Set request fields

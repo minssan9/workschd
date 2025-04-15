@@ -57,23 +57,19 @@ public class Account extends BaseEntity implements Serializable {
     private String profileImageUrl;
 
     @Column(name = "profile_video_url")
-    private String profileVideoUrl; 
-
-    @OneToMany(mappedBy = "account")
-    private List<TeamMember> teamMembers;
+    private String profileVideoUrl;  
 
     @JsonManagedReference
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<AccountRole> accountRoles = new ArrayList<>();
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "account" ,cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AccountSns> accountSnsList = new ArrayList<>();
 
     @JsonManagedReference
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private AccountInfo accountInfo;
-
 
     public Account(AccountDTO accountDto) {
         BeanUtils.copyProperties(accountDto, this);

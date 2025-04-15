@@ -8,23 +8,12 @@
       <q-card-section class="dialog-content">
         <q-form @submit="onSubmit" class="dialog-form q-gutter-md">
           <div class="row q-col-gutter-md">
-            <!-- First row -->
+            <!-- First row --> 
             <div class="col-12 col-md-6">
               <q-select
-                v-model="taskData.branch_id"
-                label="Branch"
-                :options="branches"
-                option-value="id"
-                option-label="name"
-                filled
-                required
-              />
-            </div>
-            <div class="col-12 col-md-6">
-              <q-select
-                v-model="taskData.store_id"
+                v-model="taskData.shop_id"
                 label="Store"
-                :options="stores"
+                :options="getShopOptions"
                 option-value="id"
                 option-label="name"
                 filled
@@ -103,12 +92,16 @@
 <script setup lang="ts">
 import { ref, watch, defineProps, defineEmits } from 'vue'
 import { useQuasar } from 'quasar'
+import { useTeamStore } from '@/stores/modules/store_team'
+import { storeToRefs } from 'pinia'
 
 const $q = useQuasar()
+const teamStore = useTeamStore()
+const { getShopOptions } = storeToRefs(teamStore)
 
 interface NewTask {
-  branch_id: number | null
-  store_id: number | null
+  
+  shop_id: number | null
   additional_info: string
   task_datetime: string
   start_time: string
@@ -116,20 +109,14 @@ interface NewTask {
   daily_wage: number
 }
 
-interface Branch {
-  id: number
-  name: string
-}
-
-interface Store {
+interface Shop {
   id: number
   name: string
 }
 
 const props = defineProps<{
   modelValue: boolean
-  branches: Branch[]
-  stores: Store[]
+  shops: Shop[]
 }>()
 
 const emit = defineEmits<{
@@ -137,10 +124,10 @@ const emit = defineEmits<{
   (e: 'submit', task: NewTask): void
 }>()
 
-const dialogVisible = ref(props.modelValue)
+const dialogVisible = ref(props.modelValue) 
+
 const taskData = ref<NewTask>({
-  branch_id: null,
-  store_id: null,
+  shop_id: null,
   additional_info: '',
   task_datetime: '',
   start_time: '',
@@ -161,9 +148,8 @@ const onSubmit = async () => {
 }
 
 const handleReset = () => {
-  taskData.value = {
-    branch_id: null,
-    store_id: null,
+  taskData.value = {    
+    shop_id: null,
     additional_info: '',
     task_datetime: '',
     start_time: '',
@@ -174,5 +160,5 @@ const handleReset = () => {
 
 const onHide = () => {
   emit('update:modelValue', false)
-}
+} 
 </script> 

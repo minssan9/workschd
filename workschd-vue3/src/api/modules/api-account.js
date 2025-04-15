@@ -15,7 +15,9 @@ const apiAccount = {
     return request.put(`${baesURL}/${account.accountId}`, account)
   },
 
-
+  getTeamsByAccountId(accountId) {
+    return request.get(`${baesURL}/${accountId}/team`)
+  },
 
   getSocialLoginUrl (socialType) {
     return `${import.meta.env.VITE_API_URL}/oauth2/authorization/${socialType}?redirect_uri=${import.meta.env.VITE_API_REDIRECT_URL}/auth/redirect`

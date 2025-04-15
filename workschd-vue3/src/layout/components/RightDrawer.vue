@@ -51,6 +51,25 @@
             </q-item-section>
             <q-item-section>Account Schedule</q-item-section>
           </q-item>
+          
+          <!-- Team Selector -->
+          <q-item>
+            <q-item-section avatar>
+              <q-icon name="groups" />
+            </q-item-section>
+            <q-item-section>
+              <q-select
+                v-model="selectedTeam"
+                :options="teamOptions"
+                dense
+                outlined
+                emit-value
+                map-options
+                label="Select Team"
+                @update:model-value="handleTeamChange"
+              />
+            </q-item-section>
+          </q-item>
         </div>
         <!-- Settings Section -->
         <q-item-label header>Settings</q-item-label>
@@ -109,6 +128,7 @@
 import { ref, onMounted } from 'vue';
 import { useLayoutStore } from '@/stores/modules/store_layout'
 import { useUserStore } from '@/stores/modules/store_user'
+import { useTeamStore } from '@/stores/modules/store_team'
 import { storeToRefs } from 'pinia'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
@@ -117,9 +137,19 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const layoutStore = useLayoutStore()
 const userStore = useUserStore()
+const teamStore = useTeamStore()
 const { drawerRight } = storeToRefs(layoutStore)
+const { teamOptions } = storeToRefs(userStore)
 const $q = useQuasar()
 const { locale } = useI18n()
+
+// Team selection
+const selectedTeam = ref(userStore.user.teamId)
+
+const handleTeamChange = (teamId: number | null) => {
+  userStore.setTeam(teamId)
+  teamStore.setTeam(teamId)
+}
 
 const languageOptions = [
   { label: 'English', value: 'en' },

@@ -124,6 +124,11 @@ public class AccountController {
         return ResponseEntity.ok( accountInfoService.getById(accountId));
     }
 
+    @GetMapping("/{accountId}/team")
+    public ResponseEntity getTeamByAccountId(@Valid @NotNull @PathVariable("accountId") Integer accountId) {
+        return ResponseEntity.ok(accountService.getTeamByAccountId(accountId));
+    }
+
     @PostMapping("/info")
     public ResponseEntity saveAccountInfoById(@RequestBody AccountInfoDTO vO) {
 //        throw new CommonException();
