@@ -1,5 +1,6 @@
 package com.voyagerss.persist.entity;
 
+import com.voyagerss.persist.EnumMaster;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -32,7 +33,8 @@ public class TaskEmployee extends BaseEntity implements Serializable {
 
     @NotNull
     @Column(name = "status", nullable = false)
-    private String status;  // "PENDING", "APPROVED", "REJECTED", "ACTIVE", "INACTIVE"
+    @Enumerated(EnumType.STRING)
+    private EnumMaster.TaskEmployeeStatus status = EnumMaster.TaskEmployeeStatus.PENDING;
 
     @Column(name = "request_date")
     private LocalDateTime requestDate;

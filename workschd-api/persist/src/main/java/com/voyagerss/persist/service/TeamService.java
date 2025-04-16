@@ -6,6 +6,7 @@ import com.voyagerss.persist.dto.TeamMemberDTO;
 import com.voyagerss.persist.entity.Team;
 import com.voyagerss.persist.entity.TeamMember;
 import com.voyagerss.persist.querydsl.TeamRepositorySupport;
+import com.voyagerss.persist.repository.TeamMemberRepository;
 import com.voyagerss.persist.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -27,6 +28,7 @@ public class TeamService {
     private final CoreProperties coreProperties;
     private final TeamRepository teamRepository;
     private final TeamRepositorySupport teamRepositorySupport;
+    private final TeamMemberRepository teamMemberRepository;
 
     public TeamDTO createTeam(TeamDTO vO) {
         Team team = new Team();
@@ -112,15 +114,16 @@ public class TeamService {
     }
 
 
-
+    @Transactional(readOnly = true)
     public List<TeamMemberDTO> getTeamMembers(String teamName) {
-        Team team = teamRepository.findByName(teamName)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
-
-        if (team.getTeamMembers().isEmpty()) {
+        // Use the optimized query method to avoid LazyInitializationException
+        List<TeamMember> members = teamMemberRepository.findByTeamNameWithAccount(teamName);
+        
+        if (members.isEmpty()) {
             throw new RuntimeException("No members found for this team");
         }
-        return team.getTeamMembers().stream()
+        
+        return members.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

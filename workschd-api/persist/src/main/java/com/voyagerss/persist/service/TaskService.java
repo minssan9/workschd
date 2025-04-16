@@ -1,12 +1,12 @@
 package com.voyagerss.persist.service;
 
 import com.voyagerss.persist.dto.TaskDTO;
+import com.voyagerss.persist.dto.TaskEmployeeDTO;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.entity.Task;
 import com.voyagerss.persist.entity.TaskEmployee;
-import com.voyagerss.persist.repository.AccountRepository;
-import com.voyagerss.persist.repository.TaskEmployeeRepository;
-import com.voyagerss.persist.repository.TaskRepository;
+import com.voyagerss.persist.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,23 +18,29 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import static com.voyagerss.persist.EnumMaster.TaskEmployeeStatus.APPROVED;
+import static com.voyagerss.persist.EnumMaster.TaskEmployeeStatus.PENDING;
+
 @Service
+@RequiredArgsConstructor
 public class TaskService {
 
-    @Autowired
-    private TaskRepository taskRepository;
-    
-    @Autowired
-    private TaskEmployeeRepository taskEmployeeRepository;
-    
-    @Autowired
-    private AccountRepository accountRepository;
+    private final TeamRepository teamRepository;
+    private final ShopRepository shopRepository;
+    private final TaskRepository taskRepository;
+    private final TaskEmployeeRepository taskEmployeeRepository;
+    private final AccountRepository accountRepository;
 
-    public Long save(TaskDTO vO) {
-        Task bean = new Task();
-        BeanUtils.copyProperties(vO, bean);
-        bean = taskRepository.save(bean);
-        return bean.getId();
+    public Task save(TaskDTO vO) {
+        Task task = new Task();
+        BeanUtils.copyProperties(vO, task);
+
+        shopRepository.findById(vO.getShopId())
+                .ifPresent(task::setShop);
+        teamRepository.findById(vO.getTeamId())
+                .ifPresent(task::setTeam);
+
+        return taskRepository.save(task);
     }
 
     public void delete(Long id) {
@@ -52,10 +58,10 @@ public class TaskService {
         TaskDTO dto = toDTO(original);
         
         // Load join requests for this task
-        List<TaskEmployee> joinRequests = taskEmployeeRepository.findByTask_Id(id);
-        if (joinRequests != null && !joinRequests.isEmpty()) {
-            dto.setJoinRequests(joinRequests.stream()
-                    .map(this::toJoinRequestDTO)
+        List<TaskEmployee> taskEmployees = taskEmployeeRepository.findByTask_Id(id);
+        if (taskEmployees != null && !taskEmployees.isEmpty()) {
+            dto.setTaskEmployees(taskEmployees.stream()
+                    .map(this::toTaskEmployee)
                     .collect(Collectors.toList()));
         }
         
@@ -83,15 +89,15 @@ public class TaskService {
      */
     @Transactional
     public void approveJoinRequest(Long requestId) {
-        TaskEmployee request = taskEmployeeRepository.findById(requestId)
+        TaskEmployee taskEmployee = taskEmployeeRepository.findById(requestId)
                 .orElseThrow(() -> new NoSuchElementException("Join request not found: " + requestId));
         
         // Update request status
-        request.setStatus("APPROVED");
-        request.setApprovedAt(LocalDateTime.now());
+        taskEmployee.setStatus(APPROVED);
+        taskEmployee.setApprovedAt(LocalDateTime.now());
         
         // Save the updated request
-        taskEmployeeRepository.save(request);
+        taskEmployeeRepository.save(taskEmployee);
     }
     
     /**
@@ -101,7 +107,7 @@ public class TaskService {
      * @return The created join request as TaskDTO
      */
     @Transactional
-    public TaskDTO createJoinRequest(Long taskId, Integer accountId) {
+    public TaskEmployeeDTO createJoinRequest(Long taskId, Integer accountId) {
         // Check if task exists
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NoSuchElementException("Task not found: " + taskId));
@@ -119,49 +125,51 @@ public class TaskService {
         }
         
         // Create new request
-        TaskEmployee request = new TaskEmployee();
-        request.setTask(task);
-        request.setAccount(account);
-        request.setStatus("PENDING");
-        request.setRequestDate(LocalDateTime.now());
+        TaskEmployee taskEmployee = new TaskEmployee();
+        taskEmployee.setTask(task);
+        taskEmployee.setAccount(account);
+        taskEmployee.setStatus(PENDING);
+        taskEmployee.setRequestDate(LocalDateTime.now());
         
         // Save the request
-        request = taskEmployeeRepository.save(request);
+        taskEmployee = taskEmployeeRepository.save(taskEmployee);
         
         // Return DTO
-        return toJoinRequestDTO(request);
+        return toTaskEmployee(taskEmployee);
     }
 
-    private TaskDTO toDTO(Task original) {
-        TaskDTO bean = new TaskDTO();
-        BeanUtils.copyProperties(original, bean);
-        return bean;
+    public TaskDTO toDTO(Task task) {
+        TaskDTO taskDTO = new TaskDTO();
+        BeanUtils.copyProperties(task, taskDTO);
+        taskDTO.setShopId(task.getShop().getId());
+        taskDTO.setTeamId(task.getTeam().getId());
+        return taskDTO;
     }
     
-    private TaskDTO toJoinRequestDTO(TaskEmployee request) {
-        TaskDTO dto = new TaskDTO();
+    private TaskEmployeeDTO toTaskEmployee(TaskEmployee request) {
+        TaskEmployeeDTO taskEmployeeDTO = new TaskEmployeeDTO();
         
         // Set request fields
-        dto.setRequestId(request.getId());
-        dto.setStatus(request.getStatus());
-        dto.setRequestDate(request.getRequestDate());
-        dto.setApprovedAt(request.getApprovedAt());
-        dto.setRejectedAt(request.getRejectedAt());
-        dto.setRejectionReason(request.getRejectionReason());
+        taskEmployeeDTO.setId(request.getId());
+        taskEmployeeDTO.setStatus(request.getStatus());
+        taskEmployeeDTO.setRequestDate(request.getRequestDate());
+        taskEmployeeDTO.setApprovedAt(request.getApprovedAt());
+        taskEmployeeDTO.setRejectedAt(request.getRejectedAt());
+        taskEmployeeDTO.setRejectionReason(request.getRejectionReason());
         
         // Set task ID
         if (request.getTask() != null) {
-            dto.setTaskId(request.getTask().getId());
+            taskEmployeeDTO.setTaskId(request.getTask().getId());
         }
         
         // Set account details
         if (request.getAccount() != null) {
-            dto.setAccountId(request.getAccount().getAccountId());
-            dto.setAccountName(request.getAccount().getUsername());
-            dto.setAccountEmail(request.getAccount().getEmail());
+            taskEmployeeDTO.setAccountId(request.getAccount().getAccountId());
+            taskEmployeeDTO.setAccountName(request.getAccount().getUsername());
+            taskEmployeeDTO.setAccountEmail(request.getAccount().getEmail());
         }
         
-        return dto;
+        return taskEmployeeDTO;
     }
 
     private Task requireOne(Long id) {

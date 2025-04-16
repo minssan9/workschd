@@ -44,7 +44,7 @@ request.interceptors.response.use(
       window.sessionStorage.setItem('$accessToken', response.headers.rtntoken)
     }
 
-    if (response.status !== 200) { 
+    if (response.status < 200 || response.status >= 300) { 
       return Promise.reject(new Error(response.statusText || 'Error'))
     } else {
       return response

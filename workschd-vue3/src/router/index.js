@@ -28,6 +28,7 @@ const router = createRouter({
       children: [
         { path: '/task/manage',          name: 'TaskManage',                component: () => import('@/views/task/TaskManage.vue'),            meta: { icon: 'list' } },
         { path: '/task/attendance',    name: 'TaskAttendance',          component: () => import('@/views/task/TaskAttendance.vue'),      meta: { icon: 'how_to_reg' } },
+        { path: '/task/list-mobile',   name: 'TaskListMobile',          component: () => import('@/views/task/TaskListMobile.vue'),      meta: { icon: 'work', roles: ['WORKER'] } },
       ]
     },
 

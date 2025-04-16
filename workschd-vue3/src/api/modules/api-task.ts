@@ -6,33 +6,40 @@ import { PageResponseDTO } from '@/api/modules/api-common'
 // These were consolidated from the previous task.ts file in the interface directory
 export interface Task {
   id?: number
-  branch_id: number | null
-  store_id: number | null
-  additional_info: string
-  task_datetime: string
-  start_time: string
-  end_time: string
-  daily_wage: number
-}
-
-export interface JoinRequest {
-  id: number
-  workerName: string
-}
-
-export interface AttendanceForm {
-  actualStartTime: string
-  actualEndTime: string
-  calculatedDailyWage: number
-}
-
-export interface AttendanceRecord {
-  id: number
-  employeeName: string
-  actualStartTime: string
-  actualEndTime: string
-  calculatedDailyWage: number
+  title: string
+  description?: string
+  workerCount: number
+  startDateTime: string
+  endDateTime: string
   status: string
+  teamId: number
+  shopId: number | null
+  active?: boolean
+  taskEmployees?: TaskEmployee[] | null
+  pageable?: any
+}
+
+export interface TaskEmployee {
+  id?: number
+  taskId: number
+  taskTitle?: string
+  taskStatus?: string
+  accountId: number
+  accountName?: string
+  accountEmail?: string
+  status: string  // "PENDING", "APPROVED", "REJECTED", "ACTIVE", "INACTIVE"
+  requestDate?: string
+  approvedAt?: string
+  rejectedAt?: string
+  rejectionReason?: string
+  joinedAt?: string
+  leftAt?: string,
+
+  content: TaskEmployee[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
 }
 
 export interface Shop {
@@ -43,63 +50,63 @@ export interface Shop {
   active?: boolean
 }
 
-export interface ShopDTO extends Shop {
-  id: number
+
+// Store APIs
+const createStore = (teamId: number, store: Shop): Promise<AxiosResponse<Shop>> => {
+  return request.post(`/team/${teamId}/shop`, store)
 }
+const fetchShops = (): Promise<AxiosResponse<Shop[]>> => {
+  return request.get('/shop')
+}
+const getActiveShopsByTeamId = (teamId: number): Promise<AxiosResponse<Shop[]>> => {
+  return request.get(`/team/${teamId}/shop/active`)
+} 
+
 
 // Task APIs
 const fetchTasks = (): Promise<AxiosResponse<PageResponseDTO<Task>>> => {
   return request.get('/task')
 }
-
+// Worker-specific API to fetch available tasks with pagination
+const fetchTasksForWorker = (params?: any): Promise<AxiosResponse<TaskEmployee | Task[]>> => {
+  return request.get('/task', { params })
+}
+// Worker-specific API to get a user's task requests
+const getUserTaskRequests = (accountId: number): Promise<AxiosResponse<TaskEmployee[]>> => {
+  return request.get(`/account/${accountId}/task-requests`)
+}
 const createTask = (task: Task): Promise<AxiosResponse<Task>> => {
   return request.post('/task', task)
 } 
 
-const approveJoinRequest = (requestId: number): Promise<AxiosResponse<void>> => {
-  return request.post(`/task/request/${requestId}/approve`)
-}
 
 
-// Store APIs
-const createStore = (teamId: number, store: Shop): Promise<AxiosResponse<StoreDTO>> => {
-  return request.post(`/team/${teamId}/shop`, store)
+// Task-Employee API to create a task employee request
+const createTaskEmployeeRequest = (requestData: Partial<TaskEmployee>): Promise<AxiosResponse<TaskEmployee>> => {
+  const taskId = requestData.taskId
+  return request.post(`/task-employee/${taskId}/request`, requestData)
 }
+const approveJoinRequest = (requestData: Partial<TaskEmployee>): Promise<AxiosResponse<void>> => {
+  const taskId = requestData.taskId
+  const requestId = requestData.id
+  return request.post(`/task-employee/${taskId}/request/${requestId}/approve`)
+}  
+// Updated API to get task employees with pagination and filtering
+const getTaskEmployees = (taskId: number, params?: any): Promise<AxiosResponse<TaskEmployee[]>> => {
+  return request.get(`/task-employee/${taskId}/employees`, { params });
+};
 
-const updateStore = (teamId: number, storeId: number, store: Shop): Promise<AxiosResponse<void>> => {
-  return request.put(`/team/${teamId}/shop/${storeId}`, store)
-}
 
-const deleteStore = (teamId: number, storeId: number): Promise<AxiosResponse<void>> => {
-  return request.delete(`/team/${teamId}/shop/${storeId}`)
-}
 
-const getStoreById = (teamId: number, storeId: number): Promise<AxiosResponse<StoreDTO>> => {
-  return request.get(`/team/${teamId}/shop/${storeId}`)
-}
-
-const getStoresByTeamId = (teamId: number, region?: string): Promise<AxiosResponse<StoreDTO[]>> => {
-  const params = region ? { region } : {}
-  return request.get(`/team/${teamId}/shop`, { params })
-}
-
-const getActiveShopsByTeamId = (teamId: number): Promise<AxiosResponse<StoreDTO[]>> => {
-  return request.get(`/team/${teamId}/shop/active`)
-}
-
-const fetchShops = (): Promise<AxiosResponse<Shop[]>> => {
-  return request.get('/shop')
-}
 
 export default {
   fetchTasks,
+  fetchTasksForWorker, 
+  createTaskEmployeeRequest,
   createTask, 
   fetchShops,
   approveJoinRequest,
-  createStore,
-  updateStore,
-  deleteStore,
-  getStoreById,
-  getStoresByTeamId,
-  getActiveShopsByTeamId
+  createStore,  
+  getActiveShopsByTeamId,
+  getTaskEmployees
 } 

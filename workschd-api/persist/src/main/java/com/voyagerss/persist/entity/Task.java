@@ -1,5 +1,6 @@
 package com.voyagerss.persist.entity;
 
+import com.voyagerss.persist.EnumMaster;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +34,8 @@ public class Task extends BaseEntity {
     private String endDateTime;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private EnumMaster.TaskStatus status = EnumMaster.TaskStatus.SCHEDULED;
 
     @ManyToOne
     @JoinColumn(name = "team_id", nullable = false)

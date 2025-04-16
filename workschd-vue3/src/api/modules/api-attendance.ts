@@ -3,6 +3,23 @@ import request from "@/api/axios-voyagerss.js";
 import { AttendanceRecord } from '@/api/modules/api-task'
 import { PageResponseDTO } from '@/api/modules/api-common'
 
+
+ 
+export interface AttendanceForm {
+  actualStartTime: string
+  actualEndTime: string
+  calculatedDailyWage: number
+}
+
+export interface AttendanceRecord {
+  id: number
+  employeeName: string
+  actualStartTime: string
+  actualEndTime: string
+  calculatedDailyWage: number
+  status: string
+}
+
 export interface AttendanceDTO {
   id?: number;
   branchId: number;

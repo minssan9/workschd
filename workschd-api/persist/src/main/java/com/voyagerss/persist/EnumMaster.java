@@ -69,6 +69,63 @@ public class EnumMaster {
         private String employeeStatusDescription;
     }
 
+    /**
+     * Task status enum representing different states of a task
+     */
+    @Getter
+    @RequiredArgsConstructor
+    public enum TaskStatus {
+        SCHEDULED("SCHEDULED", "예정됨", "blue"),
+        IN_PROGRESS("IN_PROGRESS", "진행중", "green"),
+        COMPLETED("COMPLETED", "완료됨", "purple"),
+        CANCELLED("CANCELLED", "취소됨", "grey");
+
+        private final String code;
+        private final String displayName;
+        private final String color;
+
+        /**
+         * Find a TaskStatus by its code
+         * @param code The status code to look for
+         * @return The matching TaskStatus or SCHEDULED if not found
+         */
+        public static TaskStatus of(String code) {
+            return Arrays.stream(TaskStatus.values())
+                    .filter(s -> s.getCode().equals(code))
+                    .findAny()
+                    .orElse(SCHEDULED);
+        }
+    }
+
+    /**
+     * Task employee status enum for managing task assignments
+     */
+    @Getter
+    @RequiredArgsConstructor
+    public enum TaskEmployeeStatus {
+        PENDING("PENDING", "대기중", "orange"),
+        APPROVED("APPROVED", "승인됨", "green"),
+        REJECTED("REJECTED", "거부됨", "red"),
+        ACTIVE("ACTIVE", "활성", "blue"),
+        INACTIVE("INACTIVE", "비활성", "grey");
+
+        private final String code;
+        private final String displayName;
+        private final String color;
+
+        /**
+         * Find a TaskEmployeeStatus by its code
+         * @param code The status code to look for
+         * @return The matching TaskEmployeeStatus or PENDING if not found
+         */
+        public static TaskEmployeeStatus of(String code) {
+            return Arrays.stream(TaskEmployeeStatus.values())
+                    .filter(s -> s.getCode().equals(code))
+                    .findAny()
+                    .orElse(PENDING);
+        }
+    }
+
     @Getter
     public enum CommonStatus {
         ACTIVE, INACTIVE
@@ -106,11 +163,7 @@ public class EnumMaster {
         WORKER_CLASS_PAUSE,
         WORKER_ATTEND_CHANGE
     }
-
-    public enum BoardStatus {
-        ACTIVE,
-        INACTIVE
-    }
+ 
 
 
 }

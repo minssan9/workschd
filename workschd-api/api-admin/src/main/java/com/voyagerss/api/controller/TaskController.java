@@ -1,5 +1,7 @@
 package com.voyagerss.api.controller;
 
+import com.voyagerss.persist.dto.TaskEmployeeDTO;
+import com.voyagerss.persist.entity.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +47,9 @@ public class TaskController {
     public ResponseEntity<TaskDTO> save(@Valid @RequestBody TaskDTO taskDTO) {
         try {
             log.info("Creating new task: {}", taskDTO);
-            Long id = taskService.save(taskDTO);
-            TaskDTO createdTask = taskService.getById(id);
+            Task task = taskService.save(taskDTO);
+            TaskDTO createdTask = taskService.toDTO(task);
+
             return ResponseEntity.ok(createdTask);
         } catch (Exception e) {
             log.error("Error creating task: {}", e.getMessage());
@@ -111,7 +114,9 @@ public class TaskController {
      */
     @PostMapping("/request/{requestId}/approve")
     @Transactional
-    public ResponseEntity<Void> approveJoinRequest(@PathVariable Long requestId) {
+    public ResponseEntity<Void> approveJoinRequest(
+            @PathVariable Long requestId
+    ) {
         try {
             log.info("Approving join request with ID: {}", requestId);
             taskService.approveJoinRequest(requestId);
@@ -127,13 +132,13 @@ public class TaskController {
      */
     @PostMapping("/{taskId}/request")
     @Transactional
-    public ResponseEntity<TaskDTO> createJoinRequest(
+    public ResponseEntity<TaskEmployeeDTO> createJoinRequest(
             @PathVariable Long taskId,
             @RequestParam Integer accountId) {
         try {
             log.info("Creating join request for task ID: {} and account ID: {}", taskId, accountId);
-            TaskDTO request = taskService.createJoinRequest(taskId, accountId);
-            return ResponseEntity.ok(request);
+            TaskEmployeeDTO taskEmployeeDTO = taskService.createJoinRequest(taskId, accountId);
+            return ResponseEntity.ok(taskEmployeeDTO);
         } catch (IllegalStateException e) {
             // Request already exists
             log.warn("Join request already exists: {}", e.getMessage());

@@ -71,12 +71,12 @@
               />
               
               <!-- Members Pagination -->
-              <Pagination
+              <!-- <Pagination
                 :total-items="membersTotalCount"
                 :initial-page="1"
                 :initial-page-size="10"
                 @page-change="onMemberPageChange"
-              />
+              /> -->
             </div>
           </div>
         </q-tab-panel>
@@ -292,11 +292,8 @@ const fetchTeamMembers = (params?: TeamMemberParams) => {
   
   // Load team members for the selected team
   apiTeam.getTeamMembers(selectedTeamForDetails.value.name, requestParams)
-    .then(response => {
-      if (response && response.content && response.content.length > 0) {
-        teamMembers.value = response.content;
-        membersTotalCount.value = response.totalElements;
-      }  
+    .then(response => {      
+      teamMembers.value = response.data;     
     })
     .catch(error => console.error('Failed to fetch team members:', error));
 }
