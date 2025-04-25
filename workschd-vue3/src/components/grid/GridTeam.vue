@@ -114,7 +114,7 @@ function update() {
 }
 function onCellClicked(params) {
   // 셀 클릭 이벤트
-  console.log('cell click : ', params)
+  console.log('cell click : ', params)D
   emits('onCellClicked', params)
 }
 function clearSelectedNode() {

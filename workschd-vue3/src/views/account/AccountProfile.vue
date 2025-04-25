@@ -146,13 +146,13 @@
 
               <q-item tag="label" v-ripple>
                 <q-item-section>
-                  <q-item-label>{{ t('profile.notifications.schedule', '스케줄 알림') }}</q-item-label>
+                  <q-item-label>{{ t('profile.notifications.accountWorkHour', '스케줄 알림') }}</q-item-label>
                   <q-item-label caption>
                     {{ t('profile.notifications.scheduleDesc', '근무 시작 전 알림을 받습니다') }}
                   </q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-toggle v-model="notificationSettings.schedule" color="primary" />
+                  <q-toggle v-model="notificationSettings.accountWorkHour" color="primary" />
                 </q-item-section>
               </q-item>
             </div>
@@ -202,14 +202,14 @@ const isUpdating = ref(false)
 interface NotificationSettings {
   email: boolean
   push: boolean
-  schedule: boolean
+  accountWorkHour: boolean
 }
 
 // Add new ref for notification settings
 const notificationSettings = ref<NotificationSettings>({
   email: false,
   push: false,
-  schedule: false
+  accountWorkHour: false
 })
 
 const isSavingNotifications = ref(false)

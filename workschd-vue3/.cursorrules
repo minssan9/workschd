@@ -20,6 +20,7 @@ TypeScript Usage
 - Use TypeScript for all code; prefer interfaces over types for their extendability and ability to merge.
 - Avoid enums; use maps instead for better type safety and flexibility.
 - Use functional components with TypeScript interfaces.
+- Don't Use form tag, use function only 
 
 Syntax and Formatting
 - Use the "function" keyword for pure functions to benefit from hoisting and clarity.

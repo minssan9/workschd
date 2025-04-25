@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "unavailable_dates")
-public class EmployeeOffDates extends BaseEntity implements Serializable {
+public class AccountWorkOffDates extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

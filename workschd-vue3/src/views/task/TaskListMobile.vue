@@ -64,7 +64,7 @@
               <span class="text-caption">{{ formatDateRange(task.startDateTime, task.endDateTime) }}</span>
             </div>
             <div class="row items-center q-mt-xs">
-              <q-icon name="schedule" size="xs" class="q-mr-xs" />
+              <q-icon name="accountWorkHour" size="xs" class="q-mr-xs" />
               <span class="text-caption">{{ formatTimeRange(task.startDateTime, task.endDateTime) }}</span>
             </div>
             <div class="row items-center q-mt-xs">
@@ -140,7 +140,7 @@
               <span>{{ formatDateRange(selectedTask.startDateTime, selectedTask.endDateTime) }}</span>
             </div>
             <div class="row items-center q-mt-xs">
-              <q-icon name="schedule" size="xs" class="q-mr-xs" />
+              <q-icon name="accountWorkHour" size="xs" class="q-mr-xs" />
               <span>{{ formatTimeRange(selectedTask.startDateTime, selectedTask.endDateTime) }}</span>
             </div>
           </div>

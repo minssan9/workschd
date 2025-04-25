@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -57,5 +58,10 @@ public class AccountInfoService {
 
     public Optional<AccountInfo> requireOne(Integer id) {
         return accountInfoRepository.findByAccount_AccountId(id);
+    }
+
+
+    public List<AccountInfo> getEmployeesByBranch(Long branchId) {
+        return accountInfoRepository.getEmployeesByBranchId(branchId);
     }
 }

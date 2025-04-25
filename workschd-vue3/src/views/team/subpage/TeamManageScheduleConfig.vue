@@ -1,13 +1,13 @@
 <template>
   <div>
-    <h3 class="text-h5 q-mb-md">{{ t('team.schedule.title', 'Schedule Configuration') }}</h3>
+    <h3 class="text-h5 q-mb-md">{{ t('team.accountWorkHour.title', 'Schedule Configuration') }}</h3>
 
     <div class="row q-col-gutter-md">
       <!-- Minimum Staff Per Day Section -->
       <div class="col-12 col-md-6">
         <q-card class="config-card">
           <q-card-section>
-            <div class="text-h6">{{ t('team.schedule.minStaffTitle', 'Minimum Staff Per Day') }}</div>
+            <div class="text-h6">{{ t('team.accountWorkHour.minStaffTitle', 'Minimum Staff Per Day') }}</div>
             <q-separator class="q-my-sm" />
             
             <div class="row q-col-gutter-sm">
@@ -34,7 +34,7 @@
       <div class="col-12 col-md-6">
         <q-card class="config-card">
           <q-card-section>
-            <div class="text-h6">{{ t('team.schedule.maxOffDaysTitle', 'Maximum Off Days Per Month') }}</div>
+            <div class="text-h6">{{ t('team.accountWorkHour.maxOffDaysTitle', 'Maximum Off Days Per Month') }}</div>
             <q-separator class="q-my-sm" />
             
             <div class="row q-col-gutter-sm">
@@ -61,26 +61,26 @@
       <div class="col-12">
         <q-card class="config-card">
           <q-card-section>
-            <div class="text-h6">{{ t('team.schedule.additionalOptions', 'Additional Options') }}</div>
+            <div class="text-h6">{{ t('team.accountWorkHour.additionalOptions', 'Additional Options') }}</div>
             <q-separator class="q-my-sm" />
             
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
                 <q-toggle
                   v-model="allowWeekendWork"
-                  :label="t('team.schedule.allowWeekendWork', 'Allow Weekend Work')"
+                  :label="t('team.accountWorkHour.allowWeekendWork', 'Allow Weekend Work')"
                 />
               </div>
               <div class="col-12 col-md-6">
                 <q-toggle
                   v-model="enforceMinimumRest"
-                  :label="t('team.schedule.enforceMinimumRest', 'Enforce Minimum Rest Between Shifts')"
+                  :label="t('team.accountWorkHour.enforceMinimumRest', 'Enforce Minimum Rest Between Shifts')"
                 />
               </div>
               <div class="col-12 col-md-6">
                 <q-input
                   v-model="maxConsecutiveWorkDays"
-                  :label="t('team.schedule.maxConsecutiveWorkDays', 'Maximum Consecutive Work Days')"
+                  :label="t('team.accountWorkHour.maxConsecutiveWorkDays', 'Maximum Consecutive Work Days')"
                   type="number"
                   filled
                   dense
@@ -92,7 +92,7 @@
                 <q-select
                   v-model="scheduleGenerationFrequency"
                   :options="scheduleFrequencyOptions"
-                  :label="t('team.schedule.generationFrequency', 'Schedule Generation Frequency')"
+                  :label="t('team.accountWorkHour.generationFrequency', 'Schedule Generation Frequency')"
                   filled
                   dense
                 />
@@ -112,7 +112,7 @@
         @click="resetConfiguration" 
       />
       <q-btn 
-        :label="t('team.schedule.saveConfig', 'Save Configuration')" 
+        :label="t('team.accountWorkHour.saveConfig', 'Save Configuration')"
         color="primary" 
         @click="saveConfiguration" 
         :loading="isSaving"
@@ -126,7 +126,7 @@ import { ref, onMounted, watch, defineProps } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useTeamStore } from '@/stores/modules/store_team'
-import { ScheduleConfig, DayConfig, MonthConfig } from '@/interface/schedule'
+import { ScheduleConfig, DayConfig, MonthConfig } from '@/interface/accountWorkHour'
 
 const props = defineProps({
   teamId: {
@@ -189,9 +189,9 @@ const enforceMinimumRest = ref(true)
 const maxConsecutiveWorkDays = ref(5)
 const scheduleGenerationFrequency = ref('MONTHLY')
 const scheduleFrequencyOptions = [
-  { label: t('team.schedule.frequency.weekly', 'Weekly'), value: 'WEEKLY' },
-  { label: t('team.schedule.frequency.biweekly', 'Bi-weekly'), value: 'BIWEEKLY' },
-  { label: t('team.schedule.frequency.monthly', 'Monthly'), value: 'MONTHLY' }
+  { label: t('team.accountWorkHour.frequency.weekly', 'Weekly'), value: 'WEEKLY' },
+  { label: t('team.accountWorkHour.frequency.biweekly', 'Bi-weekly'), value: 'BIWEEKLY' },
+  { label: t('team.accountWorkHour.frequency.monthly', 'Monthly'), value: 'MONTHLY' }
 ]
 
 // Default values for reset
@@ -212,7 +212,7 @@ const defaultMaxOffDaysPerMonth = {
 
 const fetchScheduleConfig = async () => {
   try {
-    const response = await fetch(`/schedule-config/${props.teamId}`)
+    const response = await fetch(`/accountWorkHour-config/${props.teamId}`)
     const data = await response.json()
     
     if (data) {
@@ -228,10 +228,10 @@ const fetchScheduleConfig = async () => {
       }
     }
   } catch (error) {
-    console.error('Failed to fetch schedule configuration', error)
+    console.error('Failed to fetch accountWorkHour configuration', error)
     $q.notify({
       type: 'negative',
-      message: t('team.schedule.fetchError', 'Failed to load schedule configuration')
+      message: t('team.accountWorkHour.fetchError', 'Failed to load accountWorkHour configuration')
     })
   }
 }
@@ -240,7 +240,7 @@ const saveConfiguration = async () => {
   try {
     isSaving.value = true
     
-    await fetch(`/schedule-config/${props.teamId}`, {
+    await fetch(`/accountWorkHour-config/${props.teamId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -259,12 +259,12 @@ const saveConfiguration = async () => {
     
     $q.notify({
       type: 'positive',
-      message: t('team.schedule.saveSuccess', 'Configuration saved successfully')
+      message: t('team.accountWorkHour.saveSuccess', 'Configuration saved successfully')
     })
   } catch (error) {
     $q.notify({
       type: 'negative',
-      message: t('team.schedule.saveError', 'Failed to save configuration')
+      message: t('team.accountWorkHour.saveError', 'Failed to save configuration')
     })
   } finally {
     isSaving.value = false
@@ -273,8 +273,8 @@ const saveConfiguration = async () => {
 
 const resetConfiguration = () => {
   $q.dialog({
-    title: t('team.schedule.resetConfirmTitle', 'Reset Configuration'),
-    message: t('team.schedule.resetConfirmMessage', 'Are you sure you want to reset all configuration values to defaults?'),
+    title: t('team.accountWorkHour.resetConfirmTitle', 'Reset Configuration'),
+    message: t('team.accountWorkHour.resetConfirmMessage', 'Are you sure you want to reset all configuration values to defaults?'),
     cancel: true,
     persistent: true
   }).onOk(() => {
@@ -287,7 +287,7 @@ const resetConfiguration = () => {
     
     $q.notify({
       type: 'info',
-      message: t('team.schedule.resetSuccess', 'Configuration reset to defaults')
+      message: t('team.accountWorkHour.resetSuccess', 'Configuration reset to defaults')
     })
   })
 }

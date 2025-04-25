@@ -1,6 +1,7 @@
 package com.voyagerss.persist.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.voyagerss.persist.component.converter.IntegerArrayConverter;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.AccountInfoDTO;
@@ -11,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -53,8 +55,14 @@ public class AccountInfo extends BaseEntity implements Serializable {
     @Convert(converter = IntegerArrayConverter.class)
     private Set<Integer> offDaysOfWeek; // 직원이 근무할 수 없는 요일들 (예: "SATURDAY", "SUNDAY")
 
-    @OneToMany(mappedBy = "accountInfo", fetch = FetchType.LAZY)
-    private List<EmployeeOffDates> offDates; // 휴무 일자로 지정된 날들
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "accountInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountWorkHour> accountWorkHours = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "accountInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountWorkOffDates> accountWorkOffDates = new ArrayList<>();
 
 
     @JsonBackReference
@@ -86,7 +94,7 @@ public class AccountInfo extends BaseEntity implements Serializable {
     // 직원의 근무 가능 여부를 확인하는 메서드
     public boolean isAvailable(LocalDate date) {
         // 지정된 휴무일이거나, 근무할 수 없는 요일인 경우 false
-        if (offDates.stream().anyMatch(offDates -> offDates.getOffDate().equals(date)) ||
+        if (accountWorkOffDates.stream().anyMatch(offDates -> offDates.getOffDate().equals(date)) ||
                 offDaysOfWeek.contains(date.getDayOfWeek().toString())) {
             return false;
         }

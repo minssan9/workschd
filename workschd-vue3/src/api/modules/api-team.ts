@@ -123,6 +123,18 @@ const getShopsByTeamId = (teamId: number): Promise<AxiosResponse<Shop[]>> => {
   return request.get(`/team/${teamId}/shop`);
 };
 
+const createShop = (teamId: number, shop: Shop): Promise<AxiosResponse<Shop>> => {
+  return request.post(`/team/${teamId}/shop`, shop);
+};
+
+const updateShop = (teamId: number, shopId: number, shop: Shop): Promise<AxiosResponse<Shop>> => {
+  return request.put(`/team/${teamId}/shop/${shopId}`, shop);
+};
+
+const deleteShop = (teamId: number, shopId: number): Promise<AxiosResponse<void>> => {
+  return request.delete(`/team/${teamId}/shop/${shopId}`);
+};
+
 export default {
   // Remove type exports
   // TeamDTO,
@@ -147,6 +159,9 @@ export default {
 
   // Shop APIs
   getShopsByTeamId,
+  createShop,
+  updateShop,
+  deleteShop,
 
   approveJoinRequest
 }; 

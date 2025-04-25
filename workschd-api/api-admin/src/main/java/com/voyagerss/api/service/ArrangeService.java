@@ -1,10 +1,13 @@
 package com.voyagerss.api.service;
 
+import com.voyagerss.persist.dto.AccountWorkOffDatesDTO;
 import com.voyagerss.persist.dto.AttendanceDTO;
+import com.voyagerss.persist.dto.TeamMemberDTO;
 import com.voyagerss.persist.entity.AccountInfo;
-import com.voyagerss.persist.entity.EmployeeOffDates;
+import com.voyagerss.persist.entity.AccountWorkOffDates;
+import com.voyagerss.persist.service.AccountScheduleService;
 import com.voyagerss.persist.service.AttendanceService;
-import com.voyagerss.persist.service.EmployeeService;
+import com.voyagerss.persist.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +20,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class ArrangeService {
+    private final TeamService teamService;
+    private final AccountScheduleService accountScheduleService;
     private final AttendanceService attendanceService;
-    private final EmployeeService employeeService;
 
     // 필드 정의
     private Map<String, Integer> minStaffPerDay; // 요일별 최소 근무 인원
@@ -86,9 +90,9 @@ public class ArrangeService {
     }
 
     // 출근부 생성 메서드
-    public void generateMonthlyAttendance(Long branchId, int year, int month) throws SQLException {
+    public void generateMonthlyAttendance(Long teamId, int year, int month) throws SQLException {
         // 해당 지점에 속한 직원 목록 가져오기
-        List<AccountInfo> accountInfos = employeeService.getEmployeesByBranch(branchId);
+        List<TeamMemberDTO> teamMembers = teamService.getTeamMembers(teamId);
 
         // 해당 월의 시작일과 종료일 설정
         LocalDate startDate = LocalDate.of(year, month, 1);
@@ -99,22 +103,25 @@ public class ArrangeService {
             String dayOfWeek = currentDate.getDayOfWeek().toString();
 
             // 각 직원별로 스케줄 생성
-            for (AccountInfo accountInfo : accountInfos) {
+            for (TeamMemberDTO teamMemberDTO : teamMembers) {
+                List<AccountWorkOffDatesDTO> accountWorkOffDatesDTOS = accountScheduleService.getOffDatesByAccountId(teamMemberDTO.getAccountId());
+                accountScheduleService.getWorkHourByAccountId(teamMemberDTO.getAccountId());
+
                 // 직원의 출근 불가능 요일 또는 출근 불가능 일자가 있는지 확인
-                Set<LocalDate> offDates = accountInfo.getOffDates().stream().map(EmployeeOffDates::getOffDate).collect(Collectors.toSet());
-                Set<Integer> unavailableDays = accountInfo.getOffDaysOfWeek();
+//                Set<LocalDate> offDates = teamMemberDTO.getOffDates().stream().map(AccountWorkOffDates::getOffDate).collect(Collectors.toSet());
+//                Set<Integer> unavailableDays = teamMemberDTO.getOffDaysOfWeek();
 
                 // 직원이 해당 일에 근무할 수 있는지 확인
-                if (offDates.contains(currentDate) || unavailableDays.contains(dayOfWeek)) {
-                    continue; // 근무 불가능한 요일이나 일자면 건너뜀
-                }
+//                if (offDates.contains(currentDate) || unavailableDays.contains(dayOfWeek)) {
+//                    continue; // 근무 불가능한 요일이나 일자면 건너뜀
+//                }
 
                 // 출근 및 퇴근 시간 랜덤 생성 (8시~10시 사이 출근, 17시~19시 사이 퇴근)
                 LocalTime startTime = getRandomStartTime();
                 LocalTime endTime = getRandomEndTime(startTime);
 
                 AttendanceDTO attendance = new AttendanceDTO();
-                attendance.setEmployeeId(accountInfo.getId());
+                attendance.setEmployeeId(teamMemberDTO.getId());
                 attendance.setAttendanceDate(currentDate);
                 attendance.setStartTime(startTime);
                 attendance.setEndTime(endTime);

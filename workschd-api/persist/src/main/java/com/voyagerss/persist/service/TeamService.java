@@ -114,16 +114,16 @@ public class TeamService {
     }
 
 
+
     @Transactional(readOnly = true)
-    public List<TeamMemberDTO> getTeamMembers(String teamName) {
-        // Use the optimized query method to avoid LazyInitializationException
-        List<TeamMember> members = teamMemberRepository.findByTeamNameWithAccount(teamName);
-        
-        if (members.isEmpty()) {
+    public List<TeamMemberDTO> getTeamMembers(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        if (team.getTeamMembers().isEmpty()) {
             throw new RuntimeException("No members found for this team");
         }
-        
-        return members.stream()
+        return team.getTeamMembers().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -131,6 +131,7 @@ public class TeamService {
     private TeamMemberDTO convertToDTO(TeamMember member) {
         TeamMemberDTO dto = new TeamMemberDTO();
         dto.setId(member.getId());
+        dto.setAccountId(member.getAccount().getAccountId());
         dto.setName(member.getAccount().getUsername());
         dto.setEmail(member.getAccount().getEmail());
         dto.setJoinDate(member.getJoinDate());

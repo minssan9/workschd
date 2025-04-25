@@ -10,4 +10,7 @@ public class TeamMemberDTO {
     private String email;
     private LocalDateTime joinDate;
     private String status;
-} 
+
+    private Integer accountId;
+
+}

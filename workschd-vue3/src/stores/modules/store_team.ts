@@ -10,6 +10,7 @@ interface TeamState {
   teamMembers: TeamMember[];
   scheduleConfig: ScheduleConfig;
   shops: Shop[];
+  isLoadingShops: boolean;
 }  
 
 export const useTeamStore = defineStore('team', {
@@ -32,7 +33,8 @@ export const useTeamStore = defineStore('team', {
         7: 4, 8: 4, 9: 4, 10: 4, 11: 4, 12: 4
       }
     },
-    shops: []
+    shops: [],
+    isLoadingShops: false
   }),
 
   actions: {
@@ -77,10 +79,46 @@ export const useTeamStore = defineStore('team', {
 
     async fetchShopsByTeamId(teamId: number): Promise<void> {
       try {
+        this.isLoadingShops = true;
         const response = await apiTeam.getShopsByTeamId(teamId);
         this.shops = response.data;
       } catch (error) {
         console.error('Error fetching shops:', error);
+        throw error;
+      } finally {
+        this.isLoadingShops = false;
+      }
+    },
+
+    async createShop(teamId: number, shop: Shop): Promise<void> {
+      try {
+        const response = await apiTeam.createShop(teamId, shop);
+        this.shops.push(response.data);
+      } catch (error) {
+        console.error('Error creating shop:', error);
+        throw error;
+      }
+    },
+
+    async updateShop(teamId: number, shopId: number, shop: Shop): Promise<void> {
+      try {
+        const response = await apiTeam.updateShop(teamId, shopId, shop);
+        const index = this.shops.findIndex(s => s.id === shopId);
+        if (index !== -1) {
+          this.shops[index] = response.data;
+        }
+      } catch (error) {
+        console.error('Error updating shop:', error);
+        throw error;
+      }
+    },
+
+    async deleteShop(teamId: number, shopId: number): Promise<void> {
+      try {
+        await apiTeam.deleteShop(teamId, shopId);
+        this.shops = this.shops.filter(shop => shop.id !== shopId);
+      } catch (error) {
+        console.error('Error deleting shop:', error);
         throw error;
       }
     },

@@ -40,6 +40,24 @@ const apiAccount = {
     return request.postFile(`${baesURL}/${accountId}/image`, profileImage)
   },
 
+  // Schedule preferences methods
+  getSchedulePreferences(accountId) {
+    return request.get(`${baesURL}/${accountId}/schedule-preferences`)
+  },
+
+  saveSchedulePreferences(accountId, preferences) {
+    return request.post(`${baesURL}/${accountId}/schedule-preferences`, preferences)
+  },
+
+  // Unavailable dates methods
+  getUnavailableDates(accountId) {
+    return request.get(`${baesURL}/${accountId}/unavailable-dates`)
+  },
+
+  saveUnavailableDates(accountId, dates) {
+    return request.post(`${baesURL}/${accountId}/unavailable-dates`, { dates })
+  },
+
   login(data) {
     return request({
       url: '/auth/login',

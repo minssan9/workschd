@@ -8,11 +8,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class UnavailableDatesDTO implements Serializable {
+public class AccountWorkOffDatesDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
 
-    private Integer accountId;
+    private Long accountId;
 
     private LocalDate date;
 

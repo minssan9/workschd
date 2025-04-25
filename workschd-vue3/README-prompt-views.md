@@ -14,3 +14,6 @@ $q.notify({type: 'positive',message: t('attendance.notification.success', 'Atten
 
 - integrate all dialog layout design to one style 
 - extract used scss to 1 file @/styles
+
+--- 
+columnDef each column properties in 1 line 

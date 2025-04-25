@@ -6,13 +6,13 @@ import com.voyagerss.persist.dto.AccountDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +71,7 @@ public class Account extends BaseEntity implements Serializable {
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private AccountInfo accountInfo;
 
+
     public Account(AccountDTO accountDto) {
         BeanUtils.copyProperties(accountDto, this);
         this.username = accountDto.getUsername();
@@ -105,4 +106,5 @@ public class Account extends BaseEntity implements Serializable {
         BeanUtils.copyProperties(this, bean);
         return bean;
     }
+
 }

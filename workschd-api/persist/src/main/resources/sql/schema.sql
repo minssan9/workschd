@@ -87,7 +87,7 @@ create table workschd.common_audit
     last_modified_at timestamp  default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
 );
 
-create table workschd.schedule
+create table workschd.accountWorkHour
 (
     id            bigint auto_increment
         primary key,

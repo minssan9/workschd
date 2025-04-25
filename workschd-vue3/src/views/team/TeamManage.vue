@@ -50,8 +50,8 @@
           align="left"
         >
           <q-tab name="members" :label="t('team.manage.tabs.members', 'Members')" />
-          <q-tab name="workplace" :label="t('team.manage.tabs.workplace', 'Workplace')" />
-          <q-tab name="schedule" :label="t('team.manage.tabs.schedule', 'Schedule Config')" />
+          <q-tab name="shop" :label="t('team.manage.tabs.shop', 'Shop')" />
+          <q-tab name="accountWorkHour" :label="t('team.manage.tabs.accountWorkHour', 'Schedule Config')" />
         </q-tabs>
       </div>
 
@@ -80,10 +80,10 @@
             </div>
           </div>
         </q-tab-panel>
-        <q-tab-panel name="workplace">
-          <TeamWorkPlace :team-id="selectedTeamForDetails.id" />
+        <q-tab-panel name="shop">
+          <TeamManageShop :team-id="selectedTeamForDetails.id" />
         </q-tab-panel>
-        <q-tab-panel name="schedule">
+        <q-tab-panel name="accountWorkHour">
           <TeamScheduleConfig :team-id="selectedTeamForDetails.id" />
         </q-tab-panel>
       </q-tab-panels>
@@ -111,7 +111,7 @@ import {useI18n} from 'vue-i18n'
 import TeamApproveDialog from './dialog/TeamApproveDialog.vue'
 import TeamRegistrationDialog from './dialog/TeamRegistrationDialog.vue'
 import TeamScheduleConfig from './subpage/TeamManageScheduleConfig.vue'
-import TeamWorkPlace from './subpage/TeamManageShop.vue'
+import TeamManageShop from './subpage/TeamManageShop.vue'
 import GridDefault from '@/components/grid/GridDefault.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import apiTeam, {TeamDTO, TeamMemberParams} from '@/api/modules/api-team'

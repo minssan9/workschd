@@ -202,9 +202,9 @@ public class TeamController {
         }
     }
 
-    @GetMapping("/{teamName}/members")
-    public ResponseEntity<List<TeamMemberDTO>> getTeamMembers(@PathVariable String teamName) {
-        List<TeamMemberDTO> members = teamService.getTeamMembers(teamName);
+    @GetMapping("/{teamId}/members")
+    public ResponseEntity<List<TeamMemberDTO>> getTeamMembers(@PathVariable Long teamId) {
+        List<TeamMemberDTO> members = teamService.getTeamMembers(teamId);
         return ResponseEntity.ok(members);
     }
     
