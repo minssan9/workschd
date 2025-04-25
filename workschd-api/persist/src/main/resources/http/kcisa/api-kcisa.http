@@ -1,0 +1,10 @@
+GET http://api.kcisa.kr/openapi/CNV_060/request?
+    serviceKey=8602e1b8-baf0-47be-b9b7-4a76a8511dcc
+    &numOfRows=10&pageNo=1
+    &dtype=%EC%A0%84%EC%8B%9C
+#    &title=%EA%B5%AD%EC%95%85
+
+###
+GET http://api.kcisa.kr/openapi/service/rest/meta2020/getKOCAperf
+    ?serviceKey=3d01c77c-2a16-451f-9fb7-3400a6a010bb
+    &numOfRows=10&pageNo=1

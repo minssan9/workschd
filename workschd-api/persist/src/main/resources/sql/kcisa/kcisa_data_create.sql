@@ -1,0 +1,21 @@
+CREATE TABLE kcisa_data (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description VARCHAR(1000),
+    performance_type VARCHAR(255),
+    event_date VARCHAR(255),
+    venue VARCHAR(255),
+    period VARCHAR(255),
+    event_period INTEGER,
+    charge VARCHAR(255),
+    contact_point VARCHAR(255),
+    url VARCHAR(255),
+    image_object VARCHAR(255),
+    type VARCHAR(255),
+    view_count INTEGER,
+    api_id VARCHAR(255),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    CONSTRAINT uk_title_period UNIQUE (title, period),
+    CONSTRAINT uk_api_id UNIQUE (api_id)
+);
