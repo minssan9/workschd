@@ -42,26 +42,6 @@ export interface TaskEmployee {
   size: number
 }
 
-export interface Shop {
-  id?: number
-  name: string
-  teamId?: number
-  region?: string
-  active?: boolean
-}
-
-
-// Store APIs
-const createStore = (teamId: number, store: Shop): Promise<AxiosResponse<Shop>> => {
-  return request.post(`/team/${teamId}/shop`, store)
-}
-const fetchShops = (): Promise<AxiosResponse<Shop[]>> => {
-  return request.get('/shop')
-}
-const getActiveShopsByTeamId = (teamId: number): Promise<AxiosResponse<Shop[]>> => {
-  return request.get(`/team/${teamId}/shop/active`)
-} 
-
 
 // Task APIs
 const fetchTasks = (): Promise<AxiosResponse<PageResponseDTO<Task>>> => {
@@ -104,9 +84,6 @@ export default {
   fetchTasksForWorker, 
   createTaskEmployeeRequest,
   createTask, 
-  fetchShops,
   approveJoinRequest,
-  createStore,  
-  getActiveShopsByTeamId,
   getTaskEmployees
 } 

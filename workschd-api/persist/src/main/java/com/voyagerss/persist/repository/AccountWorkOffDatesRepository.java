@@ -13,5 +13,6 @@ import java.util.Optional;
 @Repository
 public interface AccountWorkOffDatesRepository extends JpaRepository<AccountWorkOffDates, Long>, JpaSpecificationExecutor<AccountWorkOffDates> {
 
-  List<AccountWorkOffDates> findByAccountInfoId(Long id);
+  List<AccountWorkOffDates> findByAccountAccountId(Integer accountId);
+
 }

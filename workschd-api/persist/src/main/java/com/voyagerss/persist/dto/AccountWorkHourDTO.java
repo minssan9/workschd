@@ -20,8 +20,8 @@ public class AccountWorkHourDTO {
     }
 
     public AccountWorkHourDTO(AccountWorkHour accountWorkHour) {
-        if (accountWorkHour.getAccountInfo() != null) {
-            this.accountId = accountWorkHour.getAccountInfo().getAccount().getAccountId();
+        if (accountWorkHour.getAccount() != null) {
+            this.accountId = accountWorkHour.getAccount().getAccountId();
         }
         this.date = accountWorkHour.getDate();
         this.day = accountWorkHour.getDay();

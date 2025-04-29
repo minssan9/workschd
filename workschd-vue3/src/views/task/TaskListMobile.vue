@@ -119,83 +119,28 @@
     </div>
 
     <!-- Task Details Dialog -->
-    <q-dialog v-model="showDetailsDialog">
-      <q-card style="min-width: 350px; max-width: 90vw;">
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">{{ selectedTask?.title }}</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-
-        <q-card-section v-if="selectedTask">
-          <div v-if="selectedTask.description" class="q-mb-md">
-            <div class="text-subtitle2">설명</div>
-            <p class="q-ma-none">{{ selectedTask.description }}</p>
-          </div>
-          
-          <div class="q-mb-md">
-            <div class="text-subtitle2">작업 기간</div>
-            <div class="row items-center q-mt-xs">
-              <q-icon name="event" size="xs" class="q-mr-xs" />
-              <span>{{ formatDateRange(selectedTask.startDateTime, selectedTask.endDateTime) }}</span>
-            </div>
-            <div class="row items-center q-mt-xs">
-              <q-icon name="accountWorkHour" size="xs" class="q-mr-xs" />
-              <span>{{ formatTimeRange(selectedTask.startDateTime, selectedTask.endDateTime) }}</span>
-            </div>
-          </div>
-          
-          <div class="q-mb-md">
-            <div class="text-subtitle2">작업 인원</div>
-            <div class="row items-center q-mt-xs">
-              <q-icon name="group" size="xs" class="q-mr-xs" />
-              <span>{{ selectedTask.taskEmployees?.length || 0 }}명 / {{ selectedTask.workerCount }}명</span>
-            </div>
-          </div>
-          
-          <div class="q-mb-md">
-            <div class="text-subtitle2">상태</div>
-            <q-chip
-              :color="getStatusColor(selectedTask.status)"
-              text-color="white"
-              dense
-            >
-              {{ getStatusLabel(selectedTask.status) }}
-            </q-chip>
-          </div>
-        </q-card-section>
-        
-        <q-card-actions align="right">
-          <q-btn
-            v-if="canRequestToJoin(selectedTask)"
-            color="primary" 
-            label="참여 신청" 
-            @click="confirmJoinRequest(selectedTask)"
-          />
-          <q-btn v-else flat label="닫기" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <TaskDetailsDialog
+      v-model="showDetailsDialog"
+      :task="selectedTask"
+      @join-request="confirmJoinRequest"
+      @cancel="confirmCancel"
+    />
 
     <!-- Join Request Confirmation Dialog -->
-    <q-dialog v-model="showJoinRequestDialog">
-      <q-card>
-        <q-card-section class="row items-center">
-          <div class="text-h6">작업 참여 신청</div>
-        </q-card-section>
+    <JoinRequestDialog
+      v-model="showJoinRequestDialog"
+      :task="selectedTask"
+      :is-submitting="isSubmitting"
+      @submit="submitJoinRequest"
+    />
 
-        <q-card-section>
-          <p>다음 작업에 참여 신청을 하시겠습니까?</p>
-          <p class="text-weight-bold">{{ selectedTask?.title }}</p>
-          <p>{{ formatDateRange(selectedTask?.startDateTime, selectedTask?.endDateTime) }} {{ formatTimeRange(selectedTask?.startDateTime, selectedTask?.endDateTime) }}</p>
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="취소" v-close-popup />
-          <q-btn color="primary" label="신청하기" @click="submitJoinRequest" :loading="isSubmitting" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <!-- Cancel Task Dialog -->
+    <CancelTaskDialog
+      v-model="showCancelDialog"
+      :task="selectedTask"
+      :is-submitting="isSubmitting"
+      @submit="submitCancel"
+    />
   </q-page>
 </template>
 
@@ -206,6 +151,9 @@ import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/modules/store_user'
 import taskApi from '@/api/modules/api-task'
 import type { Task, TaskEmployee } from '@/api/modules/api-task'
+import TaskDetailsDialog from '@/views/task/dialog/TaskDetailsDialog.vue'
+import JoinRequestDialog from '@/views/task/dialog/JoinRequestDialog.vue'
+import CancelTaskDialog from '@/views/task/dialog/CancelTaskDialog.vue'
 
 const $q = useQuasar()
 const userStore = useUserStore()
@@ -238,6 +186,7 @@ const showDetailsDialog = ref(false)
 const showJoinRequestDialog = ref(false)
 const selectedTask = ref<Task | null>(null)
 const isSubmitting = ref(false)
+const showCancelDialog = ref(false)
 
 // Status options for filtering
 const statusOptions = [
@@ -454,6 +403,26 @@ function getRequestStatusColor(status: string | null): string {
 const filteredTasks = computed(() => {
   return tasks.value
 })
+
+const confirmCancel = (task: Task) => {
+  showDetailsDialog.value = false
+  showCancelDialog.value = true
+}
+
+const submitCancel = async () => {
+  if (!selectedTask.value) return
+  
+  isSubmitting.value = true
+  try {
+    await taskApi.cancelTask(selectedTask.value.id)
+    showCancelDialog.value = false
+    await fetchTasks()
+  } catch (error) {
+    console.error('Failed to cancel task:', error)
+  } finally {
+    isSubmitting.value = false
+  }
+}
 </script>
 
 <style scoped>

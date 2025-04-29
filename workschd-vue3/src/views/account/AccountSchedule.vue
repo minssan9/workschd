@@ -126,7 +126,7 @@ import { useI18n } from 'vue-i18n'
 import { useQuasar } from 'quasar'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import apiAccount from '@/api/modules/api-account'
+import apiAccountSchedule from '@/api/modules/api-account-schedule'
 import GridDefault from '@/components/grid/GridDefault.vue'
 import type { ColDef } from 'ag-grid-community'
 import { useUserStore } from '@/stores/modules/store_user'
@@ -226,7 +226,7 @@ async function handleUnavailableDatesUpdate() {
       reason: row.reason
     }))
     
-    await apiAccount.saveUnavailableDates(accountId.value, unavailableDates)
+    await apiAccountSchedule.saveUnavailableDates(accountId.value, unavailableDates)
     
     $q.notify({ type: 'positive', message: t('accountWorkHour.unavailable.saveSuccess', '근무 불가능 일정이 저장되었습니다') })
   } catch (error) {
@@ -239,7 +239,7 @@ async function handleUnavailableDatesUpdate() {
 
 async function loadUnavailableDates() {
   try {
-    const response = await apiAccount.getUnavailableDates(accountId.value)
+    const response = await apiAccountSchedule.getUnavailableDates(accountId.value)
     if (response?.data?.dates) {
       const dates = response.data.dates.map((item: DateItem) => item.date)
       selectedDates.value = dates
@@ -288,7 +288,7 @@ const handleScheduleUpdate = async () => {
   try {
     isSaving.value = true
     const formattedPreferences = formatSchedulePreferencesForApi()
-    await apiAccount.saveSchedulePreferences(accountId.value, formattedPreferences)
+    await apiAccountSchedule.saveSchedulePreferences(accountId.value, formattedPreferences)
     
     $q.notify({ type: 'positive', message: t('accountWorkHour.preferences.saveSuccess', '스케줄 설정이 저장되었습니다') })
   } catch (error) {
@@ -301,7 +301,7 @@ const handleScheduleUpdate = async () => {
 // Load accountWorkHour preferences on mount
 const loadSchedulePreferences = async () => {
   try {
-    const response = await apiAccount.getSchedulePreferences(accountId.value)
+    const response = await apiAccountSchedule.getSchedulePreferences(accountId.value)
     if (response?.data) {
       parseDaySchedulesFromApi(response.data)
     }

@@ -26,8 +26,8 @@ public class AccountWorkHour extends BaseEntity {
     private Boolean preferred;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "account_info_id")
-    private AccountInfo accountInfo;
+    @JoinColumn(name = "account_id")
+    private Account account ;
 
     public AccountWorkHour(AccountWorkHourDTO accountWorkHourDTO) {
         this.date = accountWorkHourDTO.getDate();

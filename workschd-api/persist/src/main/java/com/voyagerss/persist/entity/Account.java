@@ -71,6 +71,15 @@ public class Account extends BaseEntity implements Serializable {
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private AccountInfo accountInfo;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountWorkHour> accountWorkHours = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountWorkOffDates> accountWorkOffDates = new ArrayList<>();
+
+
 
     public Account(AccountDTO accountDto) {
         BeanUtils.copyProperties(accountDto, this);

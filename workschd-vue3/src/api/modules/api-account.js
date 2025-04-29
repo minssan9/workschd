@@ -15,6 +15,7 @@ const apiAccount = {
     return request.put(`${baesURL}/${account.accountId}`, account)
   },
 
+  
   getTeamsByAccountId(accountId) {
     return request.get(`${baesURL}/${accountId}/team`)
   },
@@ -40,23 +41,8 @@ const apiAccount = {
     return request.postFile(`${baesURL}/${accountId}/image`, profileImage)
   },
 
-  // Schedule preferences methods
-  getSchedulePreferences(accountId) {
-    return request.get(`${baesURL}/${accountId}/schedule-preferences`)
-  },
 
-  saveSchedulePreferences(accountId, preferences) {
-    return request.post(`${baesURL}/${accountId}/schedule-preferences`, preferences)
-  },
-
-  // Unavailable dates methods
-  getUnavailableDates(accountId) {
-    return request.get(`${baesURL}/${accountId}/unavailable-dates`)
-  },
-
-  saveUnavailableDates(accountId, dates) {
-    return request.post(`${baesURL}/${accountId}/unavailable-dates`, { dates })
-  },
+  
 
   login(data) {
     return request({

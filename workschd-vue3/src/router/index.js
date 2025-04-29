@@ -14,21 +14,21 @@ const router = createRouter({
     { path: '/terms',                   name: 'Terms',                    component: () => import('@/views/info/Terms.vue'),                  meta: { icon: 'description' }, hidden: true },
 
     // Auth
-    { path: '/auth/login',              name: 'login',                    component: () => import('@/views/auth/Login.vue'),                  meta: { icon: 'login' }, hidden: true },
-    { path: '/auth/redirect',           name: 'redirect',                 component: () => import('@/views/auth/redirect.vue'),               meta: { icon: 'refresh' }, hidden: true },
-    { path: '/auth/signup',             name: 'Signup',                   component: () => import('@/views/auth/Signup.vue'),                 meta: { icon: 'person_add', requiresAuth: false }, hidden: true },
+    { path: '/login',              name: 'login',                    component: () => import('@/views/auth/Login.vue'),                  meta: { icon: 'login' }, hidden: true },
+    { path: '/redirect',           name: 'redirect',                 component: () => import('@/views/auth/redirect.vue'),               meta: { icon: 'refresh' }, hidden: true },
+    { path: '/signup',             name: 'Signup',                   component: () => import('@/views/auth/Signup.vue'),                 meta: { icon: 'person_add', requiresAuth: false }, hidden: true },
     
     // Account
-    { path: '/account/profile',         name: 'AccountProfile',           component: () => import('@/views/account/AccountProfile.vue'),      meta: { icon: 'person' }, hidden: true },
-    { path: '/account/schedule',        name: 'AccountSchedule',          component: () => import('@/views/account/AccountSchedule.vue'),     meta: { icon: 'calendar_today' }, hidden: true },
+    { path: '/account/profile',         name: 'AccountProfile (All)',           component: () => import('@/views/account/AccountProfile.vue'),      meta: { icon: 'person' }, hidden: true },
+    { path: '/account/schedule',        name: 'AccountSchedule (Worker)',          component: () => import('@/views/account/AccountSchedule.vue'),     meta: { icon: 'calendar_today' }, hidden: true },
 
     // Job
     { 
       path: '/task',                   name: 'Task',                    meta: { roles: ['WORKER','MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'event' },
       children: [
-        { path: '/task/manage',          name: 'TaskManage',                component: () => import('@/views/task/TaskManage.vue'),            meta: { icon: 'list' } },
-        { path: '/task/attendance',    name: 'TaskAttendance',          component: () => import('@/views/task/TaskAttendance.vue'),      meta: { icon: 'how_to_reg' } },
-        { path: '/task/list-mobile',   name: 'TaskListMobile',          component: () => import('@/views/task/TaskListMobile.vue'),      meta: { icon: 'work', roles: ['WORKER'] } },
+        { path: '/task/manage',          name: 'TaskManage (Manager)',                component: () => import('@/views/task/TaskManage.vue'),            meta: { icon: 'list' } },        
+        { path: '/task/list-mobile',   name: 'TaskListMobile (Worker)',          component: () => import('@/views/task/TaskListMobile.vue'),      meta: { icon: 'work', roles: ['WORKER'] } },
+        // { path: '/task/attendance',    name: 'TaskAttendance (Worker)',          component: () => import('@/views/task/TaskAttendance.vue'),      meta: { icon: 'how_to_reg' } },
       ]
     },
 
@@ -36,8 +36,8 @@ const router = createRouter({
     { 
       path: '/team',                    name: 'Team',                     meta: { roles: ['MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'groups' },
       children: [
-        { path: '/team/join/:token',    name: 'TeamJoin',                 component: () => import('@/views/team/TeamJoin.vue'),              meta: { roles: ['WORKER', 'MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'group_add' }, hidden: true },
-        { path: '/team/manage',         name: 'TeamManage',               component: () => import('@/views/team/TeamManage.vue'),            meta: { icon: 'manage_accounts' } },
+        { path: '/team/join/:token',    name: 'TeamJoin (Worker)',                 component: () => import('@/views/team/TeamJoin.vue'),              meta: { roles: ['WORKER', 'MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'group_add' }, hidden: true },
+        { path: '/team/manage',         name: 'TeamManage (Manager)',               component: () => import('@/views/team/TeamManage.vue'),            meta: { icon: 'manage_accounts' } },
       ]
     },
 

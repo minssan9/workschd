@@ -25,7 +25,6 @@ public class AccountInfoService {
     public AccountInfoDTO save(AccountInfoDTO vO) {
         AccountInfo accountInfo = requireOne(vO.getAccountId())
                 .orElse(new AccountInfo());
-        accountInfo.setAccountInfo(vO);
 
         Account account = accountRepository.getById(vO.getAccountId());
         accountInfo.setAccount(account);
@@ -60,8 +59,4 @@ public class AccountInfoService {
         return accountInfoRepository.findByAccount_AccountId(id);
     }
 
-
-    public List<AccountInfo> getEmployeesByBranch(Long branchId) {
-        return accountInfoRepository.getEmployeesByBranchId(branchId);
-    }
 }

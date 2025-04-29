@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "unavailable_dates")
+@Table
 public class AccountWorkOffDates extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -21,8 +21,8 @@ public class AccountWorkOffDates extends BaseEntity implements Serializable {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "account_info_id")
-    private AccountInfo accountInfo;
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     @Column(name = "off_date", nullable = false)
     private LocalDate offDate;

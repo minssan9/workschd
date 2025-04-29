@@ -37,7 +37,7 @@ public class Shop extends BaseEntity implements Serializable {
     private String region;
 
     @Column(name = "branch_id")
-    private Long branchId;
+    private Long shopId;
     
     @Column(name = "active")
     private Boolean active = true;

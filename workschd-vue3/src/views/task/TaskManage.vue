@@ -177,9 +177,12 @@ import TaskEmployeeGrid from '@/views/task/grid/TaskEmployeeGrid.vue'
 import AttendanceFormDialog from '@/views/task/dialog/AttendanceFormDialog.vue'
 import AddTaskDialog from '@/views/task/dialog/AddTaskDialog.vue'
 import ApprovalDialog from '@/views/task/dialog/ApprovalTaskDialog.vue'
+
+import { useUserStore } from '@/stores/modules/store_user'
+
 import apiAttendance from '@/api/modules/api-attendance'
 import apiTask, { Task, TaskEmployee } from '@/api/modules/api-task'
-import { useUserStore } from '@/stores/modules/store_user'
+import apiTeamShop from '@/api/modules/api-team-shop'
 
 // Define interfaces that were removed from api-task.ts
 interface AttendanceForm {
@@ -401,9 +404,9 @@ const handleTaskSubmit = async (newTaskData: Task) => {
   }
 }
 
-const fetchBranchesAndShops = async () => {
+const fetchShops = async () => {
   try {
-    const shopsResponse = await apiTask.getActiveShopsByTeamId(userStore.user.teamId)
+    const shopsResponse = await apiTeamShop.getShopsByTeamId(userStore.user.teamId)
     
     shops.value = shopsResponse.data
   } catch (error) {
@@ -412,7 +415,7 @@ const fetchBranchesAndShops = async () => {
 }
 
 onMounted(async () => {
-  await Promise.all([loadGridData(), fetchBranchesAndShops()])
+  await Promise.all([loadGridData(), fetchShops()])
 })
 </script>
 

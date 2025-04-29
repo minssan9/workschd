@@ -203,8 +203,9 @@ import { ref, onMounted, watch, defineProps } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import GridDefault from '@/components/grid/GridDefault.vue'
-import apiTeam from '@/api/modules/api-team'
-import type { Shop } from '@/api/modules/api-team'
+import apiTeamShop from '@/api/modules/api-team-shop'
+import type { Shop } from '@/api/modules/api-team-shop'
+
 
 const props = defineProps({
   teamId: {
@@ -299,7 +300,7 @@ const columnDefs = ref([
 const fetchShops = async () => {
   try {
     isLoading.value = true;
-    const response = await apiTeam.getShopsByTeamId(props.teamId);
+    const response = await apiTeamShop.getShopsByTeamId(props.teamId);
     shops.value = response.data;
   } catch (error) {
     console.error('Failed to fetch shops', error)
@@ -321,12 +322,12 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
     
     if (dialogMode.value === 'add') {
-      const response = await apiTeam.createShop(props.teamId, shopForm.value as Shop);
+      const response = await apiTeamShop.createShop(props.teamId, shopForm.value as Shop);
       shops.value.push(response.data);
       $q.notify({ type: 'positive', message: t('team.shop.shopAdded', 'Shop added successfully') });
     } else {      
       if (editingShopId.value !== null) {
-        const response = await apiTeam.updateShop(props.teamId, editingShopId.value, shopForm.value as Shop);
+        const response = await apiTeamShop.updateShop(props.teamId, editingShopId.value, shopForm.value as Shop);
         const index = shops.value.findIndex(s => s.id === editingShopId.value);
         if (index !== -1) {
           shops.value[index] = response.data;
@@ -351,7 +352,7 @@ const handleDelete = async (id) => {
       cancel: true,
       persistent: true
     }).onOk(async () => {
-      await apiTeam.deleteShop(props.teamId, id);
+      await apiTeamShop.deleteShop(props.teamId, id);
       shops.value = shops.value.filter(shop => shop.id !== id);
       $q.notify({ type: 'positive', message: t('team.shop.shopDeleted', 'Shop deleted successfully') });
     })

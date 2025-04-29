@@ -21,9 +21,9 @@
               <q-select
                 v-model="selectedShop"
                 label="Store"
-                :options="getShopOptions"
-                option-value="value"
-                option-label="label"
+                :options="shops"
+                option-value="id"
+                option-label="name"
                 filled
                 required
               />

@@ -122,11 +122,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, defineProps } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useTeamStore } from '@/stores/modules/store_team'
-import { ScheduleConfig, DayConfig, MonthConfig } from '@/interface/accountWorkHour'
+import apiTeamSchedule, { 
+  ScheduleConfig,
+  DayConfig,
+  MonthConfig,
+  AdditionalOptions,
+  daysOfWeek,
+  months,
+  defaultMinStaffPerDay,
+  defaultMaxOffDaysPerMonth,
+  defaultAdditionalOptions
+} from '@/api/modules/api-team-schedule'
 
 const props = defineProps({
   teamId: {
@@ -141,98 +151,40 @@ const $q = useQuasar()
 const teamStore = useTeamStore()
 const isSaving = ref(false)
 
-// Day and month configurations
-const daysOfWeek: DayConfig[] = [
-  { value: 'MONDAY', label: 'Monday' },
-  { value: 'TUESDAY', label: 'Tuesday' },
-  { value: 'WEDNESDAY', label: 'Wednesday' },
-  { value: 'THURSDAY', label: 'Thursday' },
-  { value: 'FRIDAY', label: 'Friday' },
-  { value: 'SATURDAY', label: 'Saturday' },
-  { value: 'SUNDAY', label: 'Sunday' }
-]
-
-const months: MonthConfig[] = [
-  { value: 1, label: 'January' },
-  { value: 2, label: 'February' },
-  { value: 3, label: 'March' },
-  { value: 4, label: 'April' },
-  { value: 5, label: 'May' },
-  { value: 6, label: 'June' },
-  { value: 7, label: 'July' },
-  { value: 8, label: 'August' },
-  { value: 9, label: 'September' },
-  { value: 10, label: 'October' },
-  { value: 11, label: 'November' },
-  { value: 12, label: 'December' }
-]
-
 // Schedule configuration values
-const minStaffPerDay = ref({
-  MONDAY: 1,
-  TUESDAY: 1,
-  WEDNESDAY: 1,
-  THURSDAY: 1,
-  FRIDAY: 1,
-  SATURDAY: 1,
-  SUNDAY: 1
-})
-
-const maxOffDaysPerMonth = ref({
-  1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4,
-  7: 4, 8: 4, 9: 4, 10: 4, 11: 4, 12: 4
-})
+const minStaffPerDay = ref<DayConfig>({ ...defaultMinStaffPerDay })
+const maxOffDaysPerMonth = ref<MonthConfig>({ ...defaultMaxOffDaysPerMonth })
 
 // Additional configuration options
-const allowWeekendWork = ref(true)
-const enforceMinimumRest = ref(true)
-const maxConsecutiveWorkDays = ref(5)
-const scheduleGenerationFrequency = ref('MONTHLY')
+const allowWeekendWork = ref(defaultAdditionalOptions.allowWeekendWork)
+const enforceMinimumRest = ref(defaultAdditionalOptions.enforceMinimumRest)
+const maxConsecutiveWorkDays = ref(defaultAdditionalOptions.maxConsecutiveWorkDays)
+const scheduleGenerationFrequency = ref(defaultAdditionalOptions.scheduleGenerationFrequency)
 const scheduleFrequencyOptions = [
   { label: t('team.accountWorkHour.frequency.weekly', 'Weekly'), value: 'WEEKLY' },
   { label: t('team.accountWorkHour.frequency.biweekly', 'Bi-weekly'), value: 'BIWEEKLY' },
   { label: t('team.accountWorkHour.frequency.monthly', 'Monthly'), value: 'MONTHLY' }
 ]
 
-// Default values for reset
-const defaultMinStaffPerDay = {
-  MONDAY: 1,
-  TUESDAY: 1,
-  WEDNESDAY: 1,
-  THURSDAY: 1,
-  FRIDAY: 1,
-  SATURDAY: 1,
-  SUNDAY: 1
-}
-
-const defaultMaxOffDaysPerMonth = {
-  1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4,
-  7: 4, 8: 4, 9: 4, 10: 4, 11: 4, 12: 4
-}
-
 const fetchScheduleConfig = async () => {
   try {
-    const response = await fetch(`/accountWorkHour-config/${props.teamId}`)
-    const data = await response.json()
+    const response = await apiTeamSchedule.getTeamScheduleConfig(props.teamId);
+    const data: ScheduleConfig | null = response.data;
     
     if (data) {
-      minStaffPerDay.value = data.minStaffPerDay || minStaffPerDay.value
-      maxOffDaysPerMonth.value = data.maxOffDaysPerMonth || maxOffDaysPerMonth.value
+      minStaffPerDay.value = data.minStaffPerDay || { ...defaultMinStaffPerDay }
+      maxOffDaysPerMonth.value = data.maxOffDaysPerMonth || { ...defaultMaxOffDaysPerMonth }
       
-      // Set additional options if available
       if (data.additionalOptions) {
-        allowWeekendWork.value = data.additionalOptions.allowWeekendWork ?? allowWeekendWork.value
-        enforceMinimumRest.value = data.additionalOptions.enforceMinimumRest ?? enforceMinimumRest.value
-        maxConsecutiveWorkDays.value = data.additionalOptions.maxConsecutiveWorkDays ?? maxConsecutiveWorkDays.value
-        scheduleGenerationFrequency.value = data.additionalOptions.scheduleGenerationFrequency ?? scheduleGenerationFrequency.value
+        allowWeekendWork.value = data.additionalOptions.allowWeekendWork ?? defaultAdditionalOptions.allowWeekendWork
+        enforceMinimumRest.value = data.additionalOptions.enforceMinimumRest ?? defaultAdditionalOptions.enforceMinimumRest
+        maxConsecutiveWorkDays.value = data.additionalOptions.maxConsecutiveWorkDays ?? defaultAdditionalOptions.maxConsecutiveWorkDays
+        scheduleGenerationFrequency.value = data.additionalOptions.scheduleGenerationFrequency ?? defaultAdditionalOptions.scheduleGenerationFrequency
       }
     }
   } catch (error) {
     console.error('Failed to fetch accountWorkHour configuration', error)
-    $q.notify({
-      type: 'negative',
-      message: t('team.accountWorkHour.fetchError', 'Failed to load accountWorkHour configuration')
-    })
+    $q.notify({ type: 'negative', message: t('team.accountWorkHour.fetchError', 'Failed to load accountWorkHour configuration') })
   }
 }
 
@@ -240,32 +192,22 @@ const saveConfiguration = async () => {
   try {
     isSaving.value = true
     
-    await fetch(`/accountWorkHour-config/${props.teamId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        minStaffPerDay: minStaffPerDay.value,
-        maxOffDaysPerMonth: maxOffDaysPerMonth.value,
-        additionalOptions: {
-          allowWeekendWork: allowWeekendWork.value,
-          enforceMinimumRest: enforceMinimumRest.value,
-          maxConsecutiveWorkDays: maxConsecutiveWorkDays.value,
-          scheduleGenerationFrequency: scheduleGenerationFrequency.value
-        }
-      })
-    })
+    const configToSave: ScheduleConfig = {
+      minStaffPerDay: minStaffPerDay.value,
+      maxOffDaysPerMonth: maxOffDaysPerMonth.value,
+      additionalOptions: {
+        allowWeekendWork: allowWeekendWork.value,
+        enforceMinimumRest: enforceMinimumRest.value,
+        maxConsecutiveWorkDays: maxConsecutiveWorkDays.value,
+        scheduleGenerationFrequency: scheduleGenerationFrequency.value
+      }
+    };
     
-    $q.notify({
-      type: 'positive',
-      message: t('team.accountWorkHour.saveSuccess', 'Configuration saved successfully')
-    })
+    await apiTeamSchedule.saveTeamScheduleConfig(props.teamId, configToSave);
+    
+    $q.notify({ type: 'positive', message: t('team.accountWorkHour.saveSuccess', 'Configuration saved successfully') })
   } catch (error) {
-    $q.notify({
-      type: 'negative',
-      message: t('team.accountWorkHour.saveError', 'Failed to save configuration')
-    })
+    $q.notify({ type: 'negative', message: t('team.accountWorkHour.saveError', 'Failed to save configuration') })
   } finally {
     isSaving.value = false
   }
@@ -280,10 +222,10 @@ const resetConfiguration = () => {
   }).onOk(() => {
     minStaffPerDay.value = { ...defaultMinStaffPerDay }
     maxOffDaysPerMonth.value = { ...defaultMaxOffDaysPerMonth }
-    allowWeekendWork.value = true
-    enforceMinimumRest.value = true
-    maxConsecutiveWorkDays.value = 5
-    scheduleGenerationFrequency.value = 'MONTHLY'
+    allowWeekendWork.value = defaultAdditionalOptions.allowWeekendWork
+    enforceMinimumRest.value = defaultAdditionalOptions.enforceMinimumRest
+    maxConsecutiveWorkDays.value = defaultAdditionalOptions.maxConsecutiveWorkDays
+    scheduleGenerationFrequency.value = defaultAdditionalOptions.scheduleGenerationFrequency
     
     $q.notify({
       type: 'info',

@@ -15,5 +15,6 @@ import java.util.Optional;
 @Repository
 public interface AccountWorkHourRepository extends JpaRepository<AccountWorkHour, Long>, JpaSpecificationExecutor<AccountWorkHour> {
 
-    List<AccountWorkHour> findByAccountInfoId(Long id);
+
+  List<AccountWorkHour> findByAccountAccountId(Integer id);
 }

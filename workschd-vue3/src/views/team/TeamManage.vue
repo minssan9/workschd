@@ -291,7 +291,7 @@ const fetchTeamMembers = (params?: TeamMemberParams) => {
   }
   
   // Load team members for the selected team
-  apiTeam.getTeamMembers(selectedTeamForDetails.value.name, requestParams)
+  apiTeam.getTeamMembers(selectedTeamForDetails.value.id, requestParams)
     .then(response => {      
       teamMembers.value = response.data;     
     })

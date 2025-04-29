@@ -16,9 +16,7 @@ public class ShopDTO implements Serializable {
     private String address;
 
     private String region;
-
-    private Long branchId;
-    
+ 
     // Team relationship fields
     private Long teamId;
     private String teamName;
