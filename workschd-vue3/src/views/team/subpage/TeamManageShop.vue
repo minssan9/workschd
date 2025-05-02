@@ -205,6 +205,7 @@ import { useI18n } from 'vue-i18n'
 import GridDefault from '@/components/grid/GridDefault.vue'
 import apiTeamShop from '@/api/modules/api-team-shop'
 import type { Shop } from '@/api/modules/api-team-shop'
+import { daysOfWeek } from '@/api/modules/api-account-schedule'
 
 
 const props = defineProps({
@@ -226,17 +227,7 @@ const selectedShop = ref<Shop | null>(null)
 const isSubmitting = ref(false)
 const dialogMode = ref('add') // 'add' or 'edit'
 const editingShopId = ref<number | null>(null)
-
-// Days of week options
-const daysOfWeek = [
-  { value: 'Monday', label: t('common.days.monday', 'Monday') },
-  { value: 'Tuesday', label: t('common.days.tuesday', 'Tuesday') },
-  { value: 'Wednesday', label: t('common.days.wednesday', 'Wednesday') },
-  { value: 'Thursday', label: t('common.days.thursday', 'Thursday') },
-  { value: 'Friday', label: t('common.days.friday', 'Friday') },
-  { value: 'Saturday', label: t('common.days.saturday', 'Saturday') },
-  { value: 'Sunday', label: t('common.days.sunday', 'Sunday') }
-]
+ 
 
 const shopForm = ref({
   name: '',
@@ -276,8 +267,9 @@ const columnDefs = ref([
       return `<div class="clickable-cell">${params.value}</div>`;
     }
   },
+  { field: 'phone', headerName: t('team.shop.grid.phone', 'Phone') },
   { field: 'address', headerName: t('team.shop.grid.address', 'Address') },
-  { field: 'region', headerName: t('team.shop.grid.region', 'Region') },
+  { field: 'district', headerName: t('team.shop.grid.district', 'District') },
   { field: 'actions',
     headerName: t('team.shop.grid.actions', 'Actions'),
     cellRenderer: () => {

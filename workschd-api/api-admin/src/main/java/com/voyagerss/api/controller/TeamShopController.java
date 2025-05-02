@@ -154,7 +154,7 @@ public class TeamShopController {
      * @return List of stores for the team
      */
     @GetMapping
-    public ResponseEntity<List<ShopDTO>> getAllStores(
+    public ResponseEntity<List<ShopDTO>> getAllShops(
             @PathVariable Long teamId,
             @RequestParam(required = false) String region) {
         try {
@@ -162,7 +162,7 @@ public class TeamShopController {
             
             if (region != null && !region.isEmpty()) {
                 log.info("Getting stores for team {} in region: {}", teamId, region);
-                stores = shopService.findByTeamIdAndRegion(teamId, region);
+                stores = shopService.findByTeamIdAndDistrict(teamId, region);
             } else {
                 log.info("Getting all stores for team: {}", teamId);
                 stores = shopService.findByTeamId(teamId);

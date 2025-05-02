@@ -34,7 +34,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, JpaSpecificat
      * @param region The region name
      * @return List of stores belonging to the team with the given ID and in the specified region
      */
-    List<Shop> findByTeam_IdAndRegion(Long teamId, String region);
+    List<Shop> findByTeam_IdAndDistrict(Long teamId, String region);
     
     /**
      * Custom query to find stores by team with additional filtering
@@ -43,4 +43,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, JpaSpecificat
      */
     @Query("SELECT s FROM Shop s WHERE s.team.id = :teamId AND s.active = true ORDER BY s.name")
     List<Shop> findActiveStoresByTeamId(@Param("teamId") Long teamId);
+    
+    @Query("SELECT s FROM Shop s WHERE s.latitude IS NULL OR s.longitude IS NULL")
+    List<Shop> findByLatitudeIsNullOrLongitudeIsNull();
 }

@@ -130,9 +130,7 @@ import apiTeamSchedule, {
   ScheduleConfig,
   DayConfig,
   MonthConfig,
-  AdditionalOptions,
-  daysOfWeek,
-  months,
+  AdditionalOptions, 
   defaultMinStaffPerDay,
   defaultMaxOffDaysPerMonth,
   defaultAdditionalOptions

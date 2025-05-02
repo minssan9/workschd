@@ -80,7 +80,7 @@ export const useTeamStore = defineStore('team', {
     async fetchShopsByTeamId(teamId: number): Promise<void> {
       try {
         this.isLoadingShops = true;
-        const response = await apiTeam.getShopsByTeamId(teamId);
+        const response = await apiTeamShop.getShopsByTeamId(teamId);
         this.shops = response.data;
       } catch (error) {
         console.error('Error fetching shops:', error);

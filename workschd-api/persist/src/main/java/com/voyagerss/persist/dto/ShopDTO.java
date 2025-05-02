@@ -15,6 +15,20 @@ public class ShopDTO implements Serializable {
 
     private String address;
 
+    private String district;
+
+    private String postalCode;
+
+    private Double latitude;
+
+    private Double longitude;
+
+    private String phone;
+
+    private String description;
+
+    private Integer totalRooms;
+
     private String region;
  
     // Team relationship fields
