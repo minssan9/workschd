@@ -1,7 +1,9 @@
 package com.voyagerss.api.component;
 
+import com.voyagerss.persist.dto.KakaoAddressResponse;
 import com.voyagerss.persist.entity.Shop;
 import com.voyagerss.persist.repository.ShopRepository;
+import com.voyagerss.persist.service.KakaoAddressService;
 import com.voyagerss.persist.service.ShopService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,9 @@ public class ShopCoordinateInitializer {
     
     @Autowired
     private ShopService shopService;
+
+    @Autowired
+    private KakaoAddressService kakaoAddressService;
     
     @EventListener(ApplicationReadyEvent.class)
     public void initializeShopCoordinates() {
