@@ -188,26 +188,6 @@ export const useUserStore = defineStore('user', {
     async login(token: string | null): Promise<void> {
       if (token) {
         Cookies.set('accessToken', token)
-
-        if (!this.user.accountId) {
-          try {
-            const res = await apiAccount.getUser()
-            Cookies.set('refreshToken', res.data.refreshToken)
-            Cookies.set('accountId',    res.data.accountId)
-            Cookies.set('username',     res.data.username)
-            Cookies.set('email',        res.data.email)
-            Cookies.set('role',         res.data.accountRoles)
-            this.user = res.data
-
-            const accountInfo = await apiAccount.getAccountInfo(res.data.accountId)
-            if (accountInfo.accountId) {
-              this.user.accountInfo = accountInfo
-            }
-          } catch (error) {
-            console.error('Error during login:', error)
-            throw error
-          }
-        }
       } else {
         Cookies.remove('accessToken')
         Cookies.remove('refreshToken')

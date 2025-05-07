@@ -19,8 +19,8 @@ const router = createRouter({
     { path: '/signup',             name: 'Signup',                   component: () => import('@/views/auth/Signup.vue'),                 meta: { icon: 'person_add', requiresAuth: false }, hidden: true },
     
     // Account
-    { path: '/account/profile',         name: 'AccountProfile (All)',           component: () => import('@/views/account/AccountProfile.vue'),      meta: { icon: 'person' }, hidden: true },
-    { path: '/account/schedule',        name: 'AccountSchedule (Worker)',          component: () => import('@/views/account/AccountSchedule.vue'),     meta: { icon: 'calendar_today' }, hidden: true },
+    { path: '/account/profile',         name: 'AccountProfile',           component: () => import('@/views/account/AccountProfile.vue'),      meta: { icon: 'person' }, hidden: true },
+    { path: '/account/schedule',        name: 'AccountSchedule',          component: () => import('@/views/account/AccountSchedule.vue'),     meta: { icon: 'calendar_today' }, hidden: true },
 
     // Job
     { 

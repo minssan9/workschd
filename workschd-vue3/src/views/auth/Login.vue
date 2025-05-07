@@ -171,38 +171,38 @@ const userStore = useUserStore()
 const isGoogleLoading = ref(false)
 const googleAuth = new GoogleAuthAPI()
 
-const kakaoLogin = () => {
-  window.Kakao.Auth.login({
-    scope: "profile_image, account_email",
-    success: getKakaoAccount,
-  })
-}
-
-const getKakaoAccount = () => {
-  window.Kakao.API.request({
-    url: "/v2/user/me",
-    success: (res) => {
-      const kakao_account = res.kakao_account
-      const ninkname = kakao_account.profile.ninkname
-      const email = kakao_account.email
-      console.log("ninkname", ninkname)
-      console.log("email", email)
-
-      //로그인처리구현
-
-      alert("로그인 성공!")
-    },
-    fail: (error) => {
-      console.log(error)
-    },
-  })
-}
-
-const kakaoLogout = () => {
-  window.Kakao.Auth.logout((res) => {
-    console.log(res)
-  })
-}
+// const kakaoLogin = () => {
+//   window.Kakao.Auth.login({
+//     scope: "profile_image, account_email",
+//     success: getKakaoAccount,
+//   })
+// }
+//
+// const getKakaoAccount = () => {
+//   window.Kakao.API.request({
+//     url: "/v2/user/me",
+//     success: (res) => {
+//       const kakao_account = res.kakao_account
+//       const ninkname = kakao_account.profile.ninkname
+//       const email = kakao_account.email
+//       console.log("ninkname", ninkname)
+//       console.log("email", email)
+//
+//       //로그인처리구현
+//
+//       alert("로그인 성공!")
+//     },
+//     fail: (error) => {
+//       console.log(error)
+//     },
+//   })
+// }
+//
+// const kakaoLogout = () => {
+//   window.Kakao.Auth.logout((res) => {
+//     console.log(res)
+//   })
+// }
 
 const getSocialLoginUrl = (socialType) => {
   removeAllCookies()
@@ -211,10 +211,6 @@ const getSocialLoginUrl = (socialType) => {
 
 const redirect = ref(null) // Add this if you need the redirect property
 
-// Google callback
-const callback = (response) => {
-  console.log("Handle the response", response)
-}
 
 // Add login form state
 const loginForm = ref({
@@ -237,16 +233,11 @@ const handleLogin = async () => {
     })
 
     if (response) {
-      // Store user data and tokens
-      await userStore.login(response.data)
-      
-      $q.notify({
-        type: 'positive',
-        message: t('login.success', '로그인되었습니다.')
-      })
-      
+      const token = response.data 
+
+      $q.notify({ type: 'positive', message: t('login.success', '로그인되었습니다.') })
       // Redirect to home or dashboard
-      router.push('/')
+      router.push('/redirect?token=' + token)
     }
   } catch (error) {
     console.error('Login error:', error)
@@ -256,10 +247,7 @@ const handleLogin = async () => {
       errorMessage = t('login.error.invalid', '이메일 또는 비밀번호가 올바르지 않습니다.')
     }
     
-    $q.notify({
-      type: 'negative',
-      message: errorMessage
-    })
+    $q.notify({ type: 'negative', message: errorMessage })
   }
 }
 
@@ -286,10 +274,7 @@ const handleGoogleSignIn = async () => {
     router.push({ name: 'home' })
   } catch (error: any) {
     console.error('Google sign in error:', error)
-    $q.notify({
-      type: 'negative',
-      message: t('auth.login.error', '로그인 실패')
-    })
+    $q.notify({ type: 'negative', message: t('auth.login.error', '로그인 실패') })
   } finally {
     isGoogleLoading.value = false
   }
