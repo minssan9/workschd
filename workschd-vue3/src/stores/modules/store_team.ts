@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia';
-import { TeamDTO as Team, JoinRequest, TeamMember, TeamForm, Shop } from '@/api/modules/api-team';
+import { TeamDTO as Team, JoinRequest, TeamMember, TeamForm } from '@/api/modules/api-team';
 import apiTeam from '@/api/modules/api-team';
+import { Shop } from '@/api/modules/api-team-shop';
+import apiTeamShop from '@/api/modules/api-team-shop';
 import { ScheduleConfig, DayConfig, MonthConfig } from '@/interface/schedule';
+
 
 // State type
 interface TeamState {
@@ -92,7 +95,7 @@ export const useTeamStore = defineStore('team', {
 
     async createShop(teamId: number, shop: Shop): Promise<void> {
       try {
-        const response = await apiTeam.createShop(teamId, shop);
+        const response = await apiTeamShop.createShop(teamId, shop);
         this.shops.push(response.data);
       } catch (error) {
         console.error('Error creating shop:', error);
@@ -102,7 +105,7 @@ export const useTeamStore = defineStore('team', {
 
     async updateShop(teamId: number, shopId: number, shop: Shop): Promise<void> {
       try {
-        const response = await apiTeam.updateShop(teamId, shopId, shop);
+        const response = await apiTeamShop.updateShop(teamId, shopId, shop);
         const index = this.shops.findIndex(s => s.id === shopId);
         if (index !== -1) {
           this.shops[index] = response.data;
@@ -115,7 +118,7 @@ export const useTeamStore = defineStore('team', {
 
     async deleteShop(teamId: number, shopId: number): Promise<void> {
       try {
-        await apiTeam.deleteShop(teamId, shopId);
+        await apiTeamShop.deleteShop(teamId, shopId);
         this.shops = this.shops.filter(shop => shop.id !== shopId);
       } catch (error) {
         console.error('Error deleting shop:', error);

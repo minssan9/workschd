@@ -110,10 +110,4 @@ const apiTeam = {
   }
 };
 
-// Helper function for parsing sort parameters
-function parseSortParam(sort: string): string {
-  // Implementation of sort parameter parsing
-  return sort;
-}
-
 export default apiTeam; 

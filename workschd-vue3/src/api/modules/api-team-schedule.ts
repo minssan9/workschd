@@ -40,12 +40,12 @@ export const defaultAdditionalOptions: AdditionalOptions = {
 
 // Function to fetch schedule configuration for a team
 export function getTeamScheduleConfig(teamId: number): Promise<AxiosResponse<ScheduleConfig>> {
-  return request.get(`/accountWorkHour-config/${teamId}`);
+  return request.get(`/team/${teamId}/schedule-config`);
 }
 
 // Function to save schedule configuration for a team
 export function saveTeamScheduleConfig(teamId: number, config: ScheduleConfig): Promise<AxiosResponse<void>> {
-  return request.post(`/accountWorkHour-config/${teamId}`, config);
+  return request.post(`/team/${teamId}/schedule-config`, config);
 }
 
 export default {
