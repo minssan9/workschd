@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import request from "@/api/axios-voyagerss.js";
+import service from "@/api/axios-voyagerss.js";
 
 export interface SubscriptionDTO {
   planType: 'premium' | 'basic' | 'starter' | 'small';
@@ -8,10 +8,10 @@ export interface SubscriptionDTO {
 
 export default {
   subscribe(planType: SubscriptionDTO['planType']): Promise<AxiosResponse> {
-    return request.post('/subscription', { planType });
+    return service.post('/subscription', { planType });
   },
 
   getCurrentPlan(): Promise<AxiosResponse> {
-    return request.get('/subscription/current');
+    return service.get('/subscription/current');
   }
 }; 

@@ -1,5 +1,5 @@
 import {AxiosResponse} from 'axios';
-import request from '@/api/axios-voyagerss'; 
+import service from '@/api/axios-voyagerss'; 
 
 
 export interface Shop { 
@@ -17,27 +17,27 @@ export interface Shop {
 // Shop APIs
 const apiTeamShop = {
   getShopsByTeamId: (teamId: number): Promise<AxiosResponse<Shop[]>> => {
-    return request.get(`/team/${teamId}/shop`);
+    return service.get(`/team/${teamId}/shop`);
   },
  
   fetchShops: (): Promise<AxiosResponse<Shop[]>> => {
-    return request.get('/shop')
+    return service.get('/shop')
   },
 
   getActiveShopsByTeamId: (teamId: number): Promise<AxiosResponse<Shop[]>> => {
-    return request.get(`/team/${teamId}/shop/active`)
+    return service.get(`/team/${teamId}/shop/active`)
   },
 
   createShop: (teamId: number, shop: Shop): Promise<AxiosResponse<Shop>> => {
-    return request.post(`/team/${teamId}/shop`, shop);
+    return service.post(`/team/${teamId}/shop`, shop);
   },
 
   updateShop: (teamId: number, shopId: number, shop: Shop): Promise<AxiosResponse<Shop>> => {
-    return request.put(`/team/${teamId}/shop/${shopId}`, shop);
+    return service.put(`/team/${teamId}/shop/${shopId}`, shop);
   },
 
   deleteShop: (teamId: number, shopId: number): Promise<AxiosResponse<void>> => {
-    return request.delete(`/team/${teamId}/shop/${shopId}`);
+    return service.delete(`/team/${teamId}/shop/${shopId}`);
   }
 };
 

@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import request from "@/api/axios-voyagerss.js";
+import service from "@/api/axios-voyagerss.js";
 import { AttendanceRecord } from '@/api/modules/api-task'
 import { PageResponseDTO } from '@/api/modules/api-common'
 
@@ -48,15 +48,15 @@ interface CreateAttendanceParams {
 }
 
 const create = (params: CreateAttendanceParams): Promise<AxiosResponse<AttendanceRecord>> => {
-  return request.post('/attendance', params)
+  return service.post('/attendance', params)
 }
 
 const getAttendanceByTaskId = (taskId: number): Promise<AxiosResponse<PageResponseDTO<AttendanceRecord>>> => {
-  return request.get(`/attendance/task/${taskId}`)
+  return service.get(`/attendance/task/${taskId}`)
 }
 
 const update = (id: number, params: Partial<CreateAttendanceParams>): Promise<AxiosResponse<AttendanceRecord>> => {
-  return request.put(`/attendance/${id}`, params)
+  return service.put(`/attendance/${id}`, params)
 }
 
 export default {

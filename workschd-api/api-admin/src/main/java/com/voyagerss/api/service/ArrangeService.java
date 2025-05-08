@@ -1,18 +1,19 @@
 package com.voyagerss.api.service;
 
 import com.voyagerss.persist.dto.AccountWorkOffDatesDTO;
-import com.voyagerss.persist.dto.AttendanceDTO;
+import com.voyagerss.persist.dto.TaskDTO;
 import com.voyagerss.persist.dto.TeamMemberDTO;
 import com.voyagerss.persist.entity.Account;
-import com.voyagerss.persist.entity.AccountWorkOffDates;
 import com.voyagerss.persist.service.AccountScheduleService;
-import com.voyagerss.persist.service.AttendanceService;
+import com.voyagerss.persist.service.TaskEmployeeService;
+import com.voyagerss.persist.service.TaskService;
 import com.voyagerss.persist.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,7 +23,8 @@ import java.util.stream.Collectors;
 public class ArrangeService {
     private final TeamService teamService;
     private final AccountScheduleService accountScheduleService;
-    private final AttendanceService attendanceService;
+    private final TaskService taskService;
+    private final TaskEmployeeService taskEmpService;
 
     // 필드 정의
     private Map<String, Integer> minStaffPerDay; // 요일별 최소 근무 인원
@@ -123,40 +125,40 @@ public class ArrangeService {
     //                Set<LocalDate> offDates = teamMemberDTO.getOffDates().stream().map(AccountWorkOffDates::getOffDate).collect(Collectors.toSet());
     //                Set<Integer> unavailableDays = teamMemberDTO.getOffDaysOfWeek();
 
-                    // 직원이 해당 일에 근무할 수 있는지 확인
-    //                if (offDates.contains(currentDate) || unavailableDays.contains(dayOfWeek)) {
-    //                    continue; // 근무 불가능한 요일이나 일자면 건너뜀
-    //                }
-
                     // 출근 및 퇴근 시간 랜덤 생성 (8시~10시 사이 출근, 17시~19시 사이 퇴근)
-                    LocalTime startTime = getRandomStartTime();
-                    LocalTime endTime = getRandomEndTime(startTime);
+                    LocalDateTime startTime = getRandomStartTime();
+                    LocalDateTime endTime = getRandomEndTime(startTime);
 
-                    AttendanceDTO attendance = new AttendanceDTO();
-                    attendance.setEmployeeId(teamMemberDTO.getId());
-                    attendance.setAttendanceDate(currentDate);
-                    attendance.setStartTime(startTime);
-                    attendance.setEndTime(endTime);
+                    TaskDTO taskDTO = new TaskDTO();
+                    taskDTO.setStartDateTime(startTime);
+                    taskDTO.setEndDateTime(endTime);
                     // 출근부에 기록 추가
-                    attendanceService.save(attendance);
+//                    taskEmpService.save(taskDTO);
+                    taskService.save(taskDTO);
                 }
             }
         }
     }
 
-    // 랜덤한 출근 시간 생성 (8시 ~ 10시 사이)
-    private LocalTime getRandomStartTime() {
+    // 랜덤한 출근 시간 생성 (오늘 날짜, 8시 ~ 10시 사이)
+    private LocalDateTime getRandomStartTime() {
         Random random = new Random();
+        LocalDate today = LocalDate.now();
         int hour = 8 + random.nextInt(3);  // 8, 9, 10시 중 하나
         int minute = random.nextInt(60);   // 0 ~ 59분 중 하나
-        return LocalTime.of(hour, minute);
+        return LocalDateTime.of(today, LocalTime.of(hour, minute));
     }
 
-    // 랜덤한 퇴근 시간 생성 (출근 후 최소 8시간 이후 퇴근)
-    private LocalTime getRandomEndTime(LocalTime startTime) {
+    // 랜덤한 퇴근 시간 생성 (출근 날짜와 동일, 출근 후 최소 8시간 이후 퇴근)
+    private LocalDateTime getRandomEndTime(LocalDateTime startTime) {
         Random random = new Random();
-        int hour = startTime.getHour() + 8 + random.nextInt(2);  // 출근 시간에서 8~10시간 후 퇴근
-        int minute = random.nextInt(60);   // 0 ~ 59분 중 하나
-        return LocalTime.of(hour, minute);
+        // Add 8 to 9 hours (inclusive of 8, exclusive of 10 -> nextInt(2) gives 0 or 1) + random minutes
+        long hoursToAdd = 8 + random.nextInt(2);
+        long minutesToAdd = random.nextInt(60);
+        return startTime.plusHours(hoursToAdd).plusMinutes(minutesToAdd);
+    }
+
+    public void arrangeDefaultSchedules(Long teamId, int year, int month) {
+        List<TeamMemberDTO> teamMembers = teamService.getTeamMembers(teamId); 
     }
 }

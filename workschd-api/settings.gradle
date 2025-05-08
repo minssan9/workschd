@@ -1,4 +1,5 @@
 rootProject.name = 'workschd-api'
 include 'api-admin'
 include 'persist'
+include 'external'
 

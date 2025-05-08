@@ -1,6 +1,6 @@
 import {ScheduleConfig} from '@/interface/schedule'; 
 import {AxiosResponse} from 'axios';
-import request from '@/api/axios-voyagerss';
+import service from '@/api/axios-voyagerss';
 import { PageDTO, PageResponseDTO, DEFAULT_PAGE_DTO, parseSortParam } from '@/api/modules/api-common';
 
 // Team related interfaces
@@ -54,16 +54,16 @@ export type { PageDTO, PageResponseDTO };
 const apiTeam = {
   // TeamApproveDialog APIs
   approveRequest: (teamId: number, joinRequest: TeamDTO): Promise<AxiosResponse> => {
-    return request.post(`/team/${teamId}/approve`, joinRequest);
+    return service.post(`/team/${teamId}/approve`, joinRequest);
   },
 
   // TeamRegistrationDialog APIs
   registerTeam: (teamData: TeamDTO): Promise<AxiosResponse<TeamDTO>> => {
-    return request.post('/team', teamData);
+    return service.post('/team', teamData);
   },
 
   generateInviteLink: (teamData: { teamName: string; region: string }): Promise<AxiosResponse> => {
-    return request.post('/team/generate-invite', teamData);
+    return service.post('/team/generate-invite', teamData);
   },
 
   getTeamMembers: (teamId: number, params: TeamMemberParams = {
@@ -71,7 +71,7 @@ const apiTeam = {
     size: DEFAULT_PAGE_DTO.size,
     sort: DEFAULT_PAGE_DTO.sort
   }): Promise<AxiosResponse<PageResponseDTO<TeamDTO>>> => {
-    return request.get(`/team/${teamId}/members`, { params });
+    return service.get(`/team/${teamId}/members`, { params });
   },
 
   // TeamManage APIs
@@ -92,21 +92,21 @@ const apiTeam = {
     if (params.region) queryParams['region'] = params.region;
     if (params.scheduleType) queryParams['scheduleType'] = params.scheduleType;
     
-    return request.get('/team', { params: queryParams });
+    return service.get('/team', { params: queryParams });
   },
 
   // TeamJoin APIs
   joinTeamByInvitation: (invitationHash: string, accountId: string): Promise<AxiosResponse<TeamDTO>> => {
-    return request.get(`/team/join/${invitationHash}`, { accountId });
+    return service.get(`/team/join/${invitationHash}`, { accountId });
   },
 
   // TeamScheduleConfig APIs
   saveScheduleConfig: (config: ScheduleConfig): Promise<AxiosResponse> => {
-    return request.post('/schedule-config', config);
+    return service.post('/schedule-config', config);
   },
  
   approveJoinRequest: (teamId: number, requestId: number): Promise<AxiosResponse<any>> => {
-    return request.post(`/team/${teamId}/approve/${requestId}`);
+    return service.post(`/team/${teamId}/approve/${requestId}`);
   }
 };
 

@@ -1,23 +1,23 @@
-import request from "@/api/axios-voyagerss.js";
+import service from "@/api/axios-voyagerss.js";
  
 const baesURL = `account` 
 const apiAccount = {
   getUser () {
-    return request.get(`${baesURL}`)
+    return service.get(`${baesURL}`)
   },
   getUserById (acconutId) {
-    return request.get(`${baesURL}/${acconutId}`)
+    return service.get(`${baesURL}/${acconutId}`)
   },
   putUser(account) {
-    return request.put(`${baesURL}`, account)
+    return service.put(`${baesURL}`, account)
   },
   putUserById(account) {
-    return request.put(`${baesURL}/${account.accountId}`, account)
+    return service.put(`${baesURL}/${account.accountId}`, account)
   },
 
   
   getTeamsByAccountId(accountId) {
-    return request.get(`${baesURL}/${accountId}/team`)
+    return service.get(`${baesURL}/${accountId}/team`)
   },
 
   getSocialLoginUrl (socialType) {
@@ -27,25 +27,25 @@ const apiAccount = {
     return `${import.meta.env.VITE_API_URL}/oauth2/auth-url/${socialType}`
   },
   saveAccountSns (providerType, oauth2Info) {
-    return request.post(`/oauth2/save/${providerType}`, oauth2Info)
+    return service.post(`/oauth2/save/${providerType}`, oauth2Info)
   },
 
   saveAccountInfo(account) {
-    return request.post(`${baesURL}/info`, account)
+    return service.post(`${baesURL}/info`, account)
   },
   getAccountInfo(accountId) {
-    return request.get(`${baesURL}/${accountId}/info`)
+    return service.get(`${baesURL}/${accountId}/info`)
   },
 
   saveProfileImg(accountId, profileImage) {
-    return request.postFile(`${baesURL}/${accountId}/image`, profileImage)
+    return service.postFile(`${baesURL}/${accountId}/image`, profileImage)
   },
 
 
   
 
   login(data) {
-    return request({
+    return service({
       url: '/auth/login',
       method: 'post',
       data: {
@@ -56,7 +56,7 @@ const apiAccount = {
   },
 
   signup(data) {
-    return request({
+    return service({
       url: '/auth/signup',
       method: 'post',
       data: {

@@ -43,6 +43,18 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    /**
+     * Save multiple tasks at once
+     * @param taskDTOs List of task DTOs to save
+     * @return List of saved Task entities
+     */
+    @Transactional
+    public List<Task> saveMultiple(List<TaskDTO> taskDTOs) {
+        return taskDTOs.stream()
+                .map(this::save)
+                .collect(Collectors.toList());
+    }
+
     public void delete(Long id) {
         taskRepository.deleteById(id);
     }

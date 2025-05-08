@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 public class AccountRoleDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-    private Long accountId;
+    private Integer accountId;
 
     private Integer accountRoleId;
 
@@ -21,5 +21,9 @@ public class AccountRoleDTO implements Serializable {
     private String roleType;
 
     public AccountRoleDTO(AccountRole original) {
+        this.accountId = original.getAccount().getAccountId();
+        this.accountRoleId = original.getAccountRoleId();
+        this.createdAt = original.getCreatedAt();
+        this.roleType = original.getRoleType().name();
     }
 }

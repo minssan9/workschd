@@ -1,4 +1,4 @@
-package com.voyagerss.api.service;
+package com.voyagerss.service;
 
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;

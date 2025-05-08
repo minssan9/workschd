@@ -12,14 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -76,26 +73,34 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                         jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
                         /// 컨텍스트에 넣기
                         accessToken = newAccessToken;
+                    } else {
+                        throw new ExpiredJwtException(null, null, "Refresh token is invalid");
                     }
                 }
             } catch (SecurityException e) {
                 log.info("Invalid JWT signature.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             } catch (MalformedJwtException e) {
                 log.info("Invalid JWT token.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             } catch (ExpiredJwtException e) {
                 log.info("Expired JWT token.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             } catch (UnsupportedJwtException e) {
                 log.info("Unsupported JWT token.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             } catch (IllegalArgumentException e) {
                 log.info("JWT token compact of handler are invalid.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             } catch (Exception e) {
                 log.error("Error processing JWT token", e);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
         }
         filterChain.doFilter(request, response);
