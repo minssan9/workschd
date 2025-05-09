@@ -1,5 +1,24 @@
 import { AxiosResponse } from 'axios';
-import request from '../axios-voyagerss';
+import request from "@/api/axios-voyagerss.js";
+import { AttendanceRecord } from '@/api/modules/api-task'
+import { PageResponseDTO } from '@/api/modules/api-common'
+
+
+ 
+export interface AttendanceForm {
+  actualStartTime: string
+  actualEndTime: string
+  calculatedDailyWage: number
+}
+
+export interface AttendanceRecord {
+  id: number
+  employeeName: string
+  actualStartTime: string
+  actualEndTime: string
+  calculatedDailyWage: number
+  status: string
+}
 
 export interface AttendanceDTO {
   id?: number;
@@ -15,28 +34,33 @@ export interface AttendanceDTO {
   actualEndTime?: string;
 }
 
+interface CreateAttendanceParams {
+  branchId: number
+  taskId: number
+  actualStartTime: string
+  actualEndTime: string
+  calculatedDailyWage: number
+  employeeId: string | number
+  attendanceDate: string
+  dayOfWeek: string
+  startTime: string
+  endTime: string
+}
+
+const create = (params: CreateAttendanceParams): Promise<AxiosResponse<AttendanceRecord>> => {
+  return request.post('/attendance', params)
+}
+
+const getAttendanceByTaskId = (taskId: number): Promise<AxiosResponse<PageResponseDTO<AttendanceRecord>>> => {
+  return request.get(`/attendance/task/${taskId}`)
+}
+
+const update = (id: number, params: Partial<CreateAttendanceParams>): Promise<AxiosResponse<AttendanceRecord>> => {
+  return request.put(`/attendance/${id}`, params)
+}
+
 export default {
-  create(data: AttendanceDTO): Promise<AxiosResponse> {
-    return request.post('/api/attendance', data);
-  },
-
-  update(id: number, data: AttendanceDTO): Promise<AxiosResponse> {
-    return request.put(`/api/attendance/${id}`, data);
-  },
-
-  delete(id: number): Promise<AxiosResponse> {
-    return request.delete(`/api/attendance/${id}`);
-  },
-
-  getById(id: number): Promise<AxiosResponse> {
-    return request.get(`/api/attendance/${id}`);
-  },
-
-  getByEmployeeId(employeeId: number): Promise<AxiosResponse> {
-    return request.get(`/api/attendance/employee/${employeeId}`);
-  },
-
-  getByDateRange(startDate: string, endDate: string): Promise<AxiosResponse> {
-    return request.get(`/api/attendance/range?start=${startDate}&end=${endDate}`);
-  }
+  create,
+  getAttendanceByTaskId,
+  update
 }; 

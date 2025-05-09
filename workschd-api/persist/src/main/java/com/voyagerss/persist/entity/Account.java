@@ -1,6 +1,7 @@
 package com.voyagerss.persist.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +12,9 @@ import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -40,32 +43,42 @@ public class Account extends BaseEntity implements Serializable {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EnumMaster.AccountStatus status;
+
     @Column(name = "access_token")
     private String accessToken;
 
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "profile_image_url", nullable = false)
+    @Column(name = "profile_image_url")
     private String profileImageUrl;
 
     @Column(name = "profile_video_url")
-    private String profileVideoUrl; 
-
-    @OneToMany(mappedBy = "account")
-    private List<TeamMember> teamMembers;
+    private String profileVideoUrl;  
 
     @JsonManagedReference
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-    private List<AccountRole> accountRoles;
+    private List<AccountRole> accountRoles = new ArrayList<>();
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "account" ,cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<AccountSns> accountSnsList;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountSns> accountSnsList = new ArrayList<>();
 
     @JsonManagedReference
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private AccountInfo accountInfo;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountWorkHour> accountWorkHours = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AccountWorkOffDates> accountWorkOffDates = new ArrayList<>();
+
 
 
     public Account(AccountDTO accountDto) {
@@ -102,4 +115,5 @@ public class Account extends BaseEntity implements Serializable {
         BeanUtils.copyProperties(this, bean);
         return bean;
     }
+
 }

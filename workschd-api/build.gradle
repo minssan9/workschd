@@ -57,7 +57,8 @@ allprojects {
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
         implementation 'org.springframework.boot:spring-boot-starter-validation'
-        implementation 'org.springframework.boot:spring-boot-starter-security'
+        // Add WebFlux dependency
+        implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 // QueryDSL dependencies
         implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

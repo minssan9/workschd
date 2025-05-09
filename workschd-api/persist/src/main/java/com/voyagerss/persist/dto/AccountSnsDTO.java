@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 public class AccountSnsDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-    private Integer accountId;
+    private Long accountId;
 
     private Integer accountSnsId;
 

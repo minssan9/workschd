@@ -1,7 +1,7 @@
 package com.voyagerss.api.config;
 
 import com.voyagerss.api.component.Interceptor.LogInterceptor;
-import com.voyagerss.api.component.properties.AppProperties;
+import com.voyagerss.api.component.properties.AuthProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,9 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 @RequiredArgsConstructor
 class WebMvcConfig implements WebMvcConfigurer {
     private final LogInterceptor logInterceptor;
-    private final AppProperties appProperties;
+    private final AuthProperties authProperties;
+
+ 
 
     @Profile("release")
     @Override
@@ -31,8 +33,10 @@ class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(appProperties.getCors().getAllowedOrigins().split(","))
-                .allowedMethods(appProperties.getCors().getAllowedMethods().split(","));
+                .allowedOrigins(authProperties.getCors().getAllowedOrigins().split(","))
+                .allowedMethods(authProperties.getCors().getAllowedMethods().split(","))
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 
     @Bean

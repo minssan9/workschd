@@ -5,54 +5,86 @@
     :breakpoint="700" 
     bordered
     @update:model-value="layoutStore.setLeftDrawer"
-  >
-    <div class="drawer-header">Left Menu</div>
+  > 
     <q-scroll-area class="drawer-side">
       <q-list>
-        <template v-for="route in filteredRoutes" :key="route.name">
-          <!-- Parent route with children -->
-          <template v-if="route.children">
-            <q-expansion-item
-              :label="route.name"
-              :default-opened="isRouteExpanded(route)"
+        <!-- Info Section -->
+        <!-- <q-item-label header>{{ t('menu.info', '정보') }}</q-item-label> -->
+        
+        <q-item to="/" exact clickable v-ripple>
+          <q-item-section avatar>
+            <q-icon name="home" />
+          </q-item-section>
+          <q-item-section>{{ t('menu.home', 'Home') }}</q-item-section>
+        </q-item>
+
+        <q-item to="/about" exact clickable v-ripple>
+          <q-item-section avatar>
+            <q-icon name="info" />
+          </q-item-section>
+          <q-item-section>{{ t('menu.about', 'Introduction') }}</q-item-section>
+        </q-item> 
+
+        <!-- Rest of the menu items -->
+        <template v-for="route in filteredRoutes">
+          <template v-if="!['home', 'about'].includes(route.name)">
+            <!-- Parent route with children -->
+            <template v-if="route.children">
+              <q-expansion-item
+                :key="route.name"
+                :label="formatRouteName(route.name)"
+                :default-opened="isRouteExpanded(route)"
+                :icon="route.meta?.icon || 'folder'"
+              >
+                <q-list>
+                  <q-item
+                    v-for="child in filterHiddenRoutes(route.children)"
+                    :key="child.name"
+                    :to="{ name: child.name }"
+                    clickable
+                    v-ripple
+                  >
+                    <q-item-section avatar>
+                      <q-icon :name="child.meta?.icon || 'label'" />
+                    </q-item-section>
+                    <q-item-section>{{ formatRouteName(child.name) }}</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-expansion-item>
+            </template>
+            
+            <!-- Routes without children -->
+            <q-item
+              v-else
+              :key="route.name"
+              :to="{ name: route.name }"
+              clickable
+              v-ripple
             >
-              <q-list>
-                <q-item
-                  v-for="child in filterHiddenRoutes(route.children)"
-                  :key="child.name"
-                  :to="{ name: child.name }"
-                  clickable
-                  v-ripple
-                >
-                  <q-item-section>{{ formatRouteName(child.name) }}</q-item-section>
-                </q-item>
-              </q-list>
-            </q-expansion-item>
+              <q-item-section avatar>
+                <q-icon :name="route.meta?.icon || 'label'" />
+              </q-item-section>
+              <q-item-section>{{ formatRouteName(route.name) }}</q-item-section>
+            </q-item>
           </template>
-          
-          <!-- Routes without children -->
-          <q-item
-            v-else
-            :to="{ name: route.name }"
-            clickable
-            v-ripple
-          >
-            <q-item-section>{{ formatRouteName(route.name) }}</q-item-section>
-          </q-item>
         </template>
       </q-list>
     </q-scroll-area>
-    <div class="drawer-footer">Left Drawer Footer</div>
+    <!-- <div class="drawer-footer">Left Drawer Footer</div> -->
   </q-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useLayoutStore } from '@/stores/modules/store_layout'
-import { storeToRefs } from 'pinia'
-import { useRoute, useRouter } from 'vue-router'
+import {computed, onMounted} from 'vue';
+import {useLayoutStore} from '@/stores/modules/store_layout'
+import {useUserStore} from '@/stores/modules/store_user'
+import {storeToRefs} from 'pinia'
+import {useRoute, useRouter} from 'vue-router'
+import {useI18n} from 'vue-i18n'
 
+const { t } = useI18n()
 const layoutStore = useLayoutStore()
+const userStore = useUserStore()
 const { drawerLeft } = storeToRefs(layoutStore)
 const route = useRoute()
 const router = useRouter()
@@ -62,9 +94,26 @@ const filteredRoutes = computed(() => {
   return filterHiddenRoutes(router.options.routes)
 })
 
-// Helper function to filter hidden routes
+// Updated helper function to filter hidden and role-based routes
 function filterHiddenRoutes(routes) {
-  return routes.filter(route => !route.hidden)
+  return routes.filter(route => {
+    // Filter out hidden routes
+    if (route.hidden) return false
+    
+    // // Check parent route roles
+    // if (route.meta?.roles && !route.meta.roles.includes(userStore.role)) return false
+    
+    // If route has children, check if at least one child is accessible
+    if (route.children) {
+      const accessibleChildren = route.children.filter(child => 
+        !child.hidden && 
+        (!child.meta?.roles || child.meta.roles.includes(userStore.role))
+      )
+      return accessibleChildren.length > 0
+    }
+    
+    return true
+  })
 }
 
 // Check if route should be expanded based on current route
@@ -92,5 +141,19 @@ onMounted(() => {
 
 .q-expansion-item :deep(.q-list) {
   padding-left: 2rem;
+}
+
+.drawer-header {
+  padding: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Add styling for section headers */
+.q-item-label.header {
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  letter-spacing: .1em;
+  color: rgba(0, 0, 0, 0.6);
 }
 </style> 

@@ -1,0 +1,21 @@
+GET https://dapi.kakao.com/v2/local/search/address.json?query=서울특별시 강남구 역삼동 737
+Authorization: KakaoAK 
+
+###
+GET https://dapi.kakao.com/v2/local/search/address.json?query=인천광역시 서구 완정로 199 (왕길동)
+Authorization: KakaoAK 
+
+###
+GET https://dapi.kakao.com/v2/local/search/address.json?query=%EC%9D%B8%EC%B2%9C%EA%B4%91%EC%97%AD%EC%8B%9C%20%EC%84%9C%EA%B5%AC%20%EC%99%84%EC%A0%95%EB%A1%9C%20199%20(%EC%99%95%EA%B8%B8%EB%8F%99)%0D
+Authorization: KakaoAK 
+
+
+###
+GET https://dapi.kakao.com/v2/local/search/address.json?query=인천광역시 강화군 강화읍 강화대로 312번길 11 (갑곳리)
+Authorization: KakaoAK 
+
+###
+GET https://dapi.kakao.com/v2/local/search/address.json?query=%EC%9D%B8%EC%B2%9C%EA%B4%91%EC%97%AD%EC%8B%9C%20%EC%84%9C%EA%B5%AC%20%EC%8B%AC%EA%B3%A1%EB%A1%9C%20100%EB%B2%88%EA%B8%B8%2025%20(%EC%8B%AC%EA%B3%A1%EB%8F%99)%0D
+Authorization: KakaoAK 
+###
+GET http://www.fta.or.kr/bbs/board.php?bo_table=sub03_01&sca=%EC%84%9C%EC%9A%B8&page=5

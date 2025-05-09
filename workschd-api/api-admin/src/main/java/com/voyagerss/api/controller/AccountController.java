@@ -52,13 +52,23 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity getUserByAuth(HttpServletRequest request) {
-        UserPrincipal userPrincipal;
         try {
-            userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } catch (ClassCastException e){
-            return new ResponseEntity<String>("token is " + request.getHeader("Authorization"), HttpStatus.UNAUTHORIZED);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+            
+            String userEmail;
+             if (principal instanceof String) {
+                // Handle JWT token case - extract user ID from token
+                String token = request.getHeader("Authorization").replace("Bearer ", "");
+                userEmail = tokenProvider.getUserEmail(token);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            
+            return ResponseEntity.ok(accountService.getAccountDtoByEmail(userEmail));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(accountService.getAccountDtoById(userPrincipal.getUserId()));
     }
 
     @GetMapping("/search")
@@ -114,57 +124,15 @@ public class AccountController {
         return ResponseEntity.ok( accountInfoService.getById(accountId));
     }
 
+    @GetMapping("/{accountId}/team")
+    public ResponseEntity getTeamByAccountId(@Valid @NotNull @PathVariable("accountId") Integer accountId) {
+        return ResponseEntity.ok(accountService.getTeamByAccountId(accountId));
+    }
+
     @PostMapping("/info")
     public ResponseEntity saveAccountInfoById(@RequestBody AccountInfoDTO vO) {
 //        throw new CommonException();
         return ResponseEntity.ok(accountInfoService.save(vO));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(),
-                    loginRequest.getPassword()
-                )
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            
-            // Get user details from AccountService
-            AccountDTO accountDTO = accountService.getAccountDtoByEmail(loginRequest.getUsername());
-            
-            // Create token using JwtTokenProvider
-            String token = tokenProvider.createAccessToken(
-                accountDTO.getAccountId(),
-                accountDTO.getEmail(),
-                accountDTO.getAccountRoles().stream().map(AccountRoleDTO::getRoleType).toList()
-            );
-
-            return ResponseEntity.ok(new AuthResponse(token));
-        } catch (AuthenticationException e) {
-            return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Invalid username or password"));
-        }
-    }
-}
-
-@Data
-class LoginRequest {
-    private String username;
-    private String password;
-}
-
-@Data
-@AllArgsConstructor
-class AuthResponse {
-    private String token;
-}
-
-@Data
-@AllArgsConstructor
-class ErrorResponse {
-    private String message;
 }

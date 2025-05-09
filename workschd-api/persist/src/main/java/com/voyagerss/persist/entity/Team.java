@@ -1,12 +1,12 @@
 package com.voyagerss.persist.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -33,8 +33,13 @@ public class Team extends BaseEntity implements Serializable {
 
     private LocalDateTime invitationCreatedAt;
 
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private LocalDateTime invitationExpireAt;
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TeamMember> teamMembers;
+    
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private List<Shop> shops;
 
     private String location;
 

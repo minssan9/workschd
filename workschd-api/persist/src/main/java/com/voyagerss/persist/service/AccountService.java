@@ -3,29 +3,30 @@ package com.voyagerss.persist.service;
 import com.voyagerss.persist.EnumMaster;
 import com.voyagerss.persist.dto.AccountDTO;
 import com.voyagerss.persist.dto.QueryDTO;
+import com.voyagerss.persist.dto.TeamDTO;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.entity.AccountRole;
 import com.voyagerss.persist.entity.AccountSns;
+import com.voyagerss.persist.entity.TeamMember;
 import com.voyagerss.persist.querydsl.AccountRepositorySupport;
-import com.voyagerss.persist.repository.AccountInfoRepository;
-import com.voyagerss.persist.repository.AccountRepository;
-import com.voyagerss.persist.repository.AccountRoleRepository;
-import com.voyagerss.persist.repository.AccountSnsRepository;
+import com.voyagerss.persist.repository.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.voyagerss.persist.EnumMaster.RoleType.TEACHER;
+import static com.voyagerss.persist.EnumMaster.RoleType.SCHEDULER;
+import static com.voyagerss.persist.EnumMaster.RoleType.WORKER;
+
 
 
 @Service
@@ -38,40 +39,29 @@ public class AccountService {
     private final AccountInfoRepository accountInfoRepository;
     private final AccountRepositorySupport accountRepositorySupport;
 
+    private final TeamService teamService;
+    private final TeamMemberRepository teamMemberRepository;
+
     public Account signin(AccountDTO vO) {
         Account account = new Account(vO);
         return accountRepository.save(account);
     }
 
+    @Transactional
     public Account save(AccountDTO accountDTO) {
-        boolean isNew = false;
-        Account account = accountRepository.findByEmail(accountDTO.getEmail())
-                .orElseGet(() -> new Account(accountDTO));
-        if(account.getAccountId() == null) isNew = true;
-        accountRepository.saveAndFlush(account);
+        // Create new Account entity from DTO
+        Account account = new Account();
+        account.setEmail(accountDTO.getEmail());
+        account.setPassword(accountDTO.getPassword()); // Encrypt password
+        account.setUsername(accountDTO.getUsername());
+        account.setStatus(EnumMaster.AccountStatus.ACTIVE); // Set default status as ACTIVE
+        account.setCreatedAt(LocalDateTime.now());
 
-        if (isNew){
-            AccountRole accountRole = new AccountRole(EnumMaster.RoleType.STUDENT, account);
-            accountRoleRepository.saveAndFlush(accountRole);
+        // Save and return the new account
+        accountRepository.save(account);
 
-            AccountSns accountSns = new AccountSns(
-                    accountDTO.getUsername(),
-                    accountDTO.getPhone(),
-                    accountDTO.getEmail(),
-                    "Y",
-                    accountDTO.getProfileImageUrl(),
-                    accountDTO.getProviderType(),
-                    "",
-                    "",
-                    account);
-            accountSnsRepository.saveAndFlush(accountSns);
-
-            HashMap<String, String> kakaoVariables = new HashMap<>();
-            kakaoVariables.put("#{username}",       account.getUsername());
-
-            account.setAccountRoles(List.of(accountRole));
-            account.setAccountSnsList(List.of(accountSns));
-        }
+        accountDTO.setRoleType(WORKER);
+        addRoleByAccountId(account.getAccountId(), accountDTO);
         return account;
     }
 
@@ -108,7 +98,7 @@ public class AccountService {
             accountRoleRepository.save(accountRole);
             account.getAccountRoles().add(accountRole);
 
-            if(vO.getRoleType().equals(TEACHER)) {
+            if(vO.getRoleType().equals(SCHEDULER)) {
 //                deleteRoleByAccountRoleId(accountId, EN9DOOR_STUDENT);
 //                MessageDTO messageDTO = MessageDTO.builder()
 //                        .templateCode(TEACHER_WELCOME)
@@ -176,4 +166,17 @@ public class AccountService {
         return toDTO(account);
     }
 
+    public boolean existsByEmail(String email) {
+        return accountRepository.existsByEmail(email);
+    }
+
+  public List<TeamDTO> getTeamByAccountId(@Valid @NotNull Integer accountId) {
+        Account account = requireOne(accountId);
+        List<TeamMember> teamMembers = teamMemberRepository.findByAccount_AccountId(accountId);
+
+        List<TeamDTO> teamDTOList = teamMembers.stream()
+                .map(teamMember -> new TeamDTO(teamMember.getTeam()))
+                .collect(Collectors.toList());
+        return teamDTOList;
+    }
 }

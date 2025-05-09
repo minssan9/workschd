@@ -12,11 +12,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -91,7 +94,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 log.info("JWT token compact of handler are invalid.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error processing JWT token", e);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
         }
         filterChain.doFilter(request, response);
@@ -112,8 +116,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     public void setAuthentication(String token) {
         // 토큰으로부터 유저 정보를 받아옵니다.
         Authentication authentication = jwtTokenProvider.getAuthentication(token);
-        // SecurityContext 에 Authentication 객체를 저장합니다.
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (authentication != null) {
+            // SecurityContext 에 Authentication 객체를 저장합니다.
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
     }
-
 }

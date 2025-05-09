@@ -11,7 +11,5 @@ import java.util.Optional;
 @Repository
 public interface AccountInfoRepository extends JpaRepository<AccountInfo, Long>, JpaSpecificationExecutor<AccountInfo> {
 
-    List<AccountInfo> getEmployeesByBranchId(Long branchId);
-
     Optional<AccountInfo> findByAccount_AccountId(Integer id);
 }

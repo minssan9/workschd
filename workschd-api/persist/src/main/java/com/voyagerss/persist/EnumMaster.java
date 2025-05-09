@@ -13,8 +13,8 @@ public class EnumMaster {
     @Getter
     @RequiredArgsConstructor
     public enum RoleType {
-        STUDENT("STUDENT", "학생"),
-        TEACHER("TEACHER", "선생님"),
+        WORKER("WORKER", "근로자"),
+        SCHEDULER("SCHEDULER", "스케쥴러"),
         MANAGER("MANAGER", "관리자"),
         OWNER("OWNER", "소유자");
 
@@ -25,9 +25,10 @@ public class EnumMaster {
             return Arrays.stream(RoleType.values())
                     .filter(r -> r.getCode().equals(code))
                     .findAny()
-                    .orElse(STUDENT);
+                    .orElse(WORKER);
         }
     }
+
 
     @RequiredArgsConstructor
     @Getter
@@ -58,16 +59,71 @@ public class EnumMaster {
 
     @Getter
     @AllArgsConstructor
-    public enum EmployeeStatus {
+    public enum AccountStatus {
         ACTIVE("ACTIVE", "진행 중"),
         INACTIVE("INACTIVE", "비활성"),
-        NOT_PAID("NOT_PAID", "미결제"),
-        END("END", "종료"),
         STOP("STOP", "중단"),
         PAUSE("PAUSE", "일시중지");
 
         private String employeeStatus;
         private String employeeStatusDescription;
+    }
+
+    /**
+     * Task status enum representing different states of a task
+     */
+    @Getter
+    @RequiredArgsConstructor
+    public enum TaskStatus {
+        SCHEDULED("SCHEDULED", "예정됨", "blue"),
+        IN_PROGRESS("IN_PROGRESS", "진행중", "green"),
+        COMPLETED("COMPLETED", "완료됨", "purple"),
+        CANCELLED("CANCELLED", "취소됨", "grey");
+
+        private final String code;
+        private final String displayName;
+        private final String color;
+
+        /**
+         * Find a TaskStatus by its code
+         * @param code The status code to look for
+         * @return The matching TaskStatus or SCHEDULED if not found
+         */
+        public static TaskStatus of(String code) {
+            return Arrays.stream(TaskStatus.values())
+                    .filter(s -> s.getCode().equals(code))
+                    .findAny()
+                    .orElse(SCHEDULED);
+        }
+    }
+
+    /**
+     * Task employee status enum for managing task assignments
+     */
+    @Getter
+    @RequiredArgsConstructor
+    public enum TaskEmployeeStatus {
+        PENDING("PENDING", "대기중", "orange"),
+        APPROVED("APPROVED", "승인됨", "green"),
+        REJECTED("REJECTED", "거부됨", "red"),
+        ACTIVE("ACTIVE", "활성", "blue"),
+        INACTIVE("INACTIVE", "비활성", "grey");
+
+        private final String code;
+        private final String displayName;
+        private final String color;
+
+        /**
+         * Find a TaskEmployeeStatus by its code
+         * @param code The status code to look for
+         * @return The matching TaskEmployeeStatus or PENDING if not found
+         */
+        public static TaskEmployeeStatus of(String code) {
+            return Arrays.stream(TaskEmployeeStatus.values())
+                    .filter(s -> s.getCode().equals(code))
+                    .findAny()
+                    .orElse(PENDING);
+        }
     }
 
     @Getter
@@ -107,11 +163,7 @@ public class EnumMaster {
         WORKER_CLASS_PAUSE,
         WORKER_ATTEND_CHANGE
     }
-
-    public enum BoardStatus {
-        ACTIVE,
-        INACTIVE
-    }
+ 
 
 
 }

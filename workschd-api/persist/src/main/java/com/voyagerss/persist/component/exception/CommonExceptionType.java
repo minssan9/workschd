@@ -26,6 +26,8 @@ public enum CommonExceptionType {
     INVALID_ACCESS_TOKEN("3000","Invalid access token."),
     INVALID_REFRESH_TOKEN("3000","Invalid refresh token."),
     NOT_EXPIRED_TOKEN_YET("3000","Not expired token yet."),
+    INVALID_CREDENTIALS("3000", "Invalid Credentials" ),
+
 
 
     // database
@@ -33,10 +35,7 @@ public enum CommonExceptionType {
     // business
     NOTEXIST_ITEM("4100", "Cannot found Item"),
     NOTEXIST_ITEM_TEMPLATE("4100", "Cannot found Item template"),
-
-
-    // HOMS
-    REGEX_ERROR("9999", "REGEX_ERROR");
+    EMAIL_ALREADY_EXISTS("403", "Email Already Exist." );
 
     private final String code;
     private final String message;

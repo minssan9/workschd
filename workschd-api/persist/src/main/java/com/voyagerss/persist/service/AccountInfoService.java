@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -24,7 +25,6 @@ public class AccountInfoService {
     public AccountInfoDTO save(AccountInfoDTO vO) {
         AccountInfo accountInfo = requireOne(vO.getAccountId())
                 .orElse(new AccountInfo());
-        accountInfo.setAccountInfo(vO);
 
         Account account = accountRepository.getById(vO.getAccountId());
         accountInfo.setAccount(account);
@@ -58,4 +58,5 @@ public class AccountInfoService {
     public Optional<AccountInfo> requireOne(Integer id) {
         return accountInfoRepository.findByAccount_AccountId(id);
     }
+
 }

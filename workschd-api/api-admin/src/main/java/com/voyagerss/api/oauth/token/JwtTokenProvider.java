@@ -1,6 +1,6 @@
 package com.voyagerss.api.oauth.token;
 
-import com.voyagerss.api.component.properties.AppProperties;
+import com.voyagerss.api.component.properties.AuthProperties;
 import com.voyagerss.api.oauth.entity.UserPrincipal;
 import com.voyagerss.api.oauth.service.CustomUserDetailsService;
 import com.voyagerss.persist.repository.AccountRepository;
@@ -16,12 +16,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,7 +40,7 @@ public class JwtTokenProvider {
     private final static String HEADER_REFRESH_TOKEN = "refreshToken";
     private final static String TOKEN_PREFIX = "Bearer ";
 
-    private final AppProperties appProperties;
+    private final AuthProperties authProperties;
     private final CustomUserDetailsService customUserDetailsService;
     private final AccountRepository accountRepository;
 
@@ -46,8 +49,8 @@ public class JwtTokenProvider {
     @PostConstruct
     protected void init() {
         secretKey = Keys.hmacShaKeyFor(secret.getBytes());
-        accessTokenValidTime = appProperties.getAuth().getTokenExpiry() * 60 * 1000L ;
-        refreshTokenValidTime = appProperties.getAuth().getRefreshTokenExpiry() * 60 * 1000L ;
+        accessTokenValidTime = authProperties.getAuth().getTokenExpiry() * 60 * 1000L;
+        refreshTokenValidTime = authProperties.getAuth().getRefreshTokenExpiry() * 60 * 1000L;
     }
 
     // Access Token 생성.
@@ -71,7 +74,6 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(email)
                 .setClaims(claims) // 발행 유저 정보 저장
-//                .setIssuedAt(date) // 발행 시간 저장
                 .signWith(secretKey, SignatureAlgorithm.HS256)  // 해싱 알고리즘 및 키 설정
                 .setExpiration(new Date(date.getTime() + tokenValid))  // 토큰 유효 시간 저장
                 .compact();
@@ -83,7 +85,6 @@ public class JwtTokenProvider {
         UserPrincipal.create(getUserId(token), getRoles(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
-
 
     // 토큰에서 회원 정보 추출
     public Integer getUserId(String token) {
@@ -125,51 +126,40 @@ public class JwtTokenProvider {
         return null;
     }
 
-
     // Request의 Header에서 RefreshToken 값을 가져옵니다. "authorization" : "token'
     public String resolveRefreshToken(HttpServletRequest request) {
         String headerValue = request.getHeader(HEADER_REFRESH_TOKEN);
-
         if (headerValue == null) return null;
         return headerValue;
     }
 
     // 토큰의 유효성 + 만료일자 확인
-    public boolean validateToken(String token)   {
-        Claims claims = null;
-        claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.getExpiration().after(new Date());
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getExpiration().after(new Date());
+        } catch (Exception e) {
+            log.error("Error validating token", e);
+            return false;
+        }
     }
 
     // 어세스 토큰 헤더 설정
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
-        response.setHeader("authorization", "bearer "+ accessToken);
+        response.setHeader("authorization", "bearer " + accessToken);
     }
 
     // 리프레시 토큰 헤더 설정
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
-        response.setHeader("refreshToken", "bearer "+ refreshToken);
+        response.setHeader("refreshToken", "bearer " + refreshToken);
     }
 
     // RefreshToken 존재유무 확인
     public boolean existsRefreshToken(String refreshToken) {
         return accountRepository.existsByRefreshToken(refreshToken);
     }
-
-
-
-
-//    // Email로 권한 정보 가져오기
-//    public List<String> getRoles(String email) {
-//        List<String> roleList = accountRoleRepository.findByAccount_Email(email)
-//                .stream()
-//                .map(accountRole -> accountRole.getRoleType().getCode())
-//                .collect(Collectors.toList());
-//        return roleList;
-//    }
 }

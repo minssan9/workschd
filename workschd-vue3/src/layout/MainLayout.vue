@@ -14,11 +14,12 @@
       <MainHeader />
       <LeftDrawer />
       <RightDrawer />
-      <q-page-container>
+      <q-page-container style="padding-bottom: 10px;">
         <q-page padding>
           <slot></slot>
         </q-page>
       </q-page-container>
+      <Footer />
     </q-layout>
   </div>
 </template>
@@ -28,14 +29,21 @@ import { ref, onMounted } from 'vue'
 import MainHeader from './components/MainHeader.vue'
 import LeftDrawer from './components/LeftDrawer.vue'
 import RightDrawer from './components/RightDrawer.vue'
+import Footer from './components/Footer.vue'
 import { useLayoutStore } from '@/stores/modules/store_layout'
+import { useUserStore } from '@/stores/modules/store_user'
 import * as ChannelService from '@channel.io/channel-web-sdk-loader'
-
+import Cookies from 'js-cookie'
 const layoutStore = useLayoutStore()
+const userStore = useUserStore()
 const notifications = ref([])
 
 onMounted(() => {
   layoutStore.resetDrawers()
+  if (Cookies.get('accessToken')) {
+    userStore.fetchUser()
+  }
+  
   ChannelService.loadScript()
   ChannelService.boot({
     "pluginKey": import.meta.env.VITE_CHANNEL_TALK_PLUGIN_KEY
@@ -44,9 +52,9 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-@import "@/scss/layout.scss";
+@import "@/assets/styles/index.scss";
 
 .drawer-side {
-  height: calc(100vh - 170px);
+  height: calc(100vh - 200px);
 }
 </style>

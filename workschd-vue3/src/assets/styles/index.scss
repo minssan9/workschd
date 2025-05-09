@@ -1,0 +1,12 @@
+// Import variables first
+@import './variables.scss';
+
+// Import all other SCSS files
+@import './base.scss';
+@import './main.scss';
+@import './global.scss';
+@import './grid-default.scss';
+@import './layout.scss';
+@import './dialog.scss';
+
+// Add any additional global styles here 

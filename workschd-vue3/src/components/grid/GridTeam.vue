@@ -114,13 +114,13 @@ function update() {
 }
 function onCellClicked(params) {
   // 셀 클릭 이벤트
-  console.log('cell click : ', params)
+  console.log('cell click : ', params)D
   emits('onCellClicked', params)
 }
 function clearSelectedNode() {
   // 범위 지정된(선택된) 셀 clear
-  gridApi.value?.clearRangeSelection()
-  gridApi.value?.clearFocusedCell()
+  // gridApi.value?.clearRangeSelection()
+  // gridApi.value?.clearFocusedCell()
 }
 function onAddRow() {
   // row추가

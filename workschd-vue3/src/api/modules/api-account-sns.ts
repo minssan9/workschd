@@ -1,12 +1,11 @@
 import { AxiosResponse } from 'axios';
-import request from '../axios-voyagerss';
-import { EnumMaster } from '@/types/enums';
+import request from '@/api/axios-voyagerss';
 
 export interface AccountSnsDTO {
   accountSnsId?: number;
   userId: string;
   snsEmail?: string;
-  providerType: EnumMaster.ProviderType;
+  providerType: string;
   snsPhone?: string;
   expired?: Date;
   emailVerifiedYn: string;
@@ -19,22 +18,22 @@ export interface AccountSnsDTO {
 
 export default {
   create(data: AccountSnsDTO): Promise<AxiosResponse> {
-    return request.post('/api/account-sns', data);
+    return request.post('/account-sns', data);
   },
 
   update(id: number, data: AccountSnsDTO): Promise<AxiosResponse> {
-    return request.put(`/api/account-sns/${id}`, data);
+    return request.put(`/account-sns/${id}`, data);
   },
 
   delete(id: number): Promise<AxiosResponse> {
-    return request.delete(`/api/account-sns/${id}`);
+    return request.delete(`/account-sns/${id}`);
   },
 
   getById(id: number): Promise<AxiosResponse> {
-    return request.get(`/api/account-sns/${id}`);
+    return request.get(`/account-sns/${id}`);
   },
 
   getByAccountId(accountId: number): Promise<AxiosResponse> {
-    return request.get(`/api/account-sns/account/${accountId}`);
+    return request.get(`/account-sns/account/${accountId}`);
   }
 }; 
