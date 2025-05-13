@@ -119,8 +119,6 @@ public class AccountService {
         }
         return account;
     }
-
-
     public AccountDTO deleteRoleByAccountRole(Integer accountId, EnumMaster.RoleType roleType ) {
         AccountRole accountRole = accountRoleRepository.findByAccount_AccountIdAndRoleType(accountId, roleType);
         accountRoleRepository.deleteByAccountRoleId(accountRole.getAccountRoleId());
@@ -128,15 +126,9 @@ public class AccountService {
         return getAccountDtoById(accountId);
     }
 
-
     public AccountDTO getAccountDtoById(Integer id) {
         Account original = requireOne(id);
         return toDTO(original);
-    }
-
-    public Account getAccountById(Integer id) {
-        return requireOne(id);
-
     }
 
     private AccountDTO toDTO(Account original) {

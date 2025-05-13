@@ -5,9 +5,9 @@ import { LoadingService } from '@/utils/loading'
 // Whitelist routes that don't require authentication
 const whiteList = [
   '/',
-  '/auth/login',
-  '/auth/signup',
-  '/auth/redirect',
+  '/login',
+  '/signup',
+  '/redirect',
   '/about',
   '/subscription',
   '/privacy-policy',

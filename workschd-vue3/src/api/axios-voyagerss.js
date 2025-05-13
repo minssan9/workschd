@@ -2,9 +2,10 @@ import { useUserStore } from '@/stores/modules/store_user'
 import axios from 'axios'
 import router from "@/router"
 import Cookies from 'js-cookie'
+import { Notify } from 'quasar'
 
 // create an axios instance
-const request = axios.create({
+const service = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
@@ -15,7 +16,7 @@ const request = axios.create({
 })
 
 // request interceptor
-request.interceptors.request.use(
+service.interceptors.request.use(
   config => {
     const userStore = useUserStore()
     let token = userStore.accessToken ?? Cookies.get('accessToken')
@@ -32,16 +33,19 @@ request.interceptors.request.use(
     }
     return config
   },
-  error => { 
+  error => {  
     return Promise.reject(error)
   }
 )
 
 // response interceptor
-request.interceptors.response.use(
+service.interceptors.response.use(
   response => {
-    if (response.headers.rtntoken) {
-      window.sessionStorage.setItem('$accessToken', response.headers.rtntoken)
+    const userStore = useUserStore()
+    if (response.headers.authorization) {
+      window.sessionStorage.setItem('$accessToken', response.headers.authorization)
+      Cookies.set('accessToken', response.headers.authorization)
+      userStore.setAccessToken(response.headers.authorization)
     }
 
     if (response.status < 200 || response.status >= 300) { 
@@ -51,6 +55,7 @@ request.interceptors.response.use(
     }
   },
   error => { 
+    errLogic(error)
     return Promise.reject(error)
   }
 )
@@ -63,7 +68,7 @@ const MethodNotAllowed = 405
 const ServerError = 500
 
 export const requestFile = (method, url, data) => {
-  return request({
+  return service({
       method,
       url: url,
       data,
@@ -72,13 +77,20 @@ export const requestFile = (method, url, data) => {
     })
     .then(result => result)
     .catch(err => errLogic(err))
-    .catch(err => this.$dialog.notify.error(err.message, {position: 'top-right', timeout: 1500}))
+    .catch(err => {
+      Notify.create({
+        type: 'negative',
+        message: err.message,
+        position: 'top-right',
+        timeout: 1500
+      })
+    })
 }
 
 function errLogic(err) {
   const userStore = useUserStore()
   
-  if (err.response.status === Unauthorized) {
+  if (err.response && err.response.status === Unauthorized) {
     userStore.logout()
       .catch(() => apiError.onUnauthorized(err))
       .finally(() => {
@@ -86,12 +98,17 @@ function errLogic(err) {
         router.go()
       })
   }
-  else if (err.response.status === Forbidden || err.response.status === MethodNotAllowed) return apiError.onForbidden(err)
-  else if (err.response.status === BadRequest) return apiError.onBadRequest(err)
-  else if (err.response.status === NotFound) return apiError.onNotFound(err)
-  else if (err.response.status === ServerError) return apiError.onServerError(err)
+  else if (err.response && (err.response.status === Forbidden || err.response.status === MethodNotAllowed)) return apiError.onForbidden(err)
+  else if (err.response && err.response.status === BadRequest) return apiError.onBadRequest(err)
+  else if (err.response && err.response.status === NotFound) return apiError.onNotFound(err)
+  else if (err.response && err.response.status === ServerError) return apiError.onServerError(err)
 
-  this.$dialog.notify.error(err.message, {position: 'top-right', timeout: 1500})
+  Notify.create({
+    type: 'negative',
+    message: err.message,
+    position: 'top-right',
+    timeout: 1500
+  })
   return Promise.reject(err)
 }
 
@@ -124,4 +141,4 @@ const apiError = {
   },
 }
 
-export default request  // Default export
+export default service  // Default export

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @Getter
 @Setter
-@Entity
+@Entity(name = "account_work_hour")
 public class AccountWorkHour extends BaseEntity {
 
     @Id

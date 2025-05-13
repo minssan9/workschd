@@ -2,7 +2,6 @@ package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.TaskEmployeeDTO;
 import com.voyagerss.persist.entity.Task;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -53,6 +52,23 @@ public class TaskController {
             return ResponseEntity.ok(createdTask);
         } catch (Exception e) {
             log.error("Error creating task: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Create multiple new tasks
+     */
+    @PostMapping("/tasks")
+    public ResponseEntity<List<TaskDTO>> saveMultiple(@Valid @RequestBody List<TaskDTO> taskDTOs) {
+        try {
+            log.info("Creating {} new tasks", taskDTOs.size());
+            List<Task> tasks = taskService.saveMultiple(taskDTOs);
+            List<TaskDTO> createdTasks = tasks.stream().map(taskService::toDTO).toList();
+
+            return ResponseEntity.ok(createdTasks);
+        } catch (Exception e) {
+            log.error("Error creating multiple tasks: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -1,4 +1,4 @@
-package com.voyagerss.api.service;
+package com.voyagerss.service;
 
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;

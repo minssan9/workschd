@@ -16,15 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -113,7 +110,7 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .get("roles");
+                .get("roles") ;
     }
 
     // Request의 Header에서 AccessToken 값을 가져옵니다. "authorization" : "token'
@@ -121,7 +118,7 @@ public class JwtTokenProvider {
         String headerValue = request.getHeader(HEADER_AUTHORIZATION);
         if (headerValue == null) return null;
         if (headerValue.startsWith(TOKEN_PREFIX)) {
-            return headerValue.substring(TOKEN_PREFIX.length());
+            return headerValue.substring(TOKEN_PREFIX.length()).trim();
         }
         return null;
     }
@@ -150,12 +147,12 @@ public class JwtTokenProvider {
 
     // 어세스 토큰 헤더 설정
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
-        response.setHeader("authorization", "bearer " + accessToken);
+        response.setHeader("Authorization", "Bearer " + accessToken);
     }
 
     // 리프레시 토큰 헤더 설정
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
-        response.setHeader("refreshToken", "bearer " + refreshToken);
+        response.setHeader("refreshToken", refreshToken);
     }
 
     // RefreshToken 존재유무 확인

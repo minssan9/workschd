@@ -132,7 +132,7 @@
               color="primary"
               class="q-px-sm"
               :label="t('login.signup.link', '회원가입')"
-              @click="router.push('/auth/signup')"
+              @click="router.push('/signup')"
             />
           </div>
 
@@ -161,7 +161,7 @@ import { removeAllCookies } from '@/utils/cookieUtils'
 import { useRouter } from 'vue-router'
 import { GoogleAuthAPI } from './GoogleAuth'
 import { useUserStore } from '@/stores/modules/store_user'
-
+import Cookies from 'js-cookie'
 const { t } = useI18n()
 const $q = useQuasar()
 const VITE_CDN_URL = import.meta.env.VITE_CDN_URL

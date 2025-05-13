@@ -3,7 +3,7 @@ package com.voyagerss.api.controller;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
-import com.voyagerss.api.service.PayPalService;
+import com.voyagerss.service.PayPalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;

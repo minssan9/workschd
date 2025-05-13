@@ -1,11 +1,11 @@
-import request from '@/api/axios-voyagerss.js'
+import service from '@/api/axios-voyagerss.js'
 
 const apiSys = {
   getSysConfLike (code) {
-    return request.get(`common/sys/conf/${code}`)
+    return service.get(`common/sys/conf/${code}`)
   },
   getSysI18n (language) {
-    return request.get(`common/sys-i18n?language=` + language)
+    return service.get(`common/sys-i18n?language=` + language)
   },
 }
 

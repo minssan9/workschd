@@ -1,5 +1,7 @@
 package com.voyagerss.api.controller;
 
+import com.voyagerss.api.oauth.entity.UserPrincipal;
+import com.voyagerss.api.oauth.token.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.voyagerss.api.oauth.entity.UserPrincipal;
-import com.voyagerss.api.oauth.token.JwtTokenProvider;
 import com.voyagerss.persist.component.exception.CommonException;
 import com.voyagerss.persist.component.exception.CommonExceptionType;
 import com.voyagerss.persist.dto.AccountDTO;
@@ -27,7 +27,10 @@ import com.voyagerss.persist.service.AccountInfoService;
 import com.voyagerss.persist.service.AccountService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Validated
 @RequiredArgsConstructor
@@ -76,7 +79,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateUser(@RequestBody AccountDTO accountDTO) {
+    public ResponseEntity<String> authenticateUser(@RequestBody AccountDTO accountDTO, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -89,13 +92,32 @@ public class AuthController {
             
             accountDTO = accountService.getAccountDtoByEmail(accountDTO.getEmail());
             
-            String token = tokenProvider.createAccessToken(
+            List<String> roles = accountDTO.getAccountRoles().stream()
+                .map(AccountRoleDTO::getRoleType)
+                .toList();
+
+            // Create access token
+            String accessToken = tokenProvider.createAccessToken(
                 accountDTO.getAccountId(),
                 accountDTO.getEmail(),
-                accountDTO.getAccountRoles().stream().map(AccountRoleDTO::getRoleType).toList()
+                roles
             );
+            
+            // Create refresh token
+            String refreshToken = tokenProvider.createRefreshToken(
+                accountDTO.getAccountId(),
+                accountDTO.getEmail(),
+                roles
+            );
+            
+            // Set tokens in response headers
+            tokenProvider.setHeaderAccessToken(response, accessToken);
+            tokenProvider.setHeaderRefreshToken(response, refreshToken);
+            
+            // Store refresh token in the database if needed
+            // accountService.saveRefreshToken(accountDTO.getAccountId(), refreshToken);
 
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(accessToken);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {

@@ -228,6 +228,14 @@ export const useUserStore = defineStore('user', {
 
     setTeam(teamId: number | null): void {
       this.user.teamId = teamId
+    },
+
+    setAccessToken(accessToken: string): void {
+      this.user.accessToken = accessToken
+    },
+
+    setRefreshToken(refreshToken: string): void {
+      this.user.refreshToken = refreshToken
     }
   }
 }) 

@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import request from '@/api/axios-voyagerss';
+import service from '@/api/axios-voyagerss';
 
 // Define interfaces for schedule configuration
 export interface DayValueConfig {
@@ -52,20 +52,20 @@ const baesURL = `account`
 const apiAccountSchedule = { 
   // Schedule preferences methods
   getSchedulePreferences(accountId) {
-    return request.get(`${baesURL}/${accountId}/schedule-preferences`)
+    return service.get(`${baesURL}/${accountId}/schedule-preferences`)
   },
 
   saveSchedulePreferences(accountId, preferences) {
-    return request.post(`${baesURL}/${accountId}/schedule-preferences`, preferences)
+    return service.post(`${baesURL}/${accountId}/schedule-preferences`, preferences)
   },
 
   // Unavailable dates methods
   getUnavailableDates(accountId) {
-    return request.get(`${baesURL}/${accountId}/unavailable-dates`)
+    return service.get(`${baesURL}/${accountId}/unavailable-dates`)
   },
 
   saveUnavailableDates(accountId, dates) {
-    return request.post(`${baesURL}/${accountId}/unavailable-dates`, { dates })
+    return service.post(`${baesURL}/${accountId}/unavailable-dates`, { dates })
   }
 }
 

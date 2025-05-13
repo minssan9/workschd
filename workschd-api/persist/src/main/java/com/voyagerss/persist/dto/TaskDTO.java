@@ -22,8 +22,8 @@ public class TaskDTO implements Serializable {
     private String title;
     private String description;
     private Integer workerCount;
-    private String startDateTime;
-    private String endDateTime;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
     private EnumMaster.TaskStatus status;
     private Long teamId;
     private Long shopId;

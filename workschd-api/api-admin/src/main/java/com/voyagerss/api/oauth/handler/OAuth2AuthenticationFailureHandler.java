@@ -1,7 +1,7 @@
 package com.voyagerss.api.oauth.handler;
 
-import com.voyagerss.api.component.util.CookieUtil;
 import com.voyagerss.api.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
+import com.voyagerss.api.component.util.CookieUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,8 +15,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
-import static com.voyagerss.api.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
-
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String targetUrl = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+        String targetUrl = CookieUtil.getCookie(request, OAuth2AuthorizationRequestBasedOnCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue)
                 .orElse(("/"));
 

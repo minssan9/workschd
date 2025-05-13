@@ -1,4 +1,4 @@
-import request from "@/api/axios-voyagerss"; // Assuming this is the shared axios instance
+import service from "@/api/axios-voyagerss"; // Assuming this is the shared axios instance
 import { AxiosResponse } from 'axios';
 import { DayConfig, MonthConfig } from '@/api/modules/api-account-schedule';
 

@@ -1,6 +1,5 @@
 package com.voyagerss.api.component;
 
-import com.voyagerss.persist.dto.KakaoAddressResponse;
 import com.voyagerss.persist.entity.Shop;
 import com.voyagerss.persist.repository.ShopRepository;
 import com.voyagerss.persist.service.KakaoAddressService;

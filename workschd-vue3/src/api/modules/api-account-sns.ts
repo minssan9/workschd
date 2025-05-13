@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import request from '@/api/axios-voyagerss';
+import service from '@/api/axios-voyagerss';
 
 export interface AccountSnsDTO {
   accountSnsId?: number;
@@ -18,22 +18,22 @@ export interface AccountSnsDTO {
 
 export default {
   create(data: AccountSnsDTO): Promise<AxiosResponse> {
-    return request.post('/account-sns', data);
+    return service.post('/account-sns', data);
   },
 
   update(id: number, data: AccountSnsDTO): Promise<AxiosResponse> {
-    return request.put(`/account-sns/${id}`, data);
+    return service.put(`/account-sns/${id}`, data);
   },
 
   delete(id: number): Promise<AxiosResponse> {
-    return request.delete(`/account-sns/${id}`);
+    return service.delete(`/account-sns/${id}`);
   },
 
   getById(id: number): Promise<AxiosResponse> {
-    return request.get(`/account-sns/${id}`);
+    return service.get(`/account-sns/${id}`);
   },
 
   getByAccountId(accountId: number): Promise<AxiosResponse> {
-    return request.get(`/account-sns/account/${accountId}`);
+    return service.get(`/account-sns/account/${accountId}`);
   }
 }; 

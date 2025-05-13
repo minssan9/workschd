@@ -85,7 +85,7 @@
             color="primary"
             class="q-px-sm"
             :label="t('signup.login.link', '로그인')"
-            @click="router.push('/auth/login')"
+            @click="router.push('/login')"
           />
         </div>
       </q-form>
@@ -126,7 +126,7 @@ const handleSignup = async () => {
 
     if (response) {
       $q.notify({type: 'positive', message: t('signup.success', '회원가입이 완료되었습니다. 로그인해주세요.') })
-      router.push('/auth/login')
+      router.push('/login')
     }
   } catch (error) {
     console.error('Signup error:', error)

@@ -9,8 +9,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@Entity
-@Table
+@Entity(name = "account_work_off_dates")
 public class AccountWorkOffDates extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

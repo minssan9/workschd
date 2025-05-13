@@ -156,13 +156,13 @@ public class TeamShopController {
     @GetMapping
     public ResponseEntity<List<ShopDTO>> getAllShops(
             @PathVariable Long teamId,
-            @RequestParam(required = false) String region) {
+            @RequestParam(required = false) String district) {
         try {
             List<ShopDTO> stores;
             
-            if (region != null && !region.isEmpty()) {
-                log.info("Getting stores for team {} in region: {}", teamId, region);
-                stores = shopService.findByTeamIdAndDistrict(teamId, region);
+            if (district != null && !district.isEmpty()) {
+                log.info("Getting stores for team {} in region: {}", teamId, district);
+                stores = shopService.findByTeamIdAndDistrict(teamId, district);
             } else {
                 log.info("Getting all stores for team: {}", teamId);
                 stores = shopService.findByTeamId(teamId);
