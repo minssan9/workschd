@@ -1,15 +1,9 @@
-##################################################################################################################
-# LOG4JDBC 관련
-##################################################################################################################
-spring:
-  output:
-    ansi:
-      enabled: ALWAYS
+spring.output.ansi.enabled: ALWAYS
 
 logging:
   pattern:
-    console: "[%d{HH:mm:ss.SSS}][%-5level][%class{1}] - %msg%n"
-    #    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+    #    console: "[%d{HH:mm:ss.SSS}][%-5level][%class{1}] - %msg%n"
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
     file: "[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-5level][%class{1}] - %msg%n"
     level:
       error: "%clr(%5p){bold,red}"
@@ -17,71 +11,63 @@ logging:
       info: "%clr(%5p){green}"
       debug: "%clr(%5p){blue}"
       trace: "%clr(%5p){faint}"
-  file:
-    name: /var/log/iphm-collector.log
+  level:
+    root: info
+    org.hibernate.SQL: info
+    org.springframework.web: DEBUG
+    com.zaxxer.hikari: DEBUG
   logback:
     rollingpolicy:
       max-file-size: 20MB
       max-history: 10
-      file-name-pattern: /var/log/iphm-collector.%d{yyyy-MM-dd}.%i.log
+      file-name-pattern: /var/log/${spring.application.name}.%d{yyyy-MM-dd}.%i.log
 
-  level:
-    root: info
-    org.hibernate.SQL: debug
-
----
-spring.config.activate.on-profile: local
+  file:
+    path: /var/log/containers/${spring.application.name}
+    name: ${logging.file.path}/${spring.application.name}.log
 
 decorator:
   datasource:
     p6spy:
-      enable-logging: true
+      logging: slf4j
+      enable-logging: false
+---
+spring.config.activate.on-profile: local
 
-#error / warn / debug / info / trace
 logging:
   level:
-#    hibernate.SQL: info
-#    sql: info
-    p6psy: info
     root: info
     org.hibernate.SQL: info
-    sql: info
-#    org.hibernate.type.descriptor.sql.BasicBinder: error
-#    org.hibernate: error
-#    sql: error
-    p6psy.p6spy: info
-#    root: warn
+    org.hibernate.orm.jdbc.bind: info
+
+# spring.datasource.hikari.data-source-properties.cachePrepStmts=false
+decorator:
+  datasource:
+    p6spy:
+      logging: slf4j
+      enable-logging: true
 
 
 ---
 spring.config.activate.on-profile: develop
 
-decorator:
-  datasource:
-    p6spy:
-      enable-logging: false
-#error / warn / debug / info / trace
 logging:
   level:
-    sql: warn
-    p6psy: warn
-    root: warn
-
-
-
+    root: info
+    org.hibernate.SQL: info
 ---
-spring.config.activate.on-profile: release
+spring.config.activate.on-profile: release-.*
+
+logging:
+  level:
+    root: warn
+    org.hibernate.SQL: warn
+    org.springframework.web: DEBUG
+    com.zaxxer.hikari: DEBUG
+
 
 decorator:
   datasource:
     p6spy:
+      logging: slf4j
       enable-logging: false
-#error / warn / debug / info / trace
-logging:
-  level:
-    org.hibernate.SQL: error
-    sql: error
-    p6psy.p6spy: error
-    root: warn
-
-

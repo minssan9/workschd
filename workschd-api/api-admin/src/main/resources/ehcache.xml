@@ -1,0 +1,47 @@
+<!--<config-->
+<!--        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--        xsi:schemaLocation="classpath:/xsd/ehcache-core-3.0.xsd">-->
+<!--    <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--            xsi:noNamespaceSchemaLocation="classpath:/xsd/ehcache-core-3.0.xsd">-->
+
+<!--    <ehcache:config-->
+<!--            xmlns:ehcache="http://www.ehcache.org/v3"-->
+<!--            xmlns:jcache="http://www.ehcache.org/v3/jsr107">-->
+<!--    <ehcache:config-->
+<!--            xmlns:ehcache="http://www.ehcache.org/v3">-->
+<ehcache:config
+        xmlns:ehcache="http://www.ehcache.org/v3">
+    <ehcache:cache alias="voyagerssCache">
+        <!--        <key-type>java.lang.Long</key-type>-->
+        <!--        <value-type>java.lang.String</value-type>-->
+        <ehcache:expiry>
+            <ehcache:ttl unit="seconds">10000</ehcache:ttl>
+        </ehcache:expiry>
+        <ehcache:listeners>
+            <ehcache:listener>
+                <ehcache:class>com.voyagerss.persist.component.CacheEventLogger</ehcache:class>
+                <ehcache:event-firing-mode>ASYNCHRONOUS</ehcache:event-firing-mode>
+                <ehcache:event-ordering-mode>UNORDERED</ehcache:event-ordering-mode>
+                <ehcache:events-to-fire-on>CREATED</ehcache:events-to-fire-on>
+                <ehcache:events-to-fire-on>UPDATED</ehcache:events-to-fire-on>
+                <ehcache:events-to-fire-on>EXPIRED</ehcache:events-to-fire-on>
+                <ehcache:events-to-fire-on>REMOVED</ehcache:events-to-fire-on>
+                <ehcache:events-to-fire-on>EVICTED</ehcache:events-to-fire-on>
+            </ehcache:listener>
+        </ehcache:listeners>
+        <ehcache:resources>
+            <ehcache:offheap unit="MB">100</ehcache:offheap>
+        </ehcache:resources>
+    </ehcache:cache>
+
+    <ehcache:cache alias="firstDataCache">
+        <!--        <key-type>java.lang.Long</key-type>-->
+        <!--        <value-type>java.lang.String</value-type>-->
+        <ehcache:expiry>
+            <ehcache:ttl unit="seconds">3600</ehcache:ttl>
+        </ehcache:expiry>
+        <ehcache:resources>
+            <ehcache:offheap unit="MB">1</ehcache:offheap>
+        </ehcache:resources>
+    </ehcache:cache>
+</ehcache:config>
