@@ -68,6 +68,8 @@ allprojects {
 
         runtimeOnly 'com.mysql:mysql-connector-j:8.0.33'
 
+        implementation 'org.ehcache:ehcache:3.10.8' // Ehcache 의존성
+
         implementation 'com.paypal.sdk:rest-api-sdk:1.14.0'
 
         implementation "io.jsonwebtoken:jjwt-api:0.11.2"

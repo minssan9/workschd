@@ -1,9 +1,4 @@
 spring:
-#  redis:
-#    host: hlhds-an2-dev-cache-redis.3uug2z.clustercfg.apn2.cache.amazonaws.com
-#    port: 6379
-
-#    cluster:
-#      nodes:
-#        - hlhds-an2-dev-cache-redis-0001-001.3uug2z.0001.apn2.cache.amazonaws.com:6379
-#        - hlhds-an2-dev-cache-redis-0001-002.3uug2z.0001.apn2.cache.amazonaws.com:6379
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
