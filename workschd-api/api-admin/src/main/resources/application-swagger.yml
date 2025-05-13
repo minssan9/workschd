@@ -1,10 +1,12 @@
 springdoc:
   version: '1.0.0'
   api-docs:
+    enabled: true
     groups:
       enabled: true
     path: /v3/api-docs
   swagger-ui:
+    enabled: true
     path: /swagger-ui.html
     operations-sorter: alpha/
     tags-sorter: alpha
@@ -21,38 +23,12 @@ springdoc:
 ---
 spring.config.activate.on-profile: local
 
-springdoc:
-  swagger-ui:
-    enabled: true
-  api-docs:
-    enabled: true
-    groups:
-      enabled: true
 ---
 spring.config.activate.on-profile: develop
 
-springdoc:
-  swagger-ui:
-    enabled: true
-  api-docs:
-    enabled: true
-    groups:
-      enabled: true
 
 ---
-spring.config.activate.on-profile: release
-
-
-springdoc:
-  swagger-ui:
-    enabled: false
-  api-docs:
-    enabled: false
-    groups:
-      enabled: false
----
-spring.config.activate.on-profile: release-voyagerss
-
+spring.config.activate.on-profile: release-*
 
 springdoc:
   swagger-ui:

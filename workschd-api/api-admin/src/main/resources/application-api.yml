@@ -27,44 +27,28 @@ spring:
       max-request-size: 5MB
 
 server:
+  port: ${SERVER_PORT:24000}
   forward-headers-strategy: native
   servlet:
     context-path: /
   tomcat:
     max-http-form-post-size: 5MB
 
+app:
+  web-address: ${VITE_WEB_URL:http://localhost:3003}
+baseUrl: ${VITE_API_URL:http://localhost:3003/api}
+
+
 jwt_secret: workschdJwtTokenSecretKeyUsedInJWTProvider
 
-logging:
-  file:
-    path: /var/log/containers/${spring.application.name}
-    name: ${logging.file.path}/${spring.application.name}.log
+#logging:
+#  file:
+#    path: /var/log/containers/${spring.application.name}
+#    name: ${logging.file.path}/${spring.application.name}.log
 
 ---
 spring.config.activate.on-profile: local
-server:
-  port: 24000
-app:
-  web-address: https://localhost:3003
-baseUrl: http://localhost:24000
-
 ---
 spring.config.activate.on-profile: develop
-server:
-  port: 24001
-
-app:
-  web-address: https://dev.voyagerss.com
-
-baseUrl: https://dev.voyagerss.com/api
-
-
 ---
 spring.config.activate.on-profile: release
-server:
-  port: 24001
-
-app:
-  web-address: https://voyagerss.com
-
-baseUrl: https://voyagerss.com/api

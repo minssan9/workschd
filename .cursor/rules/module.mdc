@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+/Users/msh/repository/msh/workschd/workschd-api
+- Spring Boot Framework
+
+/Users/msh/repository/msh/workschd/workschd-vue3
+- Vue3 Framework

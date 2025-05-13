@@ -4,8 +4,8 @@ spring:
 #    proxy-target-class: true
 
 mail:
-  host: smtp.gmail.com
-  port: 587
+  host: ${mail_host:smtp.gmail.com}
+  port: ${mail_port:587}
   protocol: smtp
   default-encoding: UTF-8
   smtp:
@@ -13,35 +13,20 @@ mail:
     auth: true
   username: ${mail_username}
   password: ${mail_password}
-  email-voyagerss: voyagerss@gmail.com
-  email-manager: abigailmaureen1993@gmail.com
+  email-voyagerss: ${mail_sender:voyagerss@gmail.com}
 
 file:
   upload-dir: /ftp
 
+core:
+  web-address: ${VITE_WEB_URL:https://localhost:3003}
+
 
 ---
 spring.config.activate.on-profile: local
-core:
-  web-address: https://localhost:3003
-
-spring:
-  devtools:
-    livereload:
-      enabled: true
-
+spring.devtools.livereload.enabled: true
 
 ---
 spring.config.activate.on-profile: develop
-core:
-  web-address: https://dev.en9doors.com
-
 ---
 spring.config.activate.on-profile: release
-core:
-  web-address: https://en9doors.com
-
----
-spring.config.activate.on-profile: release-voyagerss
-core:
-  web-address: https://voyagerss.com

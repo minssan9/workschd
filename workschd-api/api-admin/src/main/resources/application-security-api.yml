@@ -58,9 +58,7 @@ spring:
 app:
   oauth2:
     authorizedRedirectUris:
-      - http://localhost:3003/oauth/redirect
-      - https://dev.voyagerss.com/oauth/redirect
-      - https://voyagerss.com/oauth/redirect
+      - ${VITE_WEB_URL:http://localhost:3003}/oauth/redirect
       - http://local.voyagerss.com:3003/oauth/redirect
   oauth:
     kakao:
@@ -76,7 +74,7 @@ app:
 
   # cors 설정
   cors:
-    allowed-origins: 'https://voyagerss.com,https://voyagerss.com,https://dev.voyagerss.com,https://dev.voyagerss.com:3003,http://localhost:3003'
+    allowed-origins: "${VITE_WEB_URL},http://local.voyagerss.com:3003"
     allowed-methods: GET,POST,PUT,OPTIONS,DELETE
     allowed-headers: '*'
     max-age: 3600
@@ -88,36 +86,3 @@ paypal:
   clientId: ${paypal_clientId:paypal}
   clientSecret: ${paypal_clientSecret:paypal}
   mode: ${paypal_mode:paypal}
-
----
-spring.config.activate.on-profile: release
-
-#Security OAuth
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
-          kakao:
-            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
-          naver:
-            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
-
-
----
-spring.config.activate.on-profile: release-voyagerss
-
-#Security OAuth
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
-          kakao:
-            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
-          naver:
-            redirectUri: "https://voyagerss.com/api/{action}/oauth2/code/{registrationId}"
