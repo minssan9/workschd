@@ -28,7 +28,6 @@ import java.io.IOException;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@PreAuthorize("hasAnyAuthority('EN9DOOR_STUDENT', 'EN9DOOR_TEACHER', 'EN9DOOR_MANAGER')")
 @RequestMapping("/account")
 public class AccountController {
     private final AccountService accountService;
@@ -39,11 +38,10 @@ public class AccountController {
     @GetMapping
     public ResponseEntity getUserByAuth(HttpServletRequest request) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Object principal = authentication.getPrincipal();
-            
+            UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
             String userEmail;
-             if (principal instanceof String) {
+             if (userPrincipal.getUserId() != null) {
                 // Handle JWT token case - extract user ID from token
                 String token = request.getHeader("Authorization").replace("Bearer ", "");
                 userEmail = tokenProvider.getUserEmail(token);
