@@ -126,7 +126,8 @@ import { ref, onMounted, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import { useTeamStore } from '@/stores/modules/store_team'
-import apiTeamSchedule, { 
+import { 
+  apiTeamSchedule,
   ScheduleConfig,
   DayConfig,
   MonthConfig,
@@ -225,10 +226,7 @@ const resetConfiguration = () => {
     maxConsecutiveWorkDays.value = defaultAdditionalOptions.maxConsecutiveWorkDays
     scheduleGenerationFrequency.value = defaultAdditionalOptions.scheduleGenerationFrequency
     
-    $q.notify({
-      type: 'info',
-      message: t('team.accountWorkHour.resetSuccess', 'Configuration reset to defaults')
-    })
+    $q.notify({ type: 'info', message: t('team.accountWorkHour.resetSuccess', 'Configuration reset to defaults') })
   })
 }
 

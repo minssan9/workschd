@@ -195,6 +195,7 @@ export const useUserStore = defineStore('user', {
     },
 
     async logout(): Promise<void> {
+      Cookies.remove('accessToken')
       Cookies.remove('refreshToken')
       Cookies.remove('accountId')
       Cookies.remove('username')

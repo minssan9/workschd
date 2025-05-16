@@ -38,17 +38,26 @@ export const defaultAdditionalOptions: AdditionalOptions = {
   scheduleGenerationFrequency: 'MONTHLY'
 };
 
-// Function to fetch schedule configuration for a team
-export function getTeamScheduleConfig(teamId: number): Promise<AxiosResponse<ScheduleConfig>> {
-  return request.get(`/team/${teamId}/schedule-config`);
-}
+/**
+ * API functions for team schedule management
+ */
+export const apiTeamSchedule = {
+  /**
+   * Fetch schedule configuration for a team
+   * @param teamId - The ID of the team
+   * @returns Promise with the schedule configuration
+   */
+  getTeamScheduleConfig(teamId: number): Promise<AxiosResponse<ScheduleConfig>> {
+    return service.get(`/team/${teamId}/schedule-config`);
+  },
 
-// Function to save schedule configuration for a team
-export function saveTeamScheduleConfig(teamId: number, config: ScheduleConfig): Promise<AxiosResponse<void>> {
-  return request.post(`/team/${teamId}/schedule-config`, config);
-}
-
-export default {
-  getTeamScheduleConfig,
-  saveTeamScheduleConfig 
+  /**
+   * Save schedule configuration for a team
+   * @param teamId - The ID of the team
+   * @param config - The schedule configuration to save
+   * @returns Promise with the result of the operation
+   */
+  saveTeamScheduleConfig(teamId: number, config: ScheduleConfig): Promise<AxiosResponse<void>> {
+    return service.post(`/team/${teamId}/schedule-config`, config);
+  }
 }; 

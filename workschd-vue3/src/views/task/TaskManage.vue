@@ -413,9 +413,20 @@ const fetchShops = async () => {
     $q.notify({type: 'negative', message: 'Failed to fetch branches and shops'})
   }
 }
-
+const fetchTasks = async () => {
+  try { 
+    const response = await apiTask.fetchTasks()
+    rowData.value = response.data
+    
+    tasks.value = tasksResponse.data
+  } catch (error) {
+    $q.notify({type: 'negative', message: 'Failed to fetch branches and shops'})
+  }
+}
 onMounted(async () => {
-  await Promise.all([loadGridData(), fetchShops()])
+  loadGridData()
+  fetchShops()
+  fetchTasks()
 })
 </script>
 
