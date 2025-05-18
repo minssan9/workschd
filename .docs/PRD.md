@@ -52,7 +52,7 @@ WorkSchd는 불규칙적인 근무 요일에 근무하는 매장의 관리자들
 
 프론트엔드
  
-	•	Vue 3 
+	•	Vue 3, Quasar
 	•	상태 관리: Pinia 또는 Vuex 활용.
 
 백엔드

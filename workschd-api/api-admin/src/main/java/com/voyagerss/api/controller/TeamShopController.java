@@ -62,27 +62,27 @@ public class TeamShopController {
     /**
      * Delete a store
      * @param teamId The ID of the team
-     * @param id The ID of the store to delete
+     * @param shopId The ID of the store to delete
      * @return Empty response
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{shopId}")
     public ResponseEntity<Void> delete(
             @PathVariable Long teamId,
-            @Valid @NotNull @PathVariable("id") Long id) {
+            @Valid @NotNull @PathVariable("id") Long shopId) {
         try {
-            log.info("Deleting store {} for team {}", id, teamId);
+            log.info("Deleting store {} for team {}", shopId, teamId);
             
             // Verify the store belongs to the team
-            ShopDTO store = shopService.getById(id);
+            ShopDTO store = shopService.getById(shopId);
             if (!teamId.equals(store.getTeamId())) {
-                log.warn("Store {} does not belong to team {}", id, teamId);
+                log.warn("Store {} does not belong to team {}", shopId, teamId);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
             
-            shopService.delete(id);
+            shopService.delete(shopId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error("Error deleting store {} for team {}: {}", id, teamId, e.getMessage());
+            log.error("Error deleting store {} for team {}: {}", shopId, teamId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -123,27 +123,27 @@ public class TeamShopController {
     /**
      * Get a store by ID
      * @param teamId The ID of the team
-     * @param id The ID of the store
+     * @param shopId The ID of the store
      * @return The store
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{shopId}")
     public ResponseEntity<ShopDTO> getById(
             @PathVariable Long teamId,
-            @Valid @NotNull @PathVariable("id") Long id) {
+            @Valid @NotNull @PathVariable("shopId") Long shopId) {
         try {
-            log.info("Getting store {} for team {}", id, teamId);
+            log.info("Getting store {} for team {}", shopId, teamId);
             
-            ShopDTO store = shopService.getById(id);
+            ShopDTO store = shopService.getById(shopId);
             
             // Verify the store belongs to the team
             if (!teamId.equals(store.getTeamId())) {
-                log.warn("Store {} does not belong to team {}", id, teamId);
+                log.warn("Store {} does not belong to team {}", shopId, teamId);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
             
             return ResponseEntity.ok(store);
         } catch (Exception e) {
-            log.error("Error getting store {} for team {}: {}", id, teamId, e.getMessage());
+            log.error("Error getting store {} for team {}: {}", shopId, teamId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

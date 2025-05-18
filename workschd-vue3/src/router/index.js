@@ -23,15 +23,6 @@ const router = createRouter({
     { path: '/account/profile',         name: 'AccountProfile',           component: () => import('@/views/account/AccountProfile.vue'),      meta: { icon: 'person' }, hidden: true },
     { path: '/account/schedule',        name: 'AccountSchedule',          component: () => import('@/views/account/AccountSchedule.vue'),     meta: { icon: 'calendar_today' }, hidden: true },
 
-    // Job
-    { 
-      path: '/task',                   name: 'Task',                    meta: { roles: ['WORKER','MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'event' },
-      children: [
-        { path: '/task/manage',          name: 'TaskManage (Manager)',                component: () => import('@/views/task/TaskManage.vue'),            meta: { icon: 'list' } },        
-        { path: '/task/list-mobile',   name: 'TaskListMobile (Worker)',          component: () => import('@/views/task/TaskListMobile.vue'),      meta: { icon: 'work', roles: ['WORKER'] } },
-        // { path: '/task/attendance',    name: 'TaskAttendance (Worker)',          component: () => import('@/views/task/TaskAttendance.vue'),      meta: { icon: 'how_to_reg' } },
-      ]
-    },
 
     // Team
     { 
@@ -42,6 +33,16 @@ const router = createRouter({
       ]
     },
 
+    // Job
+    { 
+      path: '/task',                   name: 'Task',                    meta: { roles: ['WORKER','MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'event' },
+      children: [
+        { path: '/task/manage',          name: 'TaskManage (Manager)',                component: () => import('@/views/task/TaskManage.vue'),            meta: { icon: 'list' } },        
+        { path: '/task/list-mobile',   name: 'TaskListMobile (Worker)',          component: () => import('@/views/task/TaskListMobile.vue'),      meta: { icon: 'work', roles: ['WORKER'] } },
+        // { path: '/task/attendance',    name: 'TaskAttendance (Worker)',          component: () => import('@/views/task/TaskAttendance.vue'),      meta: { icon: 'how_to_reg' } },
+      ]
+    },
+    
     // Error pages
     { path: '/401',                     name: 'Unauthorized',             component: () => import('@/views/error/401.vue'),                   meta: { icon: 'gpp_bad' }, hidden: true },
     { path: '/403',                     name: 'Forbidden',                component: () => import('@/views/error/403.vue'),                   meta: { icon: 'block' }, hidden: true },

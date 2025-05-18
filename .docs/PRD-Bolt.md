@@ -17,6 +17,7 @@ Build a modern scheduling application for retail/service managers who oversee st
 
 ### 2. Store & Employee Management
 - Allow managers to register and manage multiple stores
+- Manager manage employees by team
 - Employee profile management with:
   - Contact information
   - Role/position
@@ -30,12 +31,19 @@ Build a modern scheduling application for retail/service managers who oversee st
 - Auto-scheduling based on employee availability
 - Shift templates for common patterns
 - Conflict detection (overlapping shifts, availability violations)
-
+- Validate against availability constraints
+#### 3-1. Task Management 
+  - Manager create tasks by daily, weekly, monthly work schedule 
+  - Employees request to works on each tasks
+  - Manager allow to work requests of employees
+  - Tasks have fields of stores, start time, end time, worker TO, remarks
+ 
 ### 4. Attendance Tracking
 - Mobile-friendly clock-in/clock-out interface
 - Real-time attendance monitoring
 - Late arrival and early departure flagging
 - Attendance history and reporting
+- Track actual vs. scheduled hours
 
 ### 5. Labor Cost Forecasting
 - Calculate projected labor costs based on scheduled hours
@@ -43,15 +51,20 @@ Build a modern scheduling application for retail/service managers who oversee st
 - Visual reports showing labor cost trends
 - Budget threshold alerts
 
+### 6. Task
+- 
+
 ## Technical Requirements
 
 ### Frontend
 - Vue 3 with Composition API
+- Quasar Frameowrk
 - Responsive design optimized for both desktop and mobile
 - Interactive calendar component with drag-and-drop
 - Chart.js for data visualization
 - Pinia for state management
 - PWA capabilities for mobile access
+- path resolve src/ as @/
 
 ### Backend
 - Spring Boot 3 with Java 17
@@ -92,3 +105,4 @@ Build a modern scheduling application for retail/service managers who oversee st
 - Advanced analytics
 - Multi-language support
 - Integration with payroll systems 
+ 

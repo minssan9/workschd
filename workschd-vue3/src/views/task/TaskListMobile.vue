@@ -1,110 +1,143 @@
 <template>
   <q-page class="q-pa-md">
-    <!-- Search and Filter Bar -->
-    <div class="q-mb-md">
-      <q-input v-model="searchQuery" outlined dense placeholder="작업 검색" class="q-mb-sm">
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-      
+    <!-- View Toggle (List/Calendar) -->
+    <div class="row items-center q-mb-md">
+      <q-btn-toggle
+        v-model="viewMode"
+        :options="[
+          { label: '목록', value: 'list' },
+          { label: '캘린더', value: 'calendar' }
+        ]"
+        color="primary"
+        dense
+        unelevated
+        class="q-mr-md"
+      />
+      <q-btn-toggle
+        v-model="requestFilter"
+        :options="[
+          { label: '전체 작업', value: 'all' },
+          { label: '내 신청', value: 'mine' }
+        ]"
+        color="secondary"
+        dense
+        unelevated
+      />
+    </div>
+
+    <!-- Calendar View (stub) -->
+    <div v-if="viewMode === 'calendar'" class="q-mb-md">
+      <q-banner class="bg-grey-2 text-grey-8 q-mb-md">
+        <q-icon name="event" class="q-mr-sm" />
+        캘린더 뷰는 곧 제공됩니다. (Stub)
+      </q-banner>
+      <!-- Replace with real calendar later -->
       <div class="row q-col-gutter-sm">
-        <div class="col-12 text-subtitle1 q-mb-xs">상태 필터</div>
-        <div class="col-auto">
-          <q-chip
-            clickable
-            :color="statusFilter === '' ? 'primary' : 'grey-4'"
-            :text-color="statusFilter === '' ? 'white' : 'black'"
-            @click="statusFilter = ''"
-            dense
-          >
-            전체
-          </q-chip>
-        </div>
-        <div v-for="status in statusOptions" :key="status.value" class="col-auto">
-          <q-chip
-            clickable
-            :color="statusFilter === status.value ? 'primary' : 'grey-4'"
-            :text-color="statusFilter === status.value ? 'white' : 'black'"
-            @click="statusFilter = status.value"
-            dense
-          >
-            {{ status.label }}
-          </q-chip>
+        <div v-for="day in 7" :key="day" class="col">
+          <q-card flat bordered class="q-pa-sm bg-grey-1">
+            <div class="text-caption text-grey-7">Day {{ day }}</div>
+            <div v-for="task in tasksForCalendar(day)" :key="task.id" class="q-mt-xs">
+              <q-chip color="primary" text-color="white" class="q-mb-xs">{{ task.title }}</q-chip>
+            </div>
+          </q-card>
         </div>
       </div>
     </div>
 
-    <!-- Tasks List -->
-    <div v-if="isLoading" class="column items-center justify-center" style="height: 200px">
-      <q-spinner color="primary" size="3em" />
-      <div class="q-mt-sm">작업 목록을 불러오는 중...</div>
-    </div>
-    
-    <div v-else-if="filteredTasks.length === 0" class="column items-center justify-center q-pa-lg">
-      <q-icon name="work_off" size="3em" color="grey-5" />
-      <div class="q-mt-sm text-subtitle1">표시할 작업이 없습니다</div>
-    </div>
-    
+    <!-- List View -->
     <div v-else>
-      <q-list bordered separator>
-        <q-item 
-          v-for="task in filteredTasks" 
-          :key="task.id" 
-          clickable 
-          v-ripple
-          @click="showTaskDetails(task)"
-          class="q-py-md"
-        >
-          <q-item-section>
-            <q-item-label class="text-subtitle1 text-weight-medium">{{ task.title }}</q-item-label>
-            <q-item-label caption lines="2">{{ task.description }}</q-item-label>
-            <div class="row items-center q-mt-xs">
-              <q-icon name="event" size="xs" class="q-mr-xs" />
-              <span class="text-caption">{{ formatDateRange(task.startDateTime, task.endDateTime) }}</span>
-            </div>
-            <div class="row items-center q-mt-xs">
-              <q-icon name="accountWorkHour" size="xs" class="q-mr-xs" />
-              <span class="text-caption">{{ formatTimeRange(task.startDateTime, task.endDateTime) }}</span>
-            </div>
-            <div class="row items-center q-mt-xs">
-              <q-icon name="group" size="xs" class="q-mr-xs" />
-              <span class="text-caption">현재 {{ task.taskEmployees?.length || 0 }}명 / 총 {{ task.workerCount }}명</span>
-            </div>
-          </q-item-section>
-          
-          <q-item-section side>
+      <!-- Search and Filter Bar -->
+      <div class="q-mb-md">
+        <q-input v-model="searchQuery" outlined dense placeholder="작업 검색" class="q-mb-sm">
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+        <div class="row q-col-gutter-sm">
+          <div class="col-12 text-subtitle1 q-mb-xs">상태 필터</div>
+          <div class="col-auto">
             <q-chip
-              :color="getStatusColor(task.status)"
-              text-color="white"
+              clickable
+              :color="statusFilter === '' ? 'primary' : 'grey-4'"
+              :text-color="statusFilter === '' ? 'white' : 'black'"
+              @click="statusFilter = ''"
               dense
             >
-              {{ getStatusLabel(task.status) }}
+              전체
             </q-chip>
-            
-            <q-btn
-              v-if="canRequestToJoin(task)"
-              color="primary" 
-              label="참여 신청" 
-              size="sm" 
-              flat
-              class="q-mt-sm"
-              @click.stop="confirmJoinRequest(task)"
-            />
-            
+          </div>
+          <div v-for="status in statusOptions" :key="status.value" class="col-auto">
             <q-chip
-              v-else-if="getTaskRequestStatus(task.id)"
-              :color="getRequestStatusColor(getTaskRequestStatus(task.id))"
-              text-color="white"
+              clickable
+              :color="statusFilter === status.value ? 'primary' : 'grey-4'"
+              :text-color="statusFilter === status.value ? 'white' : 'black'"
+              @click="statusFilter = status.value"
               dense
-              class="q-mt-sm"
             >
-              {{ getRequestStatusLabel(getTaskRequestStatus(task.id)) }}
+              {{ status.label }}
             </q-chip>
-          </q-item-section>
-        </q-item>
-      </q-list>
-      
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks List (with Quasar grid) -->
+      <div class="q-mb-md">
+        <q-list bordered separator>
+          <q-item 
+            v-for="task in filteredTasksForView" 
+            :key="task.id" 
+            clickable 
+            v-ripple
+            @click="showTaskDetails(task)"
+            class="q-py-md"
+          >
+            <q-item-section>
+              <q-item-label class="text-subtitle1 text-weight-medium">{{ task.title }}</q-item-label>
+              <q-item-label caption lines="2">{{ task.description }}</q-item-label>
+              <div class="row items-center q-mt-xs">
+                <q-icon name="event" size="xs" class="q-mr-xs" />
+                <span class="text-caption">{{ formatDateRange(task.startDateTime, task.endDateTime) }}</span>
+              </div>
+              <div class="row items-center q-mt-xs">
+                <q-icon name="accountWorkHour" size="xs" class="q-mr-xs" />
+                <span class="text-caption">{{ formatTimeRange(task.startDateTime, task.endDateTime) }}</span>
+              </div>
+              <div class="row items-center q-mt-xs">
+                <q-icon name="group" size="xs" class="q-mr-xs" />
+                <span class="text-caption">현재 {{ task.taskEmployees?.length || 0 }}명 / 총 {{ task.workerCount }}명</span>
+              </div>
+            </q-item-section>
+            <q-item-section side>
+              <q-chip
+                :color="getStatusColor(task.status)"
+                text-color="white"
+                dense
+              >
+                {{ getStatusLabel(task.status) }}
+              </q-chip>
+              <q-btn
+                v-if="canRequestToJoin(task)"
+                color="primary" 
+                label="참여 신청" 
+                size="sm" 
+                flat
+                class="q-mt-sm"
+                @click.stop="confirmJoinRequest(task)"
+              />
+              <q-chip
+                v-else-if="getTaskRequestStatus(task.id)"
+                :color="getRequestStatusColor(getTaskRequestStatus(task.id))"
+                text-color="white"
+                dense
+                class="q-mt-sm"
+              >
+                {{ getRequestStatusLabel(getTaskRequestStatus(task.id)) }}
+              </q-chip>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </div>
+
       <!-- Pagination controls -->
       <div class="row justify-center q-mt-md">
         <q-pagination
@@ -195,6 +228,11 @@ const statusOptions = [
   { label: '완료됨', value: 'COMPLETED' },
   { label: '취소됨', value: 'CANCELLED' }
 ]
+
+// View mode toggle (list/calendar)
+const viewMode = ref<'list' | 'calendar'>('list')
+// Request filter (all/mine)
+const requestFilter = ref<'all' | 'mine'>('all')
 
 // Load tasks and user's task requests
 onMounted(async () => {
@@ -399,10 +437,20 @@ function getRequestStatusColor(status: string | null): string {
   return colorMap[status] || 'grey'
 }
 
-// Computed property for filtered tasks
-const filteredTasks = computed(() => {
+// Filtered tasks for current view
+const filteredTasksForView = computed(() => {
+  if (requestFilter.value === 'mine') {
+    // Show only tasks the user has requested
+    return tasks.value.filter(task => getTaskRequestStatus(task.id))
+  }
   return tasks.value
 })
+
+// Calendar stub: return tasks for a given day
+function tasksForCalendar(day: number) {
+  // Replace with real logic later
+  return tasks.value.filter((_, idx) => idx % 7 === (day - 1))
+}
 
 const confirmCancel = (task: Task) => {
   showDetailsDialog.value = false
@@ -416,7 +464,7 @@ const submitCancel = async () => {
   try {
     await taskApi.cancelTask(selectedTask.value.id)
     showCancelDialog.value = false
-    await fetchTasks()
+    await loadTasks()
   } catch (error) {
     console.error('Failed to cancel task:', error)
   } finally {

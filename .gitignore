@@ -64,3 +64,6 @@ gradle.properties
 *.env.*
 .env  
 **/*.*.env
+actions-runner
+workschd-api/persist/src/main/generated
+

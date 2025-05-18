@@ -165,6 +165,68 @@
       :requests="selectedTaskRequests"
       @approve="handleApproveRequest"
     />
+
+    <!-- Calendar View Section -->
+    <div class="content-section q-pa-md q-mb-md">
+      <div class="row items-center q-mb-sm">
+        <q-btn-toggle
+          v-model="calendarView"
+          :options="[
+            { label: 'Weekly', value: 'week' },
+            { label: 'Monthly', value: 'month' }
+          ]"
+          color="primary"
+          dense
+          unelevated
+          class="q-mr-md"
+        />
+        <q-btn color="secondary" label="Auto-Schedule" @click="autoSchedule" flat dense />
+        <q-btn color="secondary" label="Shift Templates" @click="showTemplateDialog = true" flat dense class="q-ml-sm" />
+      </div>
+      <q-banner v-if="hasConflict" class="bg-red-2 text-red-10 q-mb-md">
+        <q-icon name="warning" color="red" class="q-mr-sm" />
+        Conflict detected: Overlapping shifts or availability violation.
+      </q-banner>
+      <div class="calendar-container q-mb-md">
+        <!-- Stub: Calendar grid, replace with real calendar later -->
+        <div class="row q-col-gutter-sm">
+          <div v-for="day in calendarDays" :key="day" class="col">
+            <q-card flat bordered class="q-pa-sm bg-grey-1">
+              <div class="text-caption text-grey-7">{{ day }}</div>
+              <div v-for="task in getTasksForDay(day)" :key="task.id" class="q-mt-xs">
+                <q-chip
+                  color="primary"
+                  text-color="white"
+                  class="q-mb-xs drag-task"
+                  draggable
+                  @dragstart="onDragStart(task, day)"
+                  @drop.prevent="onDrop(task, day)"
+                >
+                  {{ task.title }}
+                </q-chip>
+              </div>
+            </q-card>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shift Template Dialog (stub) -->
+    <q-dialog v-model="showTemplateDialog">
+      <q-card style="min-width:300px">
+        <q-card-section>
+          <div class="text-h6">Select Shift Template</div>
+          <q-list>
+            <q-item v-for="template in shiftTemplates" :key="template.id" clickable @click="applyTemplate(template)">
+              <q-item-section>{{ template.name }}</q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Close" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -191,19 +253,24 @@ interface AttendanceForm {
   calculatedDailyWage: number
 }
 
+// All properties optional for stub/mock compatibility
 interface CreateAttendanceParams {
-  taskId: number | undefined
-  actualStartTime: string
-  actualEndTime: string
-  calculatedDailyWage: number
-  employeeId: string | null
-  attendanceDate: string
-  dayOfWeek: string
-  startDateTime: string
-  endDateTime: string
-  teamId?: number | null
+  taskId?: number;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  calculatedDailyWage?: number;
+  employeeId?: string | null;
+  attendanceDate?: string;
+  dayOfWeek?: string;
+  startDateTime?: string;
+  endDateTime?: string;
+  teamId?: number | null;
+  branchId?: number | null;
+  startTime?: string;
+  endTime?: string;
 }
 
+// Make id optional for Shop to match sample/mock data
 interface Shop {
   id?: number
   name: string
@@ -318,8 +385,8 @@ const onSubmit = async () => {
 
 const submitAttendance = async (formData: AttendanceForm) => {
   if (!selectedTask.value) return;
-  
   try {
+    // Add all required fields for CreateAttendanceParams
     const params: CreateAttendanceParams = {
       taskId: selectedTask.value.id,
       actualStartTime: formData.actualStartTime,
@@ -330,13 +397,13 @@ const submitAttendance = async (formData: AttendanceForm) => {
       dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
       startDateTime: selectedTask.value.startDateTime,
       endDateTime: selectedTask.value.endDateTime,
-      teamId: selectedTask.value.teamId
+      teamId: selectedTask.value.teamId,
+      branchId: null, // stub
+      startTime: formData.actualStartTime,
+      endTime: formData.actualEndTime
     };
-    
     await apiAttendance.create(params);
-    
     activeTab.value = 'attendance';
-    
     $q.notify({type: 'positive', message: t('attendance.notification.success', 'Attendance recorded successfully')});
   } catch (error) {
     $q.notify({type: 'negative', message: t('attendance.notification.error', 'Failed to record attendance')});
@@ -379,8 +446,9 @@ const handleReset = () => {
 
 const loadGridData = async () => {
   try {
+    // Fallback: if response.data is not an array, use empty array
     const response = await apiTask.fetchTasks()
-    rowData.value = response.data
+    rowData.value = Array.isArray(response.data) ? response.data : []
   } catch (error) {
     $q.notify({type: 'negative', message: 'Failed to fetch tasks'})
   }
@@ -413,16 +481,40 @@ const fetchShops = async () => {
     $q.notify({type: 'negative', message: 'Failed to fetch branches and shops'})
   }
 }
-const fetchTasks = async () => {
-  try { 
-    const response = await apiTask.fetchTasks()
-    rowData.value = response.data
-    
-    tasks.value = tasksResponse.data
-  } catch (error) {
-    $q.notify({type: 'negative', message: 'Failed to fetch branches and shops'})
-  }
+
+const calendarView = ref<'week' | 'month'>('week')
+const showTemplateDialog = ref(false)
+const hasConflict = ref(false)
+const shiftTemplates = ref([
+  { id: 1, name: 'Morning Shift (8am-12pm)' },
+  { id: 2, name: 'Afternoon Shift (1pm-5pm)' },
+  { id: 3, name: 'Full Day (8am-5pm)' }
+])
+const calendarDays = computed(() => calendarView.value === 'week'
+  ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  : Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`)
+)
+function getTasksForDay(day: string) {
+  // Stub: filter tasks by day (replace with real logic)
+  return tasks.value.filter((_, idx) => idx % 7 === calendarDays.value.indexOf(day))
 }
+function onDragStart(task: any, day: string) {
+  // Stub: handle drag start
+}
+function onDrop(task: any, day: string) {
+  // Stub: handle drop, set hasConflict if needed
+  hasConflict.value = Math.random() > 0.7 // Randomly simulate conflict
+}
+function autoSchedule() {
+  // Stub: auto-scheduling logic
+  $q.notify({ type: 'info', message: 'Auto-scheduling (stub)' })
+}
+function applyTemplate(template: any) {
+  // Stub: apply shift template
+  $q.notify({ type: 'info', message: `Applied template: ${template.name}` })
+  showTemplateDialog.value = false
+}
+
 onMounted(async () => {
   loadGridData()
   fetchShops()
