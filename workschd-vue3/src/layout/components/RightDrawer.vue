@@ -177,7 +177,7 @@ const logout = async () => {
 }
 
 onMounted(() => {
-  
+  userStore.fetchTeams();
 })
 </script>
 

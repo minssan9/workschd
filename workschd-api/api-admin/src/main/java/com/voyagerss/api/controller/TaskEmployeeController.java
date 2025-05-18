@@ -1,6 +1,7 @@
 package com.voyagerss.api.controller;
 
 import com.voyagerss.persist.dto.TaskEmployeeDTO;
+import com.voyagerss.persist.entity.TaskEmployee;
 import com.voyagerss.persist.service.TaskEmployeeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -64,8 +65,8 @@ public class TaskEmployeeController {
     public ResponseEntity<TaskEmployeeDTO> createRequest(
             @PathVariable("taskId") Long taskId,
             @Valid @RequestBody TaskEmployeeDTO requestData) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(taskEmployeeService.createRequest(taskId, requestData));
+        TaskEmployeeDTO createdRequest = taskEmployeeService.createRequest(taskId, requestData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
     }
     
     /**

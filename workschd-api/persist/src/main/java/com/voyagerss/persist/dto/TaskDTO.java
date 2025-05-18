@@ -28,6 +28,10 @@ public class TaskDTO implements Serializable {
     private Long teamId;
     private Long shopId;
     private Boolean active;
+    
+    // Added fields for names
+    private String shopName;
+    private String teamName;
 
     List<TaskEmployeeDTO> taskEmployees;
 

@@ -4,6 +4,8 @@ import com.voyagerss.persist.EnumMaster;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,10 +30,10 @@ public class Task extends BaseEntity {
     private Integer workerCount;
 
     @Column(name = "start_date_time", nullable = false)
-    private String startDateTime;
+    private LocalDateTime startDateTime;
 
     @Column(name = "end_date_time", nullable = false)
-    private String endDateTime;
+    private LocalDateTime endDateTime;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

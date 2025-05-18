@@ -103,17 +103,25 @@
                 <span class="text-caption">{{ formatTimeRange(task.startDateTime, task.endDateTime) }}</span>
               </div>
               <div class="row items-center q-mt-xs">
+                <q-icon name="store" size="xs" class="q-mr-xs" />
+                <span class="text-caption">{{ task.shopName || 'N/A' }}</span>
+              </div>
+              <div class="row items-center q-mt-xs">
+                <q-icon name="group" size="xs" class="q-mr-xs" />
+                <span class="text-caption">Team: {{ task.teamName || 'N/A' }}</span>
+              </div>
+              <div class="row items-center q-mt-xs">
                 <q-icon name="group" size="xs" class="q-mr-xs" />
                 <span class="text-caption">현재 {{ task.taskEmployees?.length || 0 }}명 / 총 {{ task.workerCount }}명</span>
               </div>
             </q-item-section>
             <q-item-section side>
               <q-chip
-                :color="getStatusColor(task.status)"
+                :color="getTaskStatusColor(task.status)"
                 text-color="white"
                 dense
               >
-                {{ getStatusLabel(task.status) }}
+                {{ getTaskStatusLabel(task.status) }}
               </q-chip>
               <q-btn
                 v-if="canRequestToJoin(task)"
@@ -151,28 +159,13 @@
       </div>
     </div>
 
-    <!-- Task Details Dialog -->
-    <TaskDetailsDialog
-      v-model="showDetailsDialog"
-      :task="selectedTask"
-      @join-request="confirmJoinRequest"
-      @cancel="confirmCancel"
-    />
-
-    <!-- Join Request Confirmation Dialog -->
-    <JoinRequestDialog
-      v-model="showJoinRequestDialog"
+    <!-- Consolidated Task Dialog -->
+    <TaskDialog
+      v-model="showTaskDialog"
       :task="selectedTask"
       :is-submitting="isSubmitting"
-      @submit="submitJoinRequest"
-    />
-
-    <!-- Cancel Task Dialog -->
-    <CancelTaskDialog
-      v-model="showCancelDialog"
-      :task="selectedTask"
-      :is-submitting="isSubmitting"
-      @submit="submitCancel"
+      @join-request="submitJoinRequest"
+      @cancel="submitCancel"
     />
   </q-page>
 </template>
@@ -183,10 +176,20 @@ import { useQuasar, date } from 'quasar'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/modules/store_user'
 import taskApi from '@/api/modules/api-task'
-import type { Task, TaskEmployee } from '@/api/modules/api-task'
-import TaskDetailsDialog from '@/views/task/dialog/TaskDetailsDialog.vue'
-import JoinRequestDialog from '@/views/task/dialog/JoinRequestDialog.vue'
-import CancelTaskDialog from '@/views/task/dialog/CancelTaskDialog.vue'
+import { 
+  Task, 
+  TaskEmployee,
+  JoinRequest
+} from '@/types'
+import { 
+  TaskStatus, 
+  RequestStatus,
+  getTaskStatusLabel, 
+  getTaskStatusColor, 
+  getRequestStatusLabel, 
+  getRequestStatusColor 
+} from '@/types/status'
+import TaskDialog from '@/views/task/dialog/TaskDialog.vue'
 
 const $q = useQuasar()
 const userStore = useUserStore()
@@ -215,18 +218,16 @@ const statusFilter = ref('')
 const userRequests = ref<any[]>([])
 
 // Dialog state
-const showDetailsDialog = ref(false)
-const showJoinRequestDialog = ref(false)
+const showTaskDialog = ref(false)
 const selectedTask = ref<Task | null>(null)
 const isSubmitting = ref(false)
-const showCancelDialog = ref(false)
 
 // Status options for filtering
 const statusOptions = [
-  { label: '예정됨', value: 'SCHEDULED' },
-  { label: '진행중', value: 'IN_PROGRESS' },
-  { label: '완료됨', value: 'COMPLETED' },
-  { label: '취소됨', value: 'CANCELLED' }
+  { label: '예정됨', value: TaskStatus.SCHEDULED },
+  { label: '진행중', value: TaskStatus.IN_PROGRESS },
+  { label: '완료됨', value: TaskStatus.COMPLETED },
+  { label: '취소됨', value: TaskStatus.CANCELLED }
 ]
 
 // View mode toggle (list/calendar)
@@ -309,30 +310,30 @@ async function loadUserTaskRequests() {
 // Show task details
 function showTaskDetails(task: Task) {
   selectedTask.value = task
-  showDetailsDialog.value = true
+  showTaskDialog.value = true
 }
 
 // Confirm join request
 function confirmJoinRequest(task: Task) {
   selectedTask.value = task
-  showJoinRequestDialog.value = true
+  showTaskDialog.value = true
 }
 
 // Submit join request
-async function submitJoinRequest() {
-  if (!selectedTask.value || !user.value?.accountId) return
+async function submitJoinRequest(task: Task) {
+  if (!task || !task.id || !user.value?.accountId) return
 
   isSubmitting.value = true
   try {
     const requestData: Partial<TaskEmployee> = {
-      taskId: selectedTask.value.id!,
+      taskId: task.id,
       accountId: Number(user.value.accountId),
-      status: 'PENDING'
+      status: RequestStatus.PENDING
     }
 
     await taskApi.createTaskEmployeeRequest(requestData)
     $q.notify({ type: 'positive', message: '작업 참여 신청이 완료되었습니다.' })
-    showJoinRequestDialog.value = false
+    showTaskDialog.value = false
     
     // Reload user's task requests to update UI
     if (user.value?.accountId) {
@@ -351,7 +352,7 @@ function canRequestToJoin(task: Task | null): boolean {
   if (!task || !task.id || !user.value?.accountId) return false
 
   // User can't request if task is not scheduled or in progress
-  if (task.status == 'COMPLETED' || task.status == 'CANCELLED') return false
+  if (task.status === TaskStatus.COMPLETED || task.status === TaskStatus.CANCELLED) return false
 
   // User can't request if already at capacity
   if (task.taskEmployees && task.taskEmployees.length >= task.workerCount) return false
@@ -390,53 +391,6 @@ function formatTimeRange(start?: string, end?: string): string {
   return `${startTime} - ${endTime}`
 }
 
-// Helper functions for status display
-function getStatusLabel(status: string): string {
-  const statusMap: Record<string, string> = {
-    'SCHEDULED': '예정됨',
-    'IN_PROGRESS': '진행중',
-    'COMPLETED': '완료됨',
-    'CANCELLED': '취소됨'
-  }
-  return statusMap[status] || status
-}
-
-function getStatusColor(status: string): string {
-  const colorMap: Record<string, string> = {
-    'SCHEDULED': 'blue',
-    'IN_PROGRESS': 'green',
-    'COMPLETED': 'purple',
-    'CANCELLED': 'grey'
-  }
-  return colorMap[status] || 'grey'
-}
-
-function getRequestStatusLabel(status: string | null): string {
-  if (!status) return ''
-  
-  const statusMap: Record<string, string> = {
-    'PENDING': '승인 대기중',
-    'APPROVED': '승인됨',
-    'REJECTED': '거절됨',
-    'ACTIVE': '참여 중',
-    'INACTIVE': '참여 종료'
-  }
-  return statusMap[status] || status
-}
-
-function getRequestStatusColor(status: string | null): string {
-  if (!status) return 'grey'
-  
-  const colorMap: Record<string, string> = {
-    'PENDING': 'orange',
-    'APPROVED': 'green',
-    'REJECTED': 'red',
-    'ACTIVE': 'teal',
-    'INACTIVE': 'grey'
-  }
-  return colorMap[status] || 'grey'
-}
-
 // Filtered tasks for current view
 const filteredTasksForView = computed(() => {
   if (requestFilter.value === 'mine') {
@@ -452,21 +406,21 @@ function tasksForCalendar(day: number) {
   return tasks.value.filter((_, idx) => idx % 7 === (day - 1))
 }
 
-const confirmCancel = (task: Task) => {
-  showDetailsDialog.value = false
-  showCancelDialog.value = true
-}
-
-const submitCancel = async () => {
-  if (!selectedTask.value) return
+// Handle task cancellation
+const submitCancel = async (task: Task) => {
+  if (!task || !task.id) return
   
   isSubmitting.value = true
   try {
-    await taskApi.cancelTask(selectedTask.value.id)
-    showCancelDialog.value = false
+    // Update task status to cancelled
+    const updatedTask = { ...task, status: TaskStatus.CANCELLED }
+    await taskApi.updateTask(updatedTask)
+    showTaskDialog.value = false
     await loadTasks()
+    $q.notify({ type: 'positive', message: '작업이 취소되었습니다.' })
   } catch (error) {
     console.error('Failed to cancel task:', error)
+    $q.notify({ type: 'negative', message: '작업 취소에 실패했습니다.' })
   } finally {
     isSubmitting.value = false
   }

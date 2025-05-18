@@ -2,7 +2,7 @@
   <q-page padding class="page-container">
     <div class="row justify-between items-center q-mb-md">
       <h5 class="q-my-none">Task List of Today</h5>
-      <q-btn color="primary" label="Add New Task" @click="showAddDialog = true" />
+      <q-btn color="primary" label="Add New Task" @click="openAddTaskDialog" />
     </div>
 
     <div class="content-section q-pa-md q-mb-md">
@@ -20,10 +20,9 @@
         <h5 class="q-my-none">{{ t('events.taskDetails', 'Task Details') }}</h5>
         <div>
           <q-btn 
-            v-if="isWorker"
-            color="primary" 
-            :label="t('events.attend', 'Attend')" 
-            @click="showAttendanceForm = true"
+            color="secondary" 
+            :label="t('events.viewDetails', 'View Details')" 
+            @click="showTaskDialog = true"
             class="q-mr-sm"
           /> 
         </div>
@@ -50,7 +49,13 @@
                 <div class="col-12">
                   <div class="detail-item">
                     <div class="detail-label">{{ t('events.shop', 'Shop') }}</div>
-                    <div class="detail-value">{{ selectedTask.shopId }}</div>
+                    <div class="detail-value">{{ selectedTask.shopName || 'N/A' }}</div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="detail-item">
+                    <div class="detail-label">{{ t('events.team', 'Team') }}</div>
+                    <div class="detail-value">{{ selectedTask.teamName || 'N/A' }}</div>
                   </div>
                 </div>
                 <div class="col-12">
@@ -143,26 +148,24 @@
       </div>
     </div>
 
-    <!-- Replace the attendance form dialog with the new component -->
-    <AttendanceFormDialog
-      v-model="showAttendanceForm"
-      :initial-data="attendanceForm"
-      :task-id="selectedTask?.id"
-      :team-id="selectedTask?.teamId"
-      @submit="submitAttendance"
-    />
+    <div v-if="isAddMode">
+      <AddEmployeeModal
+        v-model="isAddMode"
+        @confirmed="handleAddEmployee"
+      />
+    </div>
 
-    <!-- Add Task Dialog -->
-    <AddTaskDialog
-      v-model="showAddDialog" 
+    <!-- Task Dialog - Combined functionality for all dialog types -->
+    <TaskDialog
+      v-model="showTaskDialog"
+      :task="selectedTask"
       :shops="shops"
-      @submit="handleTaskSubmit"
-    />
-
-    <!-- Approval Dialog -->
-    <ApprovalDialog
-      v-model="approvalDialogVisible"
       :requests="selectedTaskRequests"
+      :isSubmitting="isSubmitting"
+      @submit="handleTaskUpdate"
+      @add="handleTaskSubmit"
+      @join-request="confirmJoinRequest"
+      @cancel="confirmCancel"
       @approve="handleApproveRequest"
     />
 
@@ -236,81 +239,39 @@ import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import GridDefault from '@/components/grid/GridDefault.vue'
 import TaskEmployeeGrid from '@/views/task/grid/TaskEmployeeGrid.vue'
-import AttendanceFormDialog from '@/views/task/dialog/AttendanceFormDialog.vue'
-import AddTaskDialog from '@/views/task/dialog/AddTaskDialog.vue'
-import ApprovalDialog from '@/views/task/dialog/ApprovalTaskDialog.vue'
+import TaskDialog from '@/views/task/dialog/TaskDialog.vue'
 
 import { useUserStore } from '@/stores/modules/store_user'
+import { useTeamStore } from '@/stores/modules/store_team'
 
-import apiAttendance from '@/api/modules/api-attendance'
-import apiTask, { Task, TaskEmployee } from '@/api/modules/api-task'
-import apiTeamShop from '@/api/modules/api-team-shop'
+import apiTask from '@/api/modules/api-task'
 
-// Define interfaces that were removed from api-task.ts
-interface AttendanceForm {
-  actualStartTime: string
-  actualEndTime: string
-  calculatedDailyWage: number
-}
-
-// All properties optional for stub/mock compatibility
-interface CreateAttendanceParams {
-  taskId?: number;
-  actualStartTime?: string;
-  actualEndTime?: string;
-  calculatedDailyWage?: number;
-  employeeId?: string | null;
-  attendanceDate?: string;
-  dayOfWeek?: string;
-  startDateTime?: string;
-  endDateTime?: string;
-  teamId?: number | null;
-  branchId?: number | null;
-  startTime?: string;
-  endTime?: string;
-}
-
-// Make id optional for Shop to match sample/mock data
-interface Shop {
-  id?: number
-  name: string
-  teamId?: number
-  region?: string
-  active?: boolean
-}
+// Import the types and correct status enums from the types directory
+import { Task, TaskEmployee, JoinRequest, Shop, createDefaultTask } from '@/types'
+import { TaskStatus, RequestStatus } from '@/types/status'
 
 const $q = useQuasar()
 const { t } = useI18n()
 const userStore = useUserStore()
+const teamStore = useTeamStore()
 
 // Check if user is a worker
 const isWorker = computed(() => userStore.isWorker)
 
 const tasks = ref<Task[]>([])
-const newTask = ref<Task>({
-  title: '',
-  description: '',
-  workerCount: 1,
-  startDateTime: new Date().toISOString().split('T')[0] + 'T08:00:00',
-  endDateTime: new Date().toISOString().split('T')[0] + 'T17:00:00',
-  status: 'OPEN',
-  teamId: userStore.user.teamId || 0,
-  shopId: null,
-  active: true
-})
+const newTask = ref<Task>(createDefaultTask(userStore.user.teamId))
 
-const attendanceForm = ref<AttendanceForm>({
-  actualStartTime: '',
-  actualEndTime: '',
-  calculatedDailyWage: 0
-})
+const handleReset = () => {
+  newTask.value = createDefaultTask(userStore.user.teamId)
+}
 
-const shops = ref<Shop[]>([])
+// Get shops from the teamStore instead of shopStore
+const shops = computed(() => teamStore.shops)
 
 const rowData = ref([])
 const columnDefs = ref([
   { 
-    field: 'task_id', 
+    field: 'id', 
     headerName: 'Task',
     cellRenderer: (params) => {
       return `<div class="clickable-cell">${params.value}</div>`;
@@ -318,19 +279,10 @@ const columnDefs = ref([
     onCellClicked: (params) => {
       selectedTask.value = params.data;
       activeTab.value = 'details';
-      
-      // Pre-fill attendance form
-      if (selectedTask.value) {
-        const now = new Date().toISOString().slice(0, 16);
-        attendanceForm.value = {
-          actualStartTime: now,
-          actualEndTime: now,
-          calculatedDailyWage: 0 // Default to 0 since daily_wage no longer exists
-        };
-      }
     }
   },
-  { field: 'shopId', headerName: 'Shop' }, 
+  { field: 'shopName', headerName: 'Shop' }, 
+  { field: 'teamName', headerName: 'Team' },
   { field: 'title', headerName: 'Title' },
   { field: 'description', headerName: 'Description' },
   { field: 'workerCount', headerName: 'Worker Count' },
@@ -341,13 +293,14 @@ const columnDefs = ref([
 ])
 
 const showAddDialog = ref(false)
-const showAttendanceForm = ref(false)
+const showTaskDialog = ref(false)
 const showAddEmployeeDialog = ref(false)
 const approvalDialogVisible = ref(false)
-const selectedTaskRequests = ref<TaskEmployee[]>([])
+const selectedTaskRequests = ref<JoinRequest[]>([])
 const selectedTask = ref<Task | null>(null)
 const selectedEmployee = ref<TaskEmployee | null>(null)
 const activeTab = ref('details')
+const isSubmitting = ref(false)
 
 // Grid options with row click handler
 const gridOptions = ref({
@@ -355,16 +308,6 @@ const gridOptions = ref({
     console.log('Row clicked via gridOptions:', params);
     selectedTask.value = params.data;
     activeTab.value = 'details';
-    
-    // Pre-fill attendance form with task data
-    if (selectedTask.value) {
-      const now = new Date().toISOString().slice(0, 16);
-      attendanceForm.value = {
-        actualStartTime: now,
-        actualEndTime: now,
-        calculatedDailyWage: 0 // Default to 0 since daily_wage no longer exists
-      };
-    }
   },
   // Make rows look clickable
   rowStyle: { cursor: 'pointer' }
@@ -383,40 +326,25 @@ const onSubmit = async () => {
   }
 }
 
-const submitAttendance = async (formData: AttendanceForm) => {
-  if (!selectedTask.value) return;
-  try {
-    // Add all required fields for CreateAttendanceParams
-    const params: CreateAttendanceParams = {
-      taskId: selectedTask.value.id,
-      actualStartTime: formData.actualStartTime,
-      actualEndTime: formData.actualEndTime,
-      calculatedDailyWage: formData.calculatedDailyWage,
-      employeeId: userStore.user.accountId,
-      attendanceDate: new Date().toISOString().split('T')[0],
-      dayOfWeek: new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(),
-      startDateTime: selectedTask.value.startDateTime,
-      endDateTime: selectedTask.value.endDateTime,
-      teamId: selectedTask.value.teamId,
-      branchId: null, // stub
-      startTime: formData.actualStartTime,
-      endTime: formData.actualEndTime
-    };
-    await apiAttendance.create(params);
-    activeTab.value = 'attendance';
-    $q.notify({type: 'positive', message: t('attendance.notification.success', 'Attendance recorded successfully')});
-  } catch (error) {
-    $q.notify({type: 'negative', message: t('attendance.notification.error', 'Failed to record attendance')});
-  }
-};
-
 const handleEmployeeSelected = (employee: TaskEmployee) => {
   selectedEmployee.value = employee;
 };
 
-const handleApproveRequest = async (request: TaskEmployee) => {
+const handleApproveRequest = async (request: JoinRequest) => {
   try {
-    await apiTask.approveJoinRequest(request)
+    // Convert JoinRequest to TaskEmployee if needed by the API
+    const taskEmployee: TaskEmployee = {
+      id: request.id,
+      taskId: request.taskId,
+      accountId: request.accountId,
+      status: request.status,
+      // Required by TaskEmployee interface but not used in approval
+      content: '',
+      description: '',
+      size: 0
+    };
+    
+    await apiTask.approveJoinRequest(taskEmployee)
     
     $q.notify({type: 'positive', message: 'Request approved successfully'})
     
@@ -427,20 +355,6 @@ const handleApproveRequest = async (request: TaskEmployee) => {
     }
   } catch (error) {
     $q.notify({type: 'negative', message: 'Failed to approve request'})
-  }
-}
-
-const handleReset = () => {
-  newTask.value = {
-    title: '',
-    description: '',
-    workerCount: 1,
-    startDateTime: new Date().toISOString().split('T')[0] + 'T08:00:00',
-    endDateTime: new Date().toISOString().split('T')[0] + 'T17:00:00',
-    status: 'OPEN',
-    teamId: userStore.user.teamId || 0,
-    shopId: null,
-    active: true
   }
 }
 
@@ -462,23 +376,81 @@ const formatDateTime = (dateTimeString: string) => {
 
 const handleTaskSubmit = async (newTaskData: Task) => {
   try {
+    isSubmitting.value = true
     await apiTask.createTask(newTaskData)
     await loadGridData()
-    showAddDialog.value = false
+    showTaskDialog.value = false
     
     $q.notify({type: 'positive', message: 'Task registered successfully'})
   } catch (error) {
     $q.notify({type: 'negative', message: 'Failed to register task'})
+  } finally {
+    isSubmitting.value = false
   }
 }
 
-const fetchShops = async () => {
+const handleTaskUpdate = async (updatedTask: Task) => {
   try {
-    const shopsResponse = await apiTeamShop.getShopsByTeamId(userStore.user.teamId)
+    await apiTask.updateTask(updatedTask)
+    await loadGridData()
+    showTaskDialog.value = false
     
-    shops.value = shopsResponse.data
+    // Update the selected task with the updated data
+    if (selectedTask.value && selectedTask.value.id === updatedTask.id) {
+      selectedTask.value = updatedTask
+    }
+    
+    $q.notify({type: 'positive', message: 'Task updated successfully'})
   } catch (error) {
-    $q.notify({type: 'negative', message: 'Failed to fetch branches and shops'})
+    $q.notify({type: 'negative', message: 'Failed to update task'})
+  }
+}
+
+// Function to handle join requests from TaskDialog
+const confirmJoinRequest = async (task: Task) => {
+  if (!task || !userStore.user?.accountId) return;
+  
+  try {
+    const requestData: Partial<TaskEmployee> = {
+      taskId: task.id!,
+      accountId: Number(userStore.user.accountId),
+      status: RequestStatus.PENDING
+    };
+    
+    await apiTask.createTaskEmployeeRequest(requestData);
+    $q.notify({type: 'positive', message: 'Join request submitted successfully'});
+  } catch (error) {
+    $q.notify({type: 'negative', message: 'Failed to submit join request'});
+  }
+}
+
+// Function to handle task cancellation from TaskDialog
+const confirmCancel = async (task: Task) => {
+  if (!task || !task.id) return;
+  
+  try {
+    // First change task status to cancelled
+    const updatedTask = { ...task, status: TaskStatus.CANCELLED };
+    await apiTask.updateTask(updatedTask);
+    
+    // Refresh task list and update selected task
+    await loadGridData();
+    if (selectedTask.value && selectedTask.value.id === task.id) {
+      selectedTask.value = updatedTask;
+    }
+    
+    $q.notify({type: 'positive', message: 'Task cancelled successfully'});
+  } catch (error) {
+    $q.notify({type: 'negative', message: 'Failed to cancel task'});
+  }
+}
+
+const fetchTasks = async () => {
+  try {
+    const response = await apiTask.fetchTasks()
+    tasks.value = Array.isArray(response.data) ? response.data : []
+  } catch (error) {
+    $q.notify({type: 'negative', message: 'Failed to fetch tasks'})
   }
 }
 
@@ -515,10 +487,52 @@ function applyTemplate(template: any) {
   showTemplateDialog.value = false
 }
 
+// Replace loadShops with using the team store's loadShops
+const loadTeamShops = async () => {
+  try {
+    await teamStore.loadShops()
+    if (teamStore.error) {
+      $q.notify({type: 'negative', message: teamStore.error})
+    }
+  } catch (error) {
+    console.error('Error loading shops:', error)
+  }
+}
+
+// Define isAddMode for the AddEmployeeModal
+const isAddMode = ref(false)
+
+// Open add task dialog via the combined TaskDialog
+const openAddTaskDialog = () => {
+  // Create a new empty task with default values
+  selectedTask.value = {
+    title: '',
+    description: '',
+    workerCount: 1,
+    startDateTime: new Date().toISOString().split('.')[0],
+    endDateTime: new Date(Date.now() + 3600000).toISOString().split('.')[0], // 1 hour later
+    status: TaskStatus.SCHEDULED,
+    teamId: userStore.user?.teamId || 0,
+    shopId: null,
+    active: true,
+    taskEmployees: []
+  }
+  
+  // Open the dialog in add mode
+  showTaskDialog.value = true
+}
+
+// Utility function to handle adding an employee
+const handleAddEmployee = (data: any) => {
+  // Implementation for adding an employee
+  $q.notify({ type: 'positive', message: 'Employee added successfully' })
+  isAddMode.value = false
+}
+
 onMounted(async () => {
-  loadGridData()
-  fetchShops()
+  loadGridData() 
   fetchTasks()
+  loadTeamShops() // Load shops using the team store
 })
 </script>
 

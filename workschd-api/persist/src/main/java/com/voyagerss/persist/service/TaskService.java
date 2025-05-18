@@ -153,8 +153,15 @@ public class TaskService {
     public TaskDTO toDTO(Task task) {
         TaskDTO taskDTO = new TaskDTO();
         BeanUtils.copyProperties(task, taskDTO);
+        
+        // Set IDs
         taskDTO.setShopId(task.getShop().getId());
         taskDTO.setTeamId(task.getTeam().getId());
+        
+        // Set names
+        taskDTO.setShopName(task.getShop().getName());
+        taskDTO.setTeamName(task.getTeam().getName());
+        
         return taskDTO;
     }
     

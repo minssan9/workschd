@@ -4,7 +4,7 @@ import apiTeam from '@/api/modules/api-team';
 import { Shop } from '@/api/modules/api-team-shop';
 import apiTeamShop from '@/api/modules/api-team-shop';
 import { ScheduleConfig, DayConfig, MonthConfig } from '@/interface/schedule';
-
+import { useUserStore } from '@/stores/modules/store_user';
 
 // State type
 interface TeamState {
@@ -14,6 +14,8 @@ interface TeamState {
   scheduleConfig: ScheduleConfig;
   shops: Shop[];
   isLoadingShops: boolean;
+  error: string | null;
+  teamsTotalCount: number;
 }  
 
 export const useTeamStore = defineStore('team', {
@@ -37,7 +39,9 @@ export const useTeamStore = defineStore('team', {
       }
     },
     shops: [],
-    isLoadingShops: false
+    isLoadingShops: false,
+    error: null,
+    teamsTotalCount: 0
   }),
 
   actions: {
@@ -80,13 +84,24 @@ export const useTeamStore = defineStore('team', {
       this.shops = shops;
     },
 
+    // Load shops associated with current user's team
+    async loadShops() {
+      const userStore = useUserStore();
+      if (userStore.user.teamId) {
+        this.error = null;
+        await this.fetchShopsByTeamId(userStore.user.teamId);
+      }
+    },
+
     async fetchShopsByTeamId(teamId: number): Promise<void> {
       try {
         this.isLoadingShops = true;
+        this.error = null;
         const response = await apiTeamShop.getShopsByTeamId(teamId);
         this.shops = response.data;
       } catch (error) {
         console.error('Error fetching shops:', error);
+        this.error = 'Failed to fetch shops';
         throw error;
       } finally {
         this.isLoadingShops = false;
@@ -129,6 +144,23 @@ export const useTeamStore = defineStore('team', {
     requestJoinTeam(request: JoinRequest) {
       if (!this.selectedTeam) return;
       this.selectedTeam.joinRequests.push(request);
+    },
+
+    async fetchTeams(params?: Partial<Team>): Promise<void> {
+      this.error = null;
+      const requestParams = params || {} as Team;
+      
+      try {
+        const response = await apiTeam.getTeams(requestParams as Team);
+        if (response.data.content) {
+          this.teams = response.data.content;
+          this.teamsTotalCount = response.data.totalElements;
+        }
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+        this.error = 'Failed to fetch teams';
+        throw error;
+      }
     }
   },
 
