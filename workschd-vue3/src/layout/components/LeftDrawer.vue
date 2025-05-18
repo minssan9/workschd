@@ -18,6 +18,14 @@
           <q-item-section>{{ t('menu.home', 'Home') }}</q-item-section>
         </q-item>
 
+        <!-- Dashboard link - only visible for authenticated users -->
+        <q-item v-if="userStore.accessToken" to="/dashboard" exact clickable v-ripple>
+          <q-item-section avatar>
+            <q-icon name="dashboard" />
+          </q-item-section>
+          <q-item-section>{{ t('menu.dashboard', 'Dashboard') }}</q-item-section>
+        </q-item>
+
         <q-item to="/about" exact clickable v-ripple>
           <q-item-section avatar>
             <q-icon name="info" />
@@ -107,7 +115,10 @@ function filterHiddenRoutes(routes) {
     if (route.children) {
       const accessibleChildren = route.children.filter(child => 
         !child.hidden && 
-        (!child.meta?.roles || child.meta.roles.includes(userStore.role))
+        (!child.meta?.roles || (userStore.user.accountRoles && 
+          child.meta.roles.some(role => 
+            userStore.user.accountRoles.some(ar => ar.roleType === role)
+          )))
       )
       return accessibleChildren.length > 0
     }

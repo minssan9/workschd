@@ -7,11 +7,12 @@ const router = createRouter({
   /* eslint-disable */
   routes: [
     // Info (these don't need meta.requiresAuth: false since they're in whitelist)
-    { path: '/',                        name: 'home',                     component: () => import('@/views/info/Home.vue'),                   meta: { icon: 'home' } },
-    { path: '/about',                   name: 'about',                    component: () => import('@/views/info/About.vue'),                  meta: { icon: 'info' } },
-    { path: '/subscription',            name: 'Subscription',             component: () => import('@/views/info/Subscription.vue'),           meta: { icon: 'card_membership' } },
-    { path: '/privacy-policy',          name: 'PrivacyPolicy',            component: () => import('@/views/info/PrivacyPolicy.vue'),          meta: { icon: 'policy' }, hidden: true },
-    { path: '/terms',                   name: 'Terms',                    component: () => import('@/views/info/Terms.vue'),                  meta: { icon: 'description' }, hidden: true },
+    { path: '/',                        name: 'home',                     component: () => import('@/views/main/Home.vue'),                   meta: { icon: 'home' } },
+    { path: '/about',                   name: 'about',                    component: () => import('@/views/main/About.vue'),                  meta: { icon: 'info' } },
+    { path: '/subscription',            name: 'Subscription',             component: () => import('@/views/main/Subscription.vue'),           meta: { icon: 'card_membership' } },
+    { path: '/privacy-policy',          name: 'PrivacyPolicy',            component: () => import('@/views/main/PrivacyPolicy.vue'),          meta: { icon: 'policy' }, hidden: true },
+    { path: '/terms',                   name: 'Terms',                    component: () => import('@/views/main/Terms.vue'),                  meta: { icon: 'description' }, hidden: true },
+    { path: '/dashboard',               name: 'Dashboard',                component: () => import('@/views/main/Dashboard.vue'),              meta: { icon: 'dashboard' } },
 
     // Auth
     { path: '/login',              name: 'login',                    component: () => import('@/views/auth/Login.vue'),                  meta: { icon: 'login' }, hidden: true },
