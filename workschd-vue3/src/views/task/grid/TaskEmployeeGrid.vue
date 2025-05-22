@@ -230,6 +230,12 @@ onMounted(() => {
 })
 </script>
 
+<script lang="ts">
+export default {
+  name: 'TaskEmployeeGrid'
+}
+</script>
+
 <style scoped>
 .task-employee-grid {
   width: 100%;

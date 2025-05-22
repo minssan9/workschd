@@ -1,6 +1,10 @@
 <template>
   <q-dialog v-model="isOpen" :maximized="dialogMode === 'view'" persistent :transition-show="transitionShow" :transition-hide="transitionHide">
-    <q-card :class="{'task-details-dialog': dialogMode === 'view', 'dialog-card': dialogMode === 'add', 'approval-dialog': dialogMode === 'approval'}">
+    <q-card :class="{
+      'task-details-dialog': dialogMode === 'view',
+      'dialog-card': dialogMode === 'add',
+      'approval-dialog': dialogMode === 'approval'
+    }">
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">
           <template v-if="dialogMode === 'view'">{{ task?.title }}</template>
@@ -14,324 +18,161 @@
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
-      <!-- View Mode -->
-      <template v-if="dialogMode === 'view'">
+      <!-- UNIFIED FORM SECTION -->
+      <template v-if="dialogMode !== 'approval' && dialogMode !== 'join' && dialogMode !== 'cancel'">
         <q-card-section class="q-pt-sm">
-          <div class="q-mb-md">
-            <div class="text-subtitle1 q-mb-xs">{{ t('task.details', '상세 정보') }}</div>
+          <q-form @submit.prevent="handleFormSubmit" class="q-gutter-md">
             <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-6">
-                <q-list dense>
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label caption>{{ t('task.status', '상태') }}</q-item-label>
-                      <q-item-label>
-                        <q-chip :color="getTaskStatusColor(task?.status)" text-color="white" dense>
-                          {{ getTaskStatusLabel(task?.status) }}
-                        </q-chip>
-                      </q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label caption>{{ t('task.shop', '매장') }}</q-item-label>
-                      <q-item-label>{{ task?.shopName || 'N/A' }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label caption>{{ t('task.team', '팀') }}</q-item-label>
-                      <q-item-label>{{ task?.teamName || 'N/A' }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label caption>{{ t('task.date', '일자') }}</q-item-label>
-                      <q-item-label>{{ formatDateRange(task?.startDateTime, task?.endDateTime) }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label caption>{{ t('task.time', '시간') }}</q-item-label>
-                      <q-item-label>{{ formatTimeRange(task?.startDateTime, task?.endDateTime) }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label caption>{{ t('task.workerCount', '필요 인원') }}</q-item-label>
-                      <q-item-label>{{ task?.workerCount }} {{ t('task.people', '명') }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label caption>{{ t('task.currentWorkers', '현재 인원') }}</q-item-label>
-                      <q-item-label>{{ task?.taskEmployees?.length || 0 }} {{ t('task.people', '명') }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </div>
-              
-              <div class="col-12 col-md-6">
+              <!-- Basic Info Card -->
+              <div class="col-12 col-md-4">
                 <q-card flat bordered>
                   <q-card-section>
-                    <div class="text-subtitle2">{{ t('task.description', '세부 설명') }}</div>
-                    <p class="q-mt-sm">{{ task?.description || t('task.noDescription', '세부 설명이 없습니다.') }}</p>
+                    <div class="text-h6">{{ t('events.basicInfo', 'Basic Information') }}</div>
+                    <q-separator class="q-my-sm" />
+                    <div class="q-gutter-y-md">
+                      <q-input
+                        v-model="currentForm.title"
+                        :label="t('task.title', 'Title')"
+                        :disable="dialogMode === 'view'"
+                        required
+                        :rules="[val => !!val || t('validation.required', 'Field is required')]"
+                      />
+                      <q-select 
+                        v-model="currentForm.shopId" 
+                        :options="shopOptions" 
+                        :label="t('task.shop', 'Shop')" 
+                        :disable="dialogMode === 'view'"
+                        emit-value 
+                        map-options 
+                        :rules="[val => val !== null || t('validation.required', 'Field is required')]" 
+                      />
+                      <q-select 
+                        v-model="currentForm.status" 
+                        :options="statusOptions" 
+                        :label="t('task.status', 'Status')" 
+                        :disable="dialogMode === 'view'"
+                        required 
+                        :rules="[val => !!val || t('validation.required', 'Field is required')]" 
+                      />
+                      <q-toggle 
+                        v-model="currentForm.active" 
+                        :label="t('task.active', 'Active')" 
+                        :disable="dialogMode === 'view'" 
+                      />
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </div>
+
+              <!-- Time & Assignment Card -->
+              <div class="col-12 col-md-4">
+                <q-card flat bordered>
+                  <q-card-section>
+                    <div class="text-h6">{{ t('events.timeAndAssignment', 'Time & Assignment') }}</div>
+                    <q-separator class="q-my-sm" />
+                    <div class="q-gutter-y-md">
+                      <q-input 
+                        v-model="currentForm.startDateTime" 
+                        type="datetime-local" 
+                        :label="t('task.startDateTime', 'Start Date & Time')" 
+                        :disable="dialogMode === 'view'"
+                        required 
+                        :rules="[val => !!val || t('validation.required', 'Field is required')]" 
+                      />
+                      <q-input 
+                        v-model="currentForm.endDateTime" 
+                        type="datetime-local" 
+                        :label="t('task.endDateTime', 'End Date & Time')" 
+                        :disable="dialogMode === 'view'"
+                        required 
+                        :rules="[val => !!val || t('validation.required', 'Field is required')]" 
+                      />
+                      <q-input 
+                        v-model.number="currentForm.workerCount" 
+                        type="number" 
+                        min="1" 
+                        :label="t('task.workerCount', 'Worker Count')" 
+                        :disable="dialogMode === 'view'"
+                        required 
+                        :rules="[
+                          val => !!val || t('validation.required', 'Field is required'),
+                          val => val > 0 || t('validation.min', 'Must be greater than 0')
+                        ]" 
+                      />
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </div>
+
+              <!-- Description Card -->
+              <div class="col-12 col-md-4">
+                <q-card flat bordered>
+                  <q-card-section>
+                    <div class="text-h6">{{ t('events.description', 'Description') }}</div>
+                    <q-separator class="q-my-sm" />
+                    <q-input
+                      v-model="currentForm.description"
+                      type="textarea"
+                      :label="t('task.description', 'Description')"
+                      :disable="dialogMode === 'view'"
+                      rows="3"
+                      autogrow
+                    />
                   </q-card-section>
                 </q-card>
               </div>
             </div>
-          </div>
-          
-          <div class="q-mt-lg">
-            <q-btn 
-              v-if="canRequestToJoin" 
-              color="primary" 
-              :label="t('task.joinRequest', '참여 신청')" 
-              @click="showJoinRequestDialog"
-              class="q-mr-md"
-            />
-            <q-btn 
-              v-if="canManageTask" 
-              color="secondary" 
-              :label="t('task.edit', '편집')" 
-              @click="dialogMode = 'edit'"
-              class="q-mr-md"
-            />
-            <q-btn 
-              v-if="canManageTask && hasApprovalRequests" 
-              color="info" 
-              :label="t('task.approveRequests', '승인 요청')" 
-              @click="dialogMode = 'approval'"
-              class="q-mr-md"
-            />
-            <q-btn 
-              v-if="canCancelTask" 
-              color="negative" 
-              :label="t('task.cancel', '작업 취소')" 
-              @click="showCancelDialog"
-              class="q-mr-md"
-            />
-          </div>
-        </q-card-section>
-      </template>
 
-      <!-- Edit Mode -->
-      <template v-else-if="dialogMode === 'edit'">
-        <q-card-section>
-          <q-form @submit.prevent="onEditSubmit" class="q-gutter-md">
-            <q-input
-              v-model="form.title"
-              :label="t('task.title', 'Title')"
-              required
-              :rules="[val => !!val || t('validation.required', 'Field is required')]"
-            />
-            
-            <q-input
-              v-model="form.description"
-              type="textarea"
-              :label="t('task.description', 'Description')"
-              rows="3"
-            />
-            
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-sm-6">
-                <q-input
-                  v-model="form.startDateTime"
-                  type="datetime-local"
-                  :label="t('task.startDateTime', 'Start Date & Time')"
-                  required
-                  :rules="[val => !!val || t('validation.required', 'Field is required')]"
-                />
-              </div>
-              <div class="col-12 col-sm-6">
-                <q-input
-                  v-model="form.endDateTime"
-                  type="datetime-local"
-                  :label="t('task.endDateTime', 'End Date & Time')"
-                  required
-                  :rules="[val => !!val || t('validation.required', 'Field is required')]"
-                />
-              </div>
-            </div>
-            
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-sm-6">
-                <q-select
-                  v-model="form.status"
-                  :options="statusOptions"
-                  :label="t('task.status', 'Status')"
-                  required
-                  :rules="[val => !!val || t('validation.required', 'Field is required')]"
-                />
-              </div>
-              <div class="col-12 col-sm-6">
-                <q-input
-                  v-model.number="form.workerCount"
-                  type="number"
-                  min="1"
-                  :label="t('task.workerCount', 'Worker Count')"
-                  required
-                  :rules="[
-                    val => !!val || t('validation.required', 'Field is required'),
-                    val => val > 0 || t('validation.min', 'Must be greater than 0')
-                  ]"
-                />
-              </div>
-            </div>
-            
-            <div class="row q-col-gutter-md">
+            <!-- Map Section -->
+            <div class="row q-col-gutter-md q-mt-md">
               <div class="col-12">
-                <q-select
-                  v-model="form.shopId"
-                  :options="shopOptions"
-                  :label="t('task.shop', 'Shop')"
-                  emit-value
-                  map-options
-                  :rules="[val => val !== null || t('validation.required', 'Field is required')]"
-                />
-              </div>
-            </div>
-            
-            <q-toggle
-              v-model="form.active"
-              :label="t('task.active', 'Active')"
-            />
-          </q-form>
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat :label="t('common.cancel', 'Cancel')" color="grey-7" @click="dialogMode = 'view'" />
-          <q-btn flat :label="t('common.save', 'Save')" color="primary" @click="onEditSubmit" />
-        </q-card-actions>
-      </template>
-
-      <!-- Add Mode -->
-      <template v-else-if="dialogMode === 'add'">
-        <q-card-section class="dialog-content">
-          <q-form @submit="onAddSubmit" class="dialog-form q-gutter-md">
-            <div class="row q-col-gutter-md">
-              <!-- Title and Shop selection --> 
-              <div class="col-12 col-md-6">
-                <q-input
-                  v-model="addForm.title"
-                  label="Title"
-                  filled
-                  required
-                />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-select
-                  v-model="selectedShop"
-                  label="Store"
-                  :options="shops"
-                  option-value="id"
-                  option-label="name"
-                  filled
-                  required
-                />
-              </div>
-
-              <!-- Description -->
-              <div class="col-12">
-                <q-input
-                  v-model="addForm.description"
-                  label="Description"
-                  filled
-                  type="textarea"
-                  autogrow
-                />
-              </div>
-
-              <!-- Worker Count -->
-              <div class="col-12 col-md-4">
-                <q-input
-                  v-model.number="addForm.workerCount"
-                  label="Worker Count"
-                  filled
-                  type="number"
-                  required
-                />
-              </div>
-
-              <!-- Date and Time -->
-              <div class="col-12 col-md-4">
-                <q-input
-                  v-model="startDate"
-                  label="Start Date"
-                  filled
-                  type="date"
-                  required
-                  @update:model-value="updateStartDateTime"
-                />
-              </div>
-              <div class="col-12 col-md-4">
-                <q-input
-                  v-model="startTime"
-                  label="Start Time"
-                  filled
-                  type="time"
-                  required
-                  @update:model-value="updateStartDateTime"
-                />
-              </div>
-              
-              <div class="col-12 col-md-4">
-                <q-input
-                  v-model="endDate"
-                  label="End Date"
-                  filled
-                  type="date"
-                  required
-                  @update:model-value="updateEndDateTime"
-                />
-              </div>
-              <div class="col-12 col-md-4">
-                <q-input
-                  v-model="endTime"
-                  label="End Time"
-                  filled
-                  type="time"
-                  required
-                  @update:model-value="updateEndDateTime"
-                />
-              </div>
-
-              <!-- Status -->
-              <div class="col-12 col-md-4">
-                <q-select
-                  v-model="addForm.status"
-                  label="Status"
-                  :options="statusOptions"
-                  filled
-                  required
-                />
-              </div>
-
-              <!-- Active -->
-              <div class="col-12 col-md-4">
-                <q-toggle
-                  v-model="addForm.active"
-                  label="Active"
-                />
+                <q-card flat bordered>
+                  <q-card-section>
+                    <div class="text-h6">{{ t('task.location', 'Location') }}</div>
+                    <q-separator class="q-my-sm" />
+                    <div id="map" style="height: 300px;"></div>
+                  </q-card-section>
+                </q-card>
               </div>
             </div>
 
+            <!-- Action Buttons -->
             <div class="row justify-end q-mt-md">
-              <q-btn label="Cancel" color="negative" flat v-close-popup class="q-mr-sm" />
-              <q-btn label="Reset" type="reset" color="warning" flat @click="handleReset" class="q-mr-sm" />
-              <q-btn label="Submit" type="submit" color="primary" unelevated />
+              <template v-if="dialogMode === 'view'">
+                <q-btn v-if="showJoinBtn" color="primary" :label="t('task.joinRequest', '참여 신청')" @click="showJoinRequestDialog" class="q-mr-md" />
+                <q-btn v-if="showEditBtn" color="secondary" :label="t('task.edit', '편집')" @click="dialogMode = 'edit'" class="q-mr-md" />
+                <q-btn v-if="showApprovalBtn" color="info" :label="t('task.approveRequests', '승인 요청')" @click="dialogMode = 'approval'" class="q-mr-md" />
+                <q-btn v-if="showCancelBtn" color="negative" :label="t('task.cancel', '작업 취소')" @click="showCancelDialog" class="q-mr-md" />
+              </template>
+              <template v-else>
+                <q-btn flat :label="t('common.cancel', 'Cancel')" color="grey-7" @click="handleCancel" class="q-mr-md" />
+                <q-btn v-if="dialogMode === 'edit'" flat :label="t('common.save', 'Save')" color="primary" type="submit" :loading="isSubmitting" />
+                <q-btn v-else-if="dialogMode === 'add'" flat :label="t('common.submit', 'Submit')" color="primary" type="submit" :loading="isSubmitting" />
+              </template>
             </div>
           </q-form>
         </q-card-section>
+
+        <!-- Task Employees Grid (outside form) -->
+        <q-card-section v-if="dialogMode === 'view' && task?.id">
+          <div class="row justify-between items-center q-mb-md">
+            <h6 class="q-my-none">{{ t('events.taskEmployees', 'Task Employees') }}</h6>
+            <q-btn 
+              color="primary" 
+              :label="t('task.addEmployee', 'Add Employee')"
+              size="sm"
+              @click="showAddEmployeeDialog = true" 
+              v-if="!isWorker"
+            />
+          </div>
+          <TaskEmployeeGrid 
+            :task-id="task.id"
+            @employee-selected="handleEmployeeSelected"
+          />
+        </q-card-section>
       </template>
 
-      <!-- Approval Mode -->
+      <!-- APPROVAL MODE -->
       <template v-else-if="dialogMode === 'approval'">
         <q-card-section>
           <div v-if="!requests || requests.length === 0" class="text-center q-pa-md">
@@ -345,45 +186,37 @@
                   <q-item-label caption>Request Date: {{ formatDateTime(request.requestDate) }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-btn
-                    color="positive"
-                    label="Approve"
-                    size="sm"
-                    @click="approveRequest(request)"
-                  />
+                  <q-btn color="positive" label="Approve" size="sm" @click="approveRequest(request)" />
                 </q-item-section>
               </q-item>
             </q-list>
           </div>
         </q-card-section>
-
         <q-card-actions align="right">
           <q-btn flat label="Back" @click="dialogMode = 'view'" />
         </q-card-actions>
       </template>
 
-      <!-- Join Request Mode -->
+      <!-- JOIN REQUEST MODE -->
       <template v-else-if="dialogMode === 'join'">
         <q-card-section>
           <p>다음 작업에 참여 신청을 하시겠습니까?</p>
           <p class="text-weight-bold">{{ task?.title }}</p>
           <p>{{ formatDateRange(task?.startDateTime, task?.endDateTime) }} {{ formatTimeRange(task?.startDateTime, task?.endDateTime) }}</p>
         </q-card-section>
-
         <q-card-actions align="right">
           <q-btn flat label="취소" @click="dialogMode = 'view'" />
           <q-btn color="primary" label="신청하기" @click="submitJoinRequest" :loading="isSubmitting" />
         </q-card-actions>
       </template>
 
-      <!-- Cancel Task Mode -->
+      <!-- CANCEL TASK MODE -->
       <template v-else-if="dialogMode === 'cancel'">
         <q-card-section>
           <p>다음 작업을 취소하시겠습니까?</p>
           <p class="text-weight-bold">{{ task?.title }}</p>
           <p>{{ formatDateRange(task?.startDateTime, task?.endDateTime) }} {{ formatTimeRange(task?.startDateTime, task?.endDateTime) }}</p>
         </q-card-section>
-
         <q-card-actions align="right">
           <q-btn flat label="취소" @click="dialogMode = 'view'" />
           <q-btn color="negative" label="취소하기" @click="submitCancelTask" :loading="isSubmitting" />
@@ -394,11 +227,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useQuasar, date } from 'quasar';
 import { useUserStore } from '@/stores/modules/store_user';
 import { Task, Shop, TaskStatus, JoinRequest, getTaskStatusLabel, getTaskStatusColor } from '@/types';
+import TaskEmployeeGrid from '../grid/TaskEmployeeGrid.vue'
+import 'leaflet/dist/leaflet.css'
+import L, { Map as LMap, Marker, TileLayer } from 'leaflet'
 
 type DialogMode = 'view' | 'edit' | 'add' | 'approval' | 'join' | 'cancel';
 
@@ -682,12 +518,115 @@ const approveRequest = (request: JoinRequest) => {
   emit('approve', request);
 };
 
+// Button visibility computed properties
+const showJoinBtn = computed(() => dialogMode.value === 'view' && canRequestToJoin.value)
+const showEditBtn = computed(() => dialogMode.value === 'view' && canManageTask.value)
+const showApprovalBtn = computed(() => dialogMode.value === 'view' && canManageTask.value && hasApprovalRequests.value)
+const showCancelBtn = computed(() => dialogMode.value === 'view' && canCancelTask.value)
+
+// View items for display
+const viewItems = computed(() => [
+  { label: t('task.status', '상태'), value: '', type: 'chip' },
+  { label: t('task.shop', '매장'), value: props.task?.shopName || 'N/A' },
+  { label: t('task.team', '팀'), value: props.task?.teamName || 'N/A' },
+  { label: t('task.date', '일자'), value: formatDateRange(props.task?.startDateTime, props.task?.endDateTime) },
+  { label: t('task.time', '시간'), value: formatTimeRange(props.task?.startDateTime, props.task?.endDateTime) },
+  { label: t('task.workerCount', '필요 인원'), value: `${props.task?.workerCount} ${t('task.people', '명')}` },
+  { label: t('task.currentWorkers', '현재 인원'), value: `${props.task?.taskEmployees?.length || 0} ${t('task.people', '명')}` }
+])
+
 // Override dialogMode to 'add' when no task is provided
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen && !props.task?.id) {
     dialogMode.value = 'add';
   }
 }, { immediate: true });
+
+const showAddEmployeeDialog = ref(false)
+const isWorker = false // Replace with actual logic if needed
+function handleEmployeeSelected(employee: any) {
+  // Implement employee selection logic or emit event
+}
+
+const currentForm = computed<Task>({
+  get() {
+    if (dialogMode.value === 'add') return addForm.value
+    return form.value
+  },
+  set(val: Task) {
+    if (dialogMode.value === 'add') addForm.value = val
+    else form.value = val
+  }
+})
+
+function handleFormSubmit() {
+  if (dialogMode.value === 'add') {
+    updateStartDateTime();
+    updateEndDateTime();
+    emit('add', addForm.value);
+  } else if (dialogMode.value === 'edit') {
+    emit('submit', form.value);
+    dialogMode.value = 'view';
+  }
+}
+
+function handleCancel() {
+  if (dialogMode.value === 'edit') dialogMode.value = 'view'
+  else isOpen.value = false
+}
+
+// Update ref types
+const map = ref<any>(null)
+const marker = ref<any>(null)
+
+// Update watch effect to handle missing coordinates
+watch(() => currentForm.value.shopId, async (newShopId) => {
+  if (!newShopId) {
+    if (map.value) {
+      map.value.remove()
+      map.value = null
+      marker.value = null
+    }
+    return
+  }
+  
+  const shop = props.shops?.find(s => s.id === newShopId)
+  if (!shop) return
+
+  const lat = shop.latitude ?? 37.5665 // Default to Seoul if no coordinates
+  const lng = shop.longitude ?? 126.9780
+
+  await nextTick()
+  if (!map.value) {
+    map.value = L.map('map').setView([lat, lng], 15)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map.value)
+  } else {
+    map.value.setView([lat, lng], 15)
+  }
+  
+  if (marker.value) {
+    marker.value.setLatLng([lat, lng])
+  } else {
+    marker.value = L.marker([lat, lng]).addTo(map.value)
+  }
+
+  // Add popup with shop info
+  marker.value.bindPopup(`
+    <b>${shop.name}</b><br>
+    ${shop.region || ''}
+  `).openPopup()
+})
+
+// Add cleanup
+onBeforeUnmount(() => {
+  if (map.value) {
+    map.value.remove()
+    map.value = null
+    marker.value = null
+  }
+})
 </script>
 
 <style scoped>

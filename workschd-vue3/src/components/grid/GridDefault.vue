@@ -14,7 +14,7 @@
           @grid-ready="onGridReady"
           :class="gridThemeClass"
           :gridOptions="gridOptions"
-          @click="onCellClicked"
+          @row-clicked="onRowClicked"
       />
     </div>
     <!-- <div class="button">
@@ -47,7 +47,7 @@ const columnApi = ref<ColumnApi | null>(null)
 
 const columnDefs = defineModel('columnDefs')
 const rowData = defineModel('rowData')
-const emits = defineEmits(['onCellClicked'])
+const emits = defineEmits(['onCellClicked', 'rowClicked'])
 
 const $q = useQuasar()
 
@@ -192,6 +192,10 @@ function autoAddRows(params) {
     gridApi.value?.applyTransaction({ add: newRowData })
   }
   return params.data
+}
+
+function onRowClicked(params) {
+  emits('rowClicked', params)
 }
 
 // Add computed property for grid theme class

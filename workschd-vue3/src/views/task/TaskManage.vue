@@ -11,147 +11,7 @@
         :columnDefs="columnDefs"
         :gridOptions="gridOptions"
         @grid-ready="loadGridData"
-      />
-    </div>
-
-    <!-- Task Details Section -->
-    <div v-if="selectedTask" class="content-section q-pa-md q-mt-md">
-      <div class="row justify-between items-center q-mb-md">
-        <h5 class="q-my-none">{{ t('events.taskDetails', 'Task Details') }}</h5>
-        <div>
-          <q-btn 
-            color="secondary" 
-            :label="t('events.viewDetails', 'View Details')" 
-            @click="showTaskDialog = true"
-            class="q-mr-sm"
-          /> 
-        </div>
-      </div>
-
-      <q-separator />
-
-      <!-- Task Details Cards -->
-      <div class="row q-col-gutter-md q-py-md">
-        <!-- Basic Info Card -->
-        <div class="col-12 col-md-4">
-          <q-card class="detail-card">
-            <q-card-section>
-              <div class="text-h6">{{ t('events.basicInfo', 'Basic Information') }}</div>
-              <q-separator class="q-my-sm" />
-              
-              <div class="row q-col-gutter-sm"> 
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.title', 'Title') }}</div>
-                    <div class="detail-value">{{ selectedTask.title }}</div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.shop', 'Shop') }}</div>
-                    <div class="detail-value">{{ selectedTask.shopName || 'N/A' }}</div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.team', 'Team') }}</div>
-                    <div class="detail-value">{{ selectedTask.teamName || 'N/A' }}</div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.status', 'Status') }}</div>
-                    <div class="detail-value">{{ selectedTask.status }}</div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.active', 'Active') }}</div>
-                    <div class="detail-value">{{ selectedTask.active ? 'Yes' : 'No' }}</div>
-                  </div>
-                </div>
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
-        
-        <!-- Time & Assignment Card -->
-        <div class="col-12 col-md-4">
-          <q-card class="detail-card">
-            <q-card-section>
-              <div class="text-h6">{{ t('events.timeAndAssignment', 'Time & Assignment') }}</div>
-              <q-separator class="q-my-sm" />
-              
-              <div class="row q-col-gutter-sm">
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.startDateTime', 'Start Date & Time') }}</div>
-                    <div class="detail-value">{{ formatDateTime(selectedTask.startDateTime) }}</div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.endDateTime', 'End Date & Time') }}</div>
-                    <div class="detail-value">{{ formatDateTime(selectedTask.endDateTime) }}</div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.workerCount', 'Worker Count') }}</div>
-                    <div class="detail-value">{{ selectedTask.workerCount }}</div>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item">
-                    <div class="detail-label">{{ t('events.teamId', 'Team ID') }}</div>
-                    <div class="detail-value">{{ selectedTask.teamId || 'N/A' }}</div>
-                  </div>
-                </div>
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
-        
-        <!-- Description Card -->
-        <div class="col-12 col-md-4">
-          <q-card class="detail-card">
-            <q-card-section>
-              <div class="text-h6">{{ t('events.description', 'Description') }}</div>
-              <q-separator class="q-my-sm" />
-              
-              <div class="detail-item">
-                <div class="detail-value description">{{ selectedTask.description || 'N/A' }}</div>
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
-      </div>
-      
-      <!-- Task Employees Section -->
-      <div class="q-mt-md">
-        <div class="row justify-between items-center q-mb-md">
-          <h6 class="q-my-none">{{ t('events.taskEmployees', 'Task Employees') }}</h6>
-          <q-btn 
-            color="primary" 
-            label="Add Employee" 
-            size="sm"
-            @click="showAddEmployeeDialog = true" 
-            v-if="!isWorker"
-          />
-        </div>
-        
-        <TaskEmployeeGrid 
-          v-if="selectedTask && selectedTask.id" 
-          :task-id="selectedTask.id"
-          @employee-selected="handleEmployeeSelected"
-        />
-      </div>
-    </div>
-
-    <div v-if="isAddMode">
-      <AddEmployeeModal
-        v-model="isAddMode"
-        @confirmed="handleAddEmployee"
+        @row-clicked="handleRowClicked"
       />
     </div>
 
@@ -255,9 +115,6 @@ const { t } = useI18n()
 const userStore = useUserStore()
 const teamStore = useTeamStore()
 
-// Check if user is a worker
-const isWorker = computed(() => userStore.isWorker)
-
 const tasks = ref<Task[]>([])
 const newTask = ref<Task>(createDefaultTask(userStore.user.teamId))
 
@@ -302,16 +159,15 @@ const selectedEmployee = ref<TaskEmployee | null>(null)
 const activeTab = ref('details')
 const isSubmitting = ref(false)
 
-// Grid options with row click handler
+// Grid options without row click handler
 const gridOptions = ref({
-  onRowClicked: (params) => {
-    console.log('Row clicked via gridOptions:', params);
-    selectedTask.value = params.data;
-    activeTab.value = 'details';
-  },
-  // Make rows look clickable
   rowStyle: { cursor: 'pointer' }
 })
+
+function handleRowClicked(params: any) {
+  selectedTask.value = params.data;
+  showTaskDialog.value = true;
+}
 
 const onSubmit = async () => {
   try {
@@ -325,10 +181,6 @@ const onSubmit = async () => {
     $q.notify({type: 'negative', message: 'Failed to register task'})
   }
 }
-
-const handleEmployeeSelected = (employee: TaskEmployee) => {
-  selectedEmployee.value = employee;
-};
 
 const handleApproveRequest = async (request: JoinRequest) => {
   try {
@@ -499,9 +351,6 @@ const loadTeamShops = async () => {
   }
 }
 
-// Define isAddMode for the AddEmployeeModal
-const isAddMode = ref(false)
-
 // Open add task dialog via the combined TaskDialog
 const openAddTaskDialog = () => {
   // Create a new empty task with default values
@@ -520,13 +369,6 @@ const openAddTaskDialog = () => {
   
   // Open the dialog in add mode
   showTaskDialog.value = true
-}
-
-// Utility function to handle adding an employee
-const handleAddEmployee = (data: any) => {
-  // Implementation for adding an employee
-  $q.notify({ type: 'positive', message: 'Employee added successfully' })
-  isAddMode.value = false
 }
 
 onMounted(async () => {

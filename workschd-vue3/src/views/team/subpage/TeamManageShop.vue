@@ -47,83 +47,44 @@
     <q-dialog v-model="showShopDialog" persistent>
       <q-card style="min-width: 400px">
         <q-card-section class="row items-center">
-          <div class="text-h6">{{ dialogMode === 'add' ? t('team.shop.addShop', 'Add Shop') : t('team.shop.editShop', 'Edit Shop') }}</div>
+          <div class="text-h6">
+            {{ dialogMode === 'add' ? t('team.shop.addShop', 'Add Shop') : t('team.shop.editShop', 'Edit Shop') }}
+          </div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
-
         <q-card-section>
-          <q-form @submit.prevent="handleSubmit" @reset="handleReset" class="row q-col-gutter-md">
+          <q-form @submit.prevent="handleSubmit" class="row q-col-gutter-md">
             <div class="col-12">
-              <q-input 
-                v-model="shopForm.name" 
-                :label="t('team.shop.shopName', 'Shop Name')" 
-                filled
-                dense
-                required 
-              />
+              <q-input v-model="shopForm.name" :label="t('team.shop.shopName', 'Shop Name')" filled dense required />
             </div>
             <div class="col-12">
-              <q-input 
-                v-model="shopForm.address" 
-                :label="t('team.shop.address', 'Address')" 
-                filled
-                dense
-              />
+              <q-input v-model="shopForm.address" :label="t('team.shop.address', 'Address')" filled dense />
             </div>
             <div class="col-12">
-              <q-input 
-                v-model="shopForm.region" 
-                :label="t('team.shop.region', 'Region')" 
-                filled
-                dense
-              />
+              <q-input v-model="shopForm.region" :label="t('team.shop.region', 'Region')" filled dense />
             </div>
-
-            <div class="col-12">
-              <div class="text-subtitle2">{{ t('team.shop.operatingHours', 'Operating Hours') }}</div>
-            </div>
-
+            <div class="col-12 text-subtitle2">{{ t('team.shop.operatingHours', 'Operating Hours') }}</div>
             <div v-for="day in daysOfWeek" :key="day.value" class="col-12">
               <div class="row q-col-gutter-sm items-center">
                 <div class="col-4">
-                  <q-checkbox v-model="shopForm.operatingHours[day.value].isOpen" 
-                    :label="day.label" 
-                  />
+                  <q-checkbox v-model="shopForm.operatingHours[day.value].isOpen" :label="day.label" />
                 </div>
                 <div class="col-4">
-                  <q-time 
-                    v-model="shopForm.operatingHours[day.value].startTime"
-                    format24h
-                    :label="t('team.shop.startTime', 'Start Time')"
-                    filled
-                    dense
-                    :disable="!shopForm.operatingHours[day.value].isOpen"
-                  />
+                  <q-time v-model="shopForm.operatingHours[day.value].startTime" format24h :label="t('team.shop.startTime', 'Start Time')" filled dense :disable="!shopForm.operatingHours[day.value].isOpen" />
                 </div>
                 <div class="col-4">
-                  <q-time 
-                    v-model="shopForm.operatingHours[day.value].endTime"
-                    format24h
-                    :label="t('team.shop.endTime', 'End Time')"
-                    filled
-                    dense
-                    :disable="!shopForm.operatingHours[day.value].isOpen"
-                  />
+                  <q-time v-model="shopForm.operatingHours[day.value].endTime" format24h :label="t('team.shop.endTime', 'End Time')" filled dense :disable="!shopForm.operatingHours[day.value].isOpen" />
                 </div>
               </div>
             </div>
           </q-form>
         </q-card-section>
-        
         <q-card-actions align="right">
-          <q-btn :label="t('common.cancel', 'Cancel')" color="secondary" flat v-close-popup />
-          <q-btn 
-            :label="t('common.submit', 'Submit')" 
-            color="primary" 
-            @click="handleSubmit" 
-            :loading="isSubmitting"
-          />
+          <q-btn v-if="dialogMode === 'add'" :label="t('common.cancel', 'Cancel')" color="secondary" flat v-close-popup />
+          <q-btn v-if="dialogMode === 'edit'" :label="t('common.cancel', 'Cancel')" color="secondary" flat v-close-popup />
+          <q-btn v-if="dialogMode === 'add'" :label="t('common.submit', 'Submit')" color="primary" @click="handleSubmit" :loading="isSubmitting" />
+          <q-btn v-if="dialogMode === 'edit'" :label="t('common.save', 'Save')" color="primary" @click="handleSubmit" :loading="isSubmitting" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -158,15 +119,15 @@
               </div>
             </div>
             
-            <div class="col-12" v-if="selectedShop.operatingHours">
+            <div class="col-12" v-if="selectedShopWithHours.operatingHours[day.value]?.isOpen">
               <div class="detail-item">
                 <div class="detail-label">{{ t('team.shop.operatingHours', 'Operating Hours') }}</div>
                 <div class="q-mt-sm">
                   <div v-for="day in daysOfWeek" :key="day.value" class="row q-mb-xs">
                     <div class="col-4 text-weight-medium">{{ day.label }}</div>
                     <div class="col-8">
-                      <template v-if="selectedShop.operatingHours && selectedShop.operatingHours[day.value] && selectedShop.operatingHours[day.value].isOpen">
-                        {{ selectedShop.operatingHours[day.value].startTime }} - {{ selectedShop.operatingHours[day.value].endTime }}
+                      <template v-if="selectedShopWithHours.operatingHours[day.value]?.isOpen">
+                        {{ selectedShopWithHours.operatingHours[day.value].startTime }} - {{ selectedShopWithHours.operatingHours[day.value].endTime }}
                       </template>
                       <template v-else>
                         {{ t('team.shop.closed', 'Closed') }}
@@ -199,14 +160,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, defineProps } from 'vue'
+import { ref, onMounted, watch, defineProps, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useI18n } from 'vue-i18n'
 import GridDefault from '@/components/grid/GridDefault.vue'
-import apiTeamShop from '@/api/modules/api-team-shop'
-import type { Shop } from '@/api/modules/api-team-shop'
+import apiTeamShop, { Shop as ApiShop } from '@/api/modules/api-team-shop'
 import { daysOfWeek } from '@/api/modules/api-account-schedule'
 
+type ShopForm = ApiShop & {
+  operatingHours: Record<string, { isOpen: boolean; startTime: string; endTime: string }>
+}
+
+function getDefaultOperatingHours() {
+  const result: Record<string, { isOpen: boolean; startTime: string; endTime: string }> = {}
+  daysOfWeek.forEach(day => {
+    result[day.value] = { isOpen: false, startTime: '09:00', endTime: '17:00' }
+  })
+  return result
+}
 
 const props = defineProps({
   teamId: {
@@ -218,31 +189,21 @@ const props = defineProps({
 const { t } = useI18n()
 const $q = useQuasar()
 
-// Local state
-const shops = ref<Shop[]>([])
+const shops = ref<ApiShop[]>([])
 const isLoading = ref(false)
 const showShopDialog = ref(false)
 const showShopDetails = ref(false)
-const selectedShop = ref<Shop | null>(null)
+const selectedShop = ref<ApiShop | null>(null)
 const isSubmitting = ref(false)
-const dialogMode = ref('add') // 'add' or 'edit'
+const dialogMode = ref<'add' | 'edit'>('add')
 const editingShopId = ref<number | null>(null)
- 
 
-const shopForm = ref({
+const shopForm = ref<ShopForm>({
   name: '',
   address: '',
   region: '',
-  team_id: props.teamId,
-  operatingHours: {
-    Monday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-    Tuesday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-    Wednesday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-    Thursday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-    Friday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-    Saturday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-    Sunday: { isOpen: false, startTime: '09:00', endTime: '17:00' }
-  }
+  teamId: props.teamId,
+  operatingHours: getDefaultOperatingHours()
 })
 
 // Grid options with row click handler
@@ -314,12 +275,12 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
     
     if (dialogMode.value === 'add') {
-      const response = await apiTeamShop.createShop(props.teamId, shopForm.value as Shop);
+      const response = await apiTeamShop.createShop(props.teamId, shopForm.value as ApiShop);
       shops.value.push(response.data);
       $q.notify({ type: 'positive', message: t('team.shop.shopAdded', 'Shop added successfully') });
     } else {      
       if (editingShopId.value !== null) {
-        const response = await apiTeamShop.updateShop(props.teamId, editingShopId.value, shopForm.value as Shop);
+        const response = await apiTeamShop.updateShop(props.teamId, editingShopId.value, shopForm.value as ApiShop);
         const index = shops.value.findIndex(s => s.id === editingShopId.value);
         if (index !== -1) {
           shops.value[index] = response.data;
@@ -364,17 +325,9 @@ const editShop = () => {
     name: selectedShop.value.name,
     address: selectedShop.value.address || '',
     region: selectedShop.value.region || '',
-    team_id: props.teamId,
-    operatingHours: {
-      Monday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Tuesday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Wednesday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Thursday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Friday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Saturday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Sunday: { isOpen: false, startTime: '09:00', endTime: '17:00' }
-    }
-  };
+    teamId: props.teamId,
+    operatingHours: getDefaultOperatingHours()
+  }
   
   // Show the dialog
   showShopDialog.value = true;
@@ -391,23 +344,25 @@ const handleReset = () => {
     name: '',
     address: '',
     region: '',
-    team_id: props.teamId,
-    operatingHours: {
-      Monday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Tuesday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Wednesday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Thursday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Friday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Saturday: { isOpen: false, startTime: '09:00', endTime: '17:00' },
-      Sunday: { isOpen: false, startTime: '09:00', endTime: '17:00' }
-    }
+    teamId: props.teamId,
+    operatingHours: getDefaultOperatingHours()
   }
 }
 
 // Watch for changes in teamId
 watch(() => props.teamId, (newVal) => {
-  shopForm.value.team_id = newVal
+  shopForm.value.teamId = newVal
   fetchShops()
+})
+
+const selectedShopWithHours = computed<ShopForm>(() => {
+  if (selectedShop.value && (selectedShop.value as any).operatingHours) {
+    return selectedShop.value as ShopForm
+  }
+  return {
+    ...selectedShop.value,
+    operatingHours: getDefaultOperatingHours()
+  } as ShopForm
 })
 
 onMounted(() => { 

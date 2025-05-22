@@ -4,4 +4,6 @@ export interface Shop {
   teamId?: number;
   region?: string;
   active?: boolean;
+  latitude?: number;
+  longitude?: number;
 } 

@@ -22,7 +22,7 @@
     <!-- Team Grid -->
     <div class="content-section q-pa-md q-mb-md">
       <GridDefault
-          style="width: 100%; height: 400px"
+          style="width: 100%; height: 200px"
           :columnDefs="columnDefs"
           :rowData="teams"
           @grid-ready="onGridReady"
@@ -59,26 +59,16 @@
 
       <q-tab-panels v-model="activeTab" animated>
         <q-tab-panel name="members">
-          <!-- Team Members Grid -->
-          <div class="q-mb-md">
-            <div class="text-h6">{{ t('team.manage.teamMembers', 'Team Members') }}</div>
-            <div class="ag-theme-alpine" style="height: 400px; width: 100%;">
-              <GridDefault
-                :columnDefs="memberColumnDefs"
-                :rowData="teamMembers"
-                @grid-ready="onMemberGridReady"
-                class="ag-theme-alpine-dark"
-              />
-              
-              <!-- Members Pagination -->
-              <!-- <Pagination
-                :total-items="membersTotalCount"
-                :initial-page="1"
-                :initial-page-size="10"
-                @page-change="onMemberPageChange"
-              /> -->
-            </div>
-          </div>
+          <TeamMembersGrid
+            :team-id="selectedTeamForDetails.id"
+            :members="teamMembers"
+            :total-count="membersTotalCount"
+            :page-request="membersPageRequest"
+            @grid-ready="onMemberGridReady"
+            @page-change="onMemberPageChange"
+            @row-clicked="onMemberRowClicked" 
+          />
+          <MemberDialog v-model="isMemberDialogOpen" :member="selectedMember" />
         </q-tab-panel>
         <q-tab-panel name="shop">
           <TeamManageShop :team-id="selectedTeamForDetails.id" />
@@ -116,6 +106,8 @@ import GridDefault from '@/components/grid/GridDefault.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import apiTeam, {TeamDTO, TeamMemberParams} from '@/api/modules/api-team'
 import { PageDTO } from '@/api/modules/api-common'
+import MemberDialog from '@/components/dialog/MemberDialog.vue'
+import TeamMembersGrid from './subpage/TeamMembers.vue'
 
 // State
 const $q = useQuasar()
@@ -205,26 +197,15 @@ const columnDefs = ref([
   }
 ])
 
-
-// Team Members Grid Configuration
-const memberColumnDefs = ref([
-  { headerName: 'Name', field: 'name', sortable: true, filter: true },
-  { headerName: 'Email', field: 'email', sortable: true, filter: true },
-  { headerName: 'Join Date', field: 'joinDate', sortable: true, filter: true },
-  { headerName: 'Status', field: 'status', sortable: true, filter: true,
-    cellRenderer: (params: any) => {
-      const status = params.value
-      const color = status === 'Active' ? 'green' : 'orange'
-      return `<span style="color: ${color}">${status}</span>`
-    }
-  }
-])
-
 // Grid options
 const gridOptions = ref({
   pagination: false,
   rowSelection: 'single'
 })
+
+// New state for MemberDialog
+const isMemberDialogOpen = ref(false)
+const selectedMember = ref<any>(null)
 
 // Methods
 const onGridReady = () => {  
@@ -273,6 +254,7 @@ const onMemberGridReady = () => {
 }
 
 const fetchTeamMembers = (params?: TeamMemberParams) => {
+  teamMembers.value = []
   if (!selectedTeamForDetails.value) return;
   
   // Create a new params object if one wasn't provided
@@ -346,6 +328,11 @@ const generateAndCopyInviteLink = async (team: TeamDTO) => {
   
   // Show success notification
   $q.notify({ type: 'positive', message: t('team.manage.inviteLinkCopied', 'Invite link copied to clipboard'), timeout: 2000 });  
+}
+
+function onMemberRowClicked(params: any) {
+  selectedMember.value = params.data
+  isMemberDialogOpen.value = true
 }
 
 // Lifecycle

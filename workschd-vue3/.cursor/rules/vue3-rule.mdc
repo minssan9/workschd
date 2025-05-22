@@ -36,10 +36,7 @@ globs: **/*.vue
       javascript
       // Route-based code splitting
       const routes = [
-        {
-          path: '/about',
-          component: () => import('./views/About.vue')
-        }
+        { path: '/about', component: () => import('./views/About.vue') } 
       ]
       
 
