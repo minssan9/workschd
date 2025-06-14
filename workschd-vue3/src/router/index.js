@@ -7,12 +7,20 @@ const router = createRouter({
   /* eslint-disable */
   routes: [
     // Info (these don't need meta.requiresAuth: false since they're in whitelist)
-    { path: '/',                        name: 'home',                     component: () => import('@/views/main/Home.vue'),                   meta: { icon: 'home' } },
-    { path: '/about',                   name: 'about',                    component: () => import('@/views/main/About.vue'),                  meta: { icon: 'info' } },
-    { path: '/subscription',            name: 'Subscription',             component: () => import('@/views/main/Subscription.vue'),           meta: { icon: 'card_membership' } },
-    { path: '/privacy-policy',          name: 'PrivacyPolicy',            component: () => import('@/views/main/PrivacyPolicy.vue'),          meta: { icon: 'policy' }, hidden: true },
-    { path: '/terms',                   name: 'Terms',                    component: () => import('@/views/main/Terms.vue'),                  meta: { icon: 'description' }, hidden: true },
-    { path: '/dashboard',               name: 'Dashboard',                component: () => import('@/views/main/Dashboard.vue'),              meta: { icon: 'dashboard' } },
+    { path: '/',                        name: 'home',                     component: () => import('@/views/main/Home.vue'),                           meta: { icon: 'home' } },
+    { path: '/dashboard',               name: 'Dashboard',                component: () => import('@/views/main/Dashboard.vue'),                      meta: { icon: 'dashboard' } },
+    { path: '/company',                 name: 'Company',                  meta: { icon: 'info' }, hidden: true,
+      children: [
+        { path: '/company/about',           name: 'about',                    component: () => import('@/views/main/company/About.vue'),                  meta: { icon: 'info' } },
+        { path: '/company/features',        name: 'features',                 component: () => import('@/views/main/company/Features.vue'),               meta: { icon: 'featured_play_list' } },
+        { path: '/company/pricing',         name: 'pricing',                  component: () => import('@/views/main/company/Pricing.vue'),                meta: { icon: 'payments' } },
+        { path: '/company/contact',         name: 'contact',                  component: () => import('@/views/main/company/Contact.vue'),                meta: { icon: 'contact_mail' } },
+        { path: '/subscription',            name: 'Subscription',             component: () => import('@/views/main/company/Subscription.vue'),           meta: { icon: 'card_membership' } },
+        { path: '/company/privacy-policy',  name: 'PrivacyPolicy',            component: () => import('@/views/main/company/PrivacyPolicy.vue'),          meta: { icon: 'policy' },  },
+        { path: '/company/terms',           name: 'Terms',                    component: () => import('@/views/main/company/Terms.vue'),                  meta: { icon: 'description' }, },
+      ]
+    },
+    
 
     // Auth
     { path: '/login',              name: 'login',                    component: () => import('@/views/auth/Login.vue'),                  meta: { icon: 'login' }, hidden: true },

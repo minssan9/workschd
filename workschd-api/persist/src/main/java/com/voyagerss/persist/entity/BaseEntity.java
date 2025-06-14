@@ -25,19 +25,19 @@ public abstract class BaseEntity {
 
     @CreatedBy
     @Column(name = "created_by", columnDefinition = "varchar(255) default 'SYSTEM'")
-    private String createdBy;
+    private String createdBy = "SYSTEM";
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @LastModifiedBy
     @Column(name = "last_modified_by")
-    private String lastModifiedBy;
+    private String lastModifiedBy = "SYSTEM";
 
     @UpdateTimestamp
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private LocalDateTime lastModifiedAt;
+    private LocalDateTime lastModifiedAt = LocalDateTime.now();
 
     @PrePersist
     public void prePersist() {

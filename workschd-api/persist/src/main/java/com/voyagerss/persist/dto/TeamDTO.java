@@ -10,7 +10,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Data
-public class TeamDTO {
+public class TeamDTO extends BaseDTO {
     Long id;
     String name;
     String region;
@@ -19,8 +19,6 @@ public class TeamDTO {
     LocalDateTime invitationCreatedAt;
     String location;
     List<TeamMemberDTO> teamMembers;
-    LocalDateTime createdAt;
-    LocalDateTime lastModifiedBy;
     Pageable pageable;
 
     public TeamDTO(Team team) {
@@ -31,7 +29,7 @@ public class TeamDTO {
         this.invitationHash = team.getInvitationHash();
         this.invitationCreatedAt = team.getInvitationCreatedAt();
         this.location = team.getLocation();
-        this.createdAt = team.getCreatedAt();
-        this.lastModifiedBy = team.getLastModifiedAt();
+        this.setCreatedAt(team.getCreatedAt());
+        this.setLastModifiedAt(team.getLastModifiedAt());
     }
 }

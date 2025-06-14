@@ -10,6 +10,8 @@ export interface Shop {
   active?: boolean
   isActive?: boolean; 
   address?: string;  
+  latitude?: number;
+  longitude?: number;
 }
  
 

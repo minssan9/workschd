@@ -13,7 +13,7 @@
               <q-btn
                 class="modern-button"
                 :label="t('home.header.button.start', '지금 시작하기')"
-                :href="webUrl"
+                to="/signup"
                 no-caps
               />
             </div>
@@ -21,7 +21,7 @@
               <q-btn
                 class="modern-button modern-button--secondary"
                 :label="t('home.header.button.learnMore', '더 알아보기')"
-                :href="webUrl"
+                to="/company/features"
                 no-caps
               />
             </div>
@@ -124,7 +124,7 @@
           <div class="modern-bg__glass q-pa-xl" style="border-radius: 24px;">
             <h2 class="modern-text__title q-mb-md">지금 시작해보세요</h2>
             <p class="q-mb-xl">무료 체험 기간을 통해 서비스의 모든 기능을 경험해보세요.</p>
-            <q-btn class="modern-button" color="primary" :label="t('home.cta.button', '무료로 시작하기')" :href="webUrl" no-caps size="lg" />
+            <q-btn class="modern-button" color="primary" :label="t('home.cta.button', '무료로 시작하기')" to="/signup" no-caps size="lg" />
           </div>
         </div>
       </div>
@@ -137,33 +137,33 @@
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-4">
               <h5 class="text-weight-bold">About Us</h5>
-              <p class="text-caption">효율적인 근무 관리를 위한 최적의 솔루션을 제공합니다.</p>
+              <p class="text-caption">{{ companyDescription }}</p>
             </div>
             <div class="col-12 col-md-4">
               <h5 class="text-weight-bold">Links</h5>
               <div class="row">
                 <div class="col-6">
                   <q-list dense padding>
-                    <q-item clickable :href="webUrl">
+                    <q-item clickable to="/">
                       <q-item-section>Home</q-item-section>
                     </q-item>
-                    <q-item clickable :href="webUrl">
+                    <q-item clickable to="/company/features">
                       <q-item-section>Features</q-item-section>
                     </q-item>
-                    <q-item clickable :href="webUrl">
+                    <q-item clickable to="/company/pricing">
                       <q-item-section>Pricing</q-item-section>
                     </q-item>
                   </q-list>
                 </div>
                 <div class="col-6">
                   <q-list dense padding>
-                    <q-item clickable :href="privacyUrl">
+                    <q-item clickable to="/company/privacy-policy">
                       <q-item-section>Privacy</q-item-section>
                     </q-item>
-                    <q-item clickable :href="termsUrl">
+                    <q-item clickable to="/company/terms">
                       <q-item-section>Terms</q-item-section>
                     </q-item>
-                    <q-item clickable :href="webUrl">
+                    <q-item clickable to="/company/contact">
                       <q-item-section>Contact</q-item-section>
                     </q-item>
                   </q-list>
@@ -173,16 +173,16 @@
             <div class="col-12 col-md-4">
               <h5 class="text-weight-bold">Contact</h5>
               <p class="text-caption">
-                <q-icon name="email" size="xs" /> info@workschedule.com<br>
-                <q-icon name="phone" size="xs" /> +82 02-123-4567<br>
-                <q-icon name="place" size="xs" /> 서울특별시 강남구 테헤란로
+                <q-icon name="email" size="xs" /> {{ companyEmail }}<br>
+                <q-icon name="phone" size="xs" /> {{ companyPhone }}<br>
+                <q-icon name="place" size="xs" /> {{ companyAddress }}
               </p>
             </div>
           </div>
           <div class="row q-mt-md">
             <div class="col-12 text-center">
               <q-separator dark class="q-my-md" />
-              <p class="text-caption q-mb-none">{{ t('home.footer.copyright', '© 2024 Work Schedule Automation Service. All rights reserved.') }}</p>
+              <p class="text-caption q-mb-none">© {{ currentYear }} {{ companyName }}. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -193,15 +193,22 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
+import { useLayoutStore } from '../../stores/modules/store_layout'
 
 const { t } = useI18n()
+const layoutStore = useLayoutStore()
 
-// Mock values for URLs to avoid import.meta TypeScript issues
-// In production, these would be pulled from environment variables
-const baseUrl = ref('https://workschedule.com');
-const webUrl = computed(() => baseUrl.value);
-const privacyUrl = computed(() => `${baseUrl.value}/company/privacy-policy`);
-const termsUrl = computed(() => `${baseUrl.value}/company/use-term`);
+// Company and application info from store and environment
+const appTitle = computed(() => layoutStore.title || 'Work Schedule')
+const companyName = computed(() => layoutStore.company.name)
+const companyEmail = computed(() => layoutStore.company.email)
+const companyPhone = computed(() => layoutStore.company.phone)
+const companyAddress = computed(() => layoutStore.company.address)
+const companyDescription = computed(() => layoutStore.company.description)
+const pageTitle = computed(() => `${appTitle.value} - ${companyName.value}`)
+
+// Dynamic page content
+const currentYear = computed(() => new Date().getFullYear())
 </script>
 
 <style lang="scss">

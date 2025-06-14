@@ -3,46 +3,63 @@ package com.voyagerss.persist.entity;
 import com.voyagerss.persist.dto.AccountWorkHourDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-
-@RequiredArgsConstructor
+@Entity
+@Table(name = "account_work_hours")
 @Getter
 @Setter
-@Entity(name = "account_work_hour")
-public class AccountWorkHour extends BaseEntity {
-
+@NoArgsConstructor
+public class AccountWorkHour extends BaseEntity  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
+    @Column(name = "date", nullable = false)
     private LocalDate date;
+
+    @Column(name = "day", nullable = false)
     private String day;
+
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
+
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
-    private Boolean preferred;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "account_id")
-    private Account account ;
+    @Column(name = "preferred", nullable = false)
+    private boolean preferred;
 
-    public AccountWorkHour(AccountWorkHourDTO accountWorkHourDTO) {
-        this.date = accountWorkHourDTO.getDate();
-        this.day = accountWorkHourDTO.getDay();
-        this.startTime = accountWorkHourDTO.getStartTime();
-        this.endTime = accountWorkHourDTO.getEndTime();
-        this.preferred = accountWorkHourDTO.getPreferred();
+    public void updateFromDto(AccountWorkHourDTO dto) {
+        if (dto != null) {
+            LocalDate newDate = dto.getDateAsLocalDate();
+            if (newDate != null) {
+                this.date = newDate;
+            }
+            if (dto.getDay() != null) {
+                this.day = dto.getDay();
+            }
+            LocalTime newStartTime = dto.getStartTimeAsLocalTime();
+            if (newStartTime != null) {
+                this.startTime = newStartTime;
+            }
+            LocalTime newEndTime = dto.getEndTimeAsLocalTime();
+            if (newEndTime != null) {
+                this.endTime = newEndTime;
+            }
+            this.preferred = dto.isPreferred();
+        }
     }
 
-    public void updateFromDto(AccountWorkHourDTO accountWorkHourDTO) {
-        this.date = accountWorkHourDTO.getDate();
-        this.day = accountWorkHourDTO.getDay();
-        this.startTime = accountWorkHourDTO.getStartTime();
-        this.endTime = accountWorkHourDTO.getEndTime();
-        this.preferred = accountWorkHourDTO.getPreferred();
+    public AccountWorkHour(AccountWorkHourDTO dto) {
+        updateFromDto(dto);
     }
 }

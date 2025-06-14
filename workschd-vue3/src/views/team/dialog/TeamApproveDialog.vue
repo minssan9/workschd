@@ -1,5 +1,8 @@
 <template>
-  <q-dialog v-model="isOpen">
+  <q-dialog 
+    v-model="isOpen"
+    auto-close
+  >
     <q-card class="dialog-card medium">
       <q-card-section class="dialog-title">
         <div class="text-h6">Approve Join Requests</div>

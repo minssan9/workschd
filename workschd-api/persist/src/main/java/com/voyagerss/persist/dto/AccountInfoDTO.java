@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Data
-public class AccountInfoDTO implements Serializable {
+public class AccountInfoDTO extends BaseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
 
@@ -33,17 +33,6 @@ public class AccountInfoDTO implements Serializable {
     private String unavailableDaysOfWeek;
 
     private Boolean manager;
-
-    private String createdBy;
-
-    private LocalDateTime createdAt;
-
-    private Boolean active;
-
-    private String lastModifiedBy;
-
-    private LocalDateTime lastModifiedAt;
-
 
     public AccountInfoDTO(Account account){
         BeanUtils.copyProperties(account, this);

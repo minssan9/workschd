@@ -14,7 +14,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class TaskDTO implements Serializable {
+public class TaskDTO extends BaseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     
     // Task fields
@@ -27,7 +27,6 @@ public class TaskDTO implements Serializable {
     private EnumMaster.TaskStatus status;
     private Long teamId;
     private Long shopId;
-    private Boolean active;
     
     // Added fields for names
     private String shopName;

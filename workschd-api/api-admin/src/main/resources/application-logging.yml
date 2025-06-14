@@ -15,7 +15,7 @@ logging:
     root: info
     org.hibernate.SQL: info
     org.springframework.web: info
-    com.zaxxer.hikari: DEBUG
+    com.zaxxer.hikari: info
   logback:
     rollingpolicy:
       max-file-size: 20MB

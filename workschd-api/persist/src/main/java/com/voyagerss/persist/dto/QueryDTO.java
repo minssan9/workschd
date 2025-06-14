@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Data
 @Builder
 @AllArgsConstructor
-public class QueryDTO {
+public class QueryDTO extends BaseDTO {
     private Pageable pageable;
     private String originAuth;
 

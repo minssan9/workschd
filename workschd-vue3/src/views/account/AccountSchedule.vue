@@ -48,6 +48,15 @@
 
             <div class="row justify-end" style="margin-top: 16px; bottom: 16px; right: 16px; width: calc(100% - 32px);">
               <q-btn
+                :label="t('accountWorkHour.preferences.refresh', '새로고침')"
+                @click="loadSchedulePreferences"
+                color="secondary"
+                :loading="isLoading"
+                flat
+                size="sm"
+                class="q-mr-sm"
+              />
+              <q-btn
                 :label="t('accountWorkHour.preferences.save', '설정 저장')"
                 @click="handleScheduleUpdate"
                 color="primary"
@@ -106,6 +115,15 @@
 
             <div class="row justify-end" style="margin-top: 16px; bottom: 16px; right: 16px; width: calc(100% - 32px);">
               <q-btn
+                :label="t('accountWorkHour.unavailable.refresh', '새로고침')"
+                @click="loadUnavailableDates"
+                color="secondary"
+                :loading="isLoadingDates"
+                flat
+                size="sm"
+                class="q-mr-sm"
+              />
+              <q-btn
                 :label="t('accountWorkHour.unavailable.save', '저장')"
                 color="primary"
                 :loading="isSavingDates"
@@ -121,12 +139,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from 'quasar'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import apiAccountSchedule from '@/api/modules/api-account-schedule'
+import apiAccountSchedule, { 
+  AccountWorkHourDto, 
+  AccountWorkOffDateDto,
+  DayValueConfig,
+  daysOfWeek as apiDaysOfWeek 
+} from '@/api/modules/api-account-schedule'
 import GridDefault from '@/components/grid/GridDefault.vue'
 import type { ColDef } from 'ag-grid-community'
 import { useUserStore } from '@/stores/modules/store_user'
@@ -136,16 +159,17 @@ const $q = useQuasar()
 const userStore = useUserStore()
 const accountId = computed(() => userStore.accountId || '')
 
-interface SchedulePreferences {
-  preferredDays: string[]
-  preferredShifts: string[]
-}
-
-interface DayScheduleDto {
+interface DaySchedule {
   day: string
   enabled: boolean
   startTime: string
   endTime: string
+  preferred: boolean
+}
+
+interface SchedulePreferences {
+  preferredDays: string[]
+  preferredShifts: string[]
 }
 
 interface DateItem {
@@ -159,14 +183,14 @@ const schedulePreferences = ref<SchedulePreferences>({
 })
 
 // Initialize day schedules
-const daySchedules = ref<Record<string, DayScheduleDto>>({
-  MONDAY: { day: 'MONDAY', enabled: false, startTime: '09:00', endTime: '18:00' },
-  TUESDAY: { day: 'TUESDAY', enabled: false, startTime: '09:00', endTime: '18:00' },
-  WEDNESDAY: { day: 'WEDNESDAY', enabled: false, startTime: '09:00', endTime: '18:00' },
-  THURSDAY: { day: 'THURSDAY', enabled: false, startTime: '09:00', endTime: '18:00' },
-  FRIDAY: { day: 'FRIDAY', enabled: false, startTime: '09:00', endTime: '18:00' },
-  SATURDAY: { day: 'SATURDAY', enabled: false, startTime: '09:00', endTime: '18:00' },
-  SUNDAY: { day: 'SUNDAY', enabled: false, startTime: '09:00', endTime: '18:00' }
+const daySchedules = ref<Record<string, DaySchedule>>({
+  MONDAY: { day: 'MONDAY', enabled: false, startTime: '09:00', endTime: '18:00', preferred: true },
+  TUESDAY: { day: 'TUESDAY', enabled: false, startTime: '09:00', endTime: '18:00', preferred: true },
+  WEDNESDAY: { day: 'WEDNESDAY', enabled: false, startTime: '09:00', endTime: '18:00', preferred: true },
+  THURSDAY: { day: 'THURSDAY', enabled: false, startTime: '09:00', endTime: '18:00', preferred: true },
+  FRIDAY: { day: 'FRIDAY', enabled: false, startTime: '09:00', endTime: '18:00', preferred: true },
+  SATURDAY: { day: 'SATURDAY', enabled: false, startTime: '09:00', endTime: '18:00', preferred: true },
+  SUNDAY: { day: 'SUNDAY', enabled: false, startTime: '09:00', endTime: '18:00', preferred: true }
 })
 
 // Generate time options for select (24-hour format)
@@ -184,20 +208,12 @@ const timeOptions = (() => {
 })()
 
 const isSaving = ref(false)
-
-const daysOfWeek = [
-  { label: t('days.monday', '월요일'), value: 'MONDAY' },
-  { label: t('days.tuesday', '화요일'), value: 'TUESDAY' },
-  { label: t('days.wednesday', '수요일'), value: 'WEDNESDAY' },
-  { label: t('days.thursday', '목요일'), value: 'THURSDAY' },
-  { label: t('days.friday', '금요일'), value: 'FRIDAY' },
-  { label: t('days.saturday', '토요일'), value: 'SATURDAY' },
-  { label: t('days.sunday', '일요일'), value: 'SUNDAY' }
-]
+const isLoading = ref(false)
 
 const activeTab = ref('calendar')
 const selectedDates = ref<string[]>([])
 const isSavingDates = ref(false)
+const isLoadingDates = ref(false)
 
 const columnDefs = ref<ColDef[]>([
   { headerName: t('accountWorkHour.grid.date', '날짜'), field: 'date', sortable: true, filter: true, editable: false },
@@ -208,6 +224,7 @@ const columnDefs = ref<ColDef[]>([
 // Transform selected dates for grid display
 const gridData = computed(() => {
   return selectedDates.value.map(date => ({
+    id: date,
     date: format(new Date(date), 'yyyy-MM-dd'),
     dayOfWeek: format(new Date(date), 'EEEE', { locale: ko }),
     reason: ''
@@ -218,15 +235,37 @@ function onGridCellClicked(params: any) {
   console.log('Grid cell clicked:', params)
 }
 
+// Use the days of week from the API
+const daysOfWeek: DayValueConfig[] = apiDaysOfWeek.map(day => ({
+  label: t(`days.${day.value.toLowerCase()}`, day.label),
+  value: day.value
+}))
+
+const handleScheduleUpdate = async () => {
+  try {
+    isSaving.value = true
+    const workHours = formatSchedulePreferencesForApi()
+    
+    // Use batch update with correct method name
+    await apiAccountSchedule.saveOrUpdateWorkHours(accountId.value, workHours)
+    
+    $q.notify({ type: 'positive', message: t('accountWorkHour.preferences.saveSuccess', '스케줄 설정이 저장되었습니다') })
+  } catch (error) {
+    $q.notify({ type: 'negative', message: t('accountWorkHour.preferences.saveError', '스케줄 설정 저장에 실패했습니다') })
+  } finally {
+    isSaving.value = false
+  }
+}
+
 async function handleUnavailableDatesUpdate() {
   try {
     isSavingDates.value = true
-    const unavailableDates = gridData.value.map(row => ({
-      date: row.date,
-      reason: row.reason
-    }))
+    const workOffDates = gridData.value.map(row => ({
+      offDate: row.date,
+    })) as AccountWorkOffDateDto[]
     
-    await apiAccountSchedule.saveUnavailableDates(accountId.value, unavailableDates)
+    // Use batch update with correct method name
+    await apiAccountSchedule.saveOrUpdateWorkOffDates(accountId.value, workOffDates)
     
     $q.notify({ type: 'positive', message: t('accountWorkHour.unavailable.saveSuccess', '근무 불가능 일정이 저장되었습니다') })
   } catch (error) {
@@ -237,82 +276,82 @@ async function handleUnavailableDatesUpdate() {
   }
 }
 
+// Convert daySchedules to format for API
+const formatSchedulePreferencesForApi = () => {
+  const currentDate = new Date()
+  return Object.values(daySchedules.value)
+    .filter(schedule => schedule.enabled)
+    .map(schedule => ({
+      date: format(currentDate, 'yyyy-MM-dd'),
+      day: schedule.day,
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      preferred: schedule.preferred
+    })) as AccountWorkHourDto[]
+}
+
+// Load work hours preferences on mount
+const loadSchedulePreferences = async () => {
+  try {
+    isLoading.value = true
+    const response = await apiAccountSchedule.getWorkHours(accountId.value)
+    if (response?.data?.content) {
+      // Reset all days to disabled first
+      Object.keys(daySchedules.value).forEach(day => {
+        daySchedules.value[day].enabled = false
+      })
+      
+      // Enable and set times for days from API
+      response.data.content.forEach((workHour: AccountWorkHourDto) => {
+        const day = workHour.day
+        if (daySchedules.value[day]) {
+          daySchedules.value[day].enabled = true
+          daySchedules.value[day].startTime = workHour.startTime
+          daySchedules.value[day].endTime = workHour.endTime
+          daySchedules.value[day].preferred = workHour.preferred
+        }
+      })
+    }
+  } catch (error) {
+    console.error('Failed to load work hours preferences:', error)
+    $q.notify({ type: 'negative', message: t('accountWorkHour.preferences.loadError', '스케줄 설정 로드에 실패했습니다') })
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Load unavailable dates
 async function loadUnavailableDates() {
   try {
-    const response = await apiAccountSchedule.getUnavailableDates(accountId.value)
-    if (response?.data?.dates) {
-      const dates = response.data.dates.map((item: DateItem) => item.date)
-      selectedDates.value = dates
+    isLoadingDates.value = true
+    const response = await apiAccountSchedule.getWorkOffDates(accountId.value)
+    if (response?.data?.content) {
+      // Map off dates to selected dates format
+      selectedDates.value = response.data.content.map((item: AccountWorkOffDateDto) => {
+        // Ensure date is in YYYY-MM-DD format
+        const date = new Date(item.offDate)
+        return format(date, 'yyyy-MM-dd')
+      })
     }
   } catch (error) {
     console.error('Failed to load unavailable dates:', error)
     $q.notify({ type: 'negative', message: t('accountWorkHour.unavailable.loadError', '근무 불가능 일정 로드에 실패했습니다') })
-  }
-}
-
-// Convert daySchedules to format for API
-const formatSchedulePreferencesForApi = () => {
-  const result = {
-    daySchedules: Object.values(daySchedules.value)
-      .filter((accountWorkHour: DayScheduleDto) => accountWorkHour.enabled)
-      .map((accountWorkHour: DayScheduleDto) => ({
-        day: accountWorkHour.day,
-        startTime: accountWorkHour.startTime,
-        endTime: accountWorkHour.endTime
-      }))
-  }
-  return result
-}
-
-// Convert API response to daySchedules format
-const parseDaySchedulesFromApi = (data: any) => {
-  // Reset all days to disabled first
-  Object.keys(daySchedules.value).forEach(day => {
-    daySchedules.value[day].enabled = false
-  })
-  
-  // Enable and set times for days from API
-  if (data?.daySchedules && Array.isArray(data.daySchedules)) {
-    data.daySchedules.forEach((accountWorkHour: DayScheduleDto) => {
-      const day = accountWorkHour.day
-      if (daySchedules.value[day]) {
-        daySchedules.value[day].enabled = true
-        daySchedules.value[day].startTime = accountWorkHour.startTime
-        daySchedules.value[day].endTime = accountWorkHour.endTime
-      }
-    })
-  }
-}
-
-const handleScheduleUpdate = async () => {
-  try {
-    isSaving.value = true
-    const formattedPreferences = formatSchedulePreferencesForApi()
-    await apiAccountSchedule.saveSchedulePreferences(accountId.value, formattedPreferences)
-    
-    $q.notify({ type: 'positive', message: t('accountWorkHour.preferences.saveSuccess', '스케줄 설정이 저장되었습니다') })
-  } catch (error) {
-    $q.notify({ type: 'negative', message: t('accountWorkHour.preferences.saveError', '스케줄 설정 저장에 실패했습니다') })
   } finally {
-    isSaving.value = false
-  }
-}
-
-// Load accountWorkHour preferences on mount
-const loadSchedulePreferences = async () => {
-  try {
-    const response = await apiAccountSchedule.getSchedulePreferences(accountId.value)
-    if (response?.data) {
-      parseDaySchedulesFromApi(response.data)
-    }
-  } catch (error) {
-    console.error('Failed to load accountWorkHour preferences:', error)
+    isLoadingDates.value = false
   }
 }
 
 onMounted(() => {
   loadSchedulePreferences()
   loadUnavailableDates()
+})
+
+// Watch accountId changes to reload data
+watch(() => accountId.value, () => {
+  if (accountId.value) {
+    loadSchedulePreferences()
+    loadUnavailableDates()
+  }
 })
 </script>
 

@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import service from '@/api/axios-voyagerss';
 
-// Define interfaces for schedule configuration
+// Value type configurations
 export interface DayValueConfig {
   value: string;
   label: string;
@@ -11,15 +11,29 @@ export interface MonthValueConfig {
   value: number;
   label: string;
 }
-export interface DayConfig {
-  [day: string]: number; // e.g., MONDAY: 1
+
+// Types for API requests and responses
+export interface AccountWorkHourDto {
+  id?: number;
+  date: string;  // LocalDate in ISO format
+  day: string;   // Day of week
+  startTime: string; // LocalTime in ISO format
+  endTime: string;   // LocalTime in ISO format
+  preferred: boolean;
 }
 
-export interface MonthConfig {
-  [month: number]: number; // e.g., 1: 4 (January: 4 days)
+export interface AccountWorkHoursResponse {
+  workHours: AccountWorkHourDto[];
 }
 
+export interface AccountWorkOffDateDto {
+  id?: number;
+  offDate: string;  // LocalDate in ISO format
+}
 
+export interface AccountWorkOffDatesResponse {
+  offDates: AccountWorkOffDateDto[];
+}
 
 // Constants for schedule configuration
 export const daysOfWeek: DayValueConfig[] = [
@@ -47,26 +61,40 @@ export const months: MonthValueConfig[] = [
   { value: 12, label: 'December' }
 ];
 
-
-const baesURL = `account` 
-const apiAccountSchedule = { 
-  // Schedule preferences methods
-  getSchedulePreferences(accountId) {
-    return service.get(`${baesURL}/${accountId}/schedule-preferences`)
+const apiAccountSchedule = {
+  // Work hour methods
+  getWorkHours(accountId: string | number): Promise<AxiosResponse<AccountWorkHoursResponse>> {
+    return service.get(`account/${accountId}/schedule/work-hours`);
   },
 
-  saveSchedulePreferences(accountId, preferences) {
-    return service.post(`${baesURL}/${accountId}/schedule-preferences`, preferences)
+  saveOrUpdateWorkHour(accountId: string | number, workHour: AccountWorkHourDto): Promise<AxiosResponse<number>> {
+    return service.post(`account/${accountId}/schedule/work-hours`, workHour);
   },
 
-  // Unavailable dates methods
-  getUnavailableDates(accountId) {
-    return service.get(`${baesURL}/${accountId}/unavailable-dates`)
+  saveOrUpdateWorkHours(accountId: string | number, workHours: AccountWorkHourDto[]): Promise<AxiosResponse<number[]>> {
+    return service.post(`account/${accountId}/schedule/work-hours/batch`, workHours);
   },
 
-  saveUnavailableDates(accountId, dates) {
-    return service.post(`${baesURL}/${accountId}/unavailable-dates`, { dates })
+  deleteWorkHour(accountId: string | number, workHourId: number): Promise<AxiosResponse> {
+    return service.delete(`account/${accountId}/schedule/work-hours/${workHourId}`);
+  },
+
+  // Work off dates methods
+  getWorkOffDates(accountId: string | number): Promise<AxiosResponse<AccountWorkOffDatesResponse>> {
+    return service.get(`account/${accountId}/schedule/off-dates`);
+  },
+
+  saveOrUpdateWorkOffDate(accountId: string | number, workOffDate: AccountWorkOffDateDto): Promise<AxiosResponse<number>> {
+    return service.post(`account/${accountId}/schedule/off-dates`, workOffDate);
+  },
+
+  saveOrUpdateWorkOffDates(accountId: string | number, workOffDates: AccountWorkOffDateDto[]): Promise<AxiosResponse<number[]>> {
+    return service.post(`account/${accountId}/schedule/off-dates/batch`, workOffDates);
+  },
+
+  deleteWorkOffDate(accountId: string | number, workOffDateId: number): Promise<AxiosResponse> {
+    return service.delete(`account/${accountId}/schedule/off-dates/${workOffDateId}`);
   }
-}
+};
 
 export default apiAccountSchedule;

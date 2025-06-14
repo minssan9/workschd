@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class TranslationsDTO implements Serializable {
+public class TranslationsDTO extends BaseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
 

@@ -1,5 +1,8 @@
 <template>
-  <q-dialog v-model="isOpen" @hide="resetForm">
+  <q-dialog 
+    v-model="isOpen"
+    @hide="handleDialogHide"
+  >
     <q-card class="dialog-card large">
       <q-card-section class="dialog-title">
         <div class="text-h6">Team Registration</div>
@@ -55,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineEmits, defineModel, defineProps, ref} from 'vue'
+import {defineEmits, defineModel, defineProps, ref, watch} from 'vue'
 import {useQuasar} from 'quasar'
 import {TeamDTO} from '@/api/modules/api-team'
 import apiTeam from '@/api/modules/api-team'
@@ -74,6 +77,8 @@ const isOpen = defineModel('modelValue')
 // Setup
 const $q = useQuasar()
  
+// Add hasUnsavedChanges ref
+const hasUnsavedChanges = ref(false)
 
 // Schedule types
 const scheduleTypes = [
@@ -99,8 +104,34 @@ const resetForm = () => {
     scheduleType: 'Weekly',
     preferredPlaces: []
   }  
+  hasUnsavedChanges.value = false
 }
 
+// Handle dialog hide
+function handleDialogHide() {
+  if (hasUnsavedChanges.value) {
+    $q.dialog({
+      title: 'Confirm',
+      message: 'You have unsaved changes. Are you sure you want to close?',
+      cancel: true,
+      persistent: true
+    }).onOk(() => {
+      resetForm()
+      isOpen.value = false
+    })
+    return
+  }
+  
+  resetForm()
+  isOpen.value = false
+}
+
+// Watch for form changes
+watch(() => teamForm.value, () => {
+  if (teamForm.value.name || teamForm.value.region || teamForm.value.scheduleType !== 'Weekly') {
+    hasUnsavedChanges.value = true
+  }
+}, { deep: true })
 
 const onSubmit = async () => {
   try {
@@ -114,7 +145,7 @@ const onSubmit = async () => {
       // Show success notification
       $q.notify({ type: 'positive', message: 'Team registered successfully' })
       
-      // Close the dialog - this will trigger resetForm via @hide
+      // Close the dialog - this will trigger resetForm via handleDialogHide
       isOpen.value = false
     } else {
       throw new Error(`API error: ${response.status}`)

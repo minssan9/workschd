@@ -47,7 +47,6 @@ build/
 
 # Database files
 *.db
-*.sql
 *.sqlite
 *.sqlite3
 

@@ -29,6 +29,9 @@ public class TeamMember extends BaseEntity implements Serializable {
     private String status;
     @Column(name = "join_date")
     private LocalDateTime joinDate;
+    
+    @Column(name = "priority")
+    private Integer priority = 0; // Default priority is 0
 
     @ManyToOne
     @JoinColumn(name = "team_id")

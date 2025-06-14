@@ -10,9 +10,9 @@ import lombok.RequiredArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Data
-public class AccountSnsDTO implements Serializable {
+public class AccountSnsDTO extends BaseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long accountId;
 
@@ -37,8 +37,7 @@ public class AccountSnsDTO implements Serializable {
     private String accessToken;
 
     private String refreshToken;
-
-    private LocalDateTime createdAt;
+ 
 
     public AccountSnsDTO(AccountSns accountSns) {
         this.accountSnsId = accountSns.getAccountSnsId();

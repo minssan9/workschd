@@ -1,135 +1,179 @@
 <template>
-  <q-page class="q-pa-md">
-    <!-- View Toggle (List/Calendar) -->
-    <div class="row items-center q-mb-md">
-      <q-btn-toggle
-        v-model="viewMode"
-        :options="[
-          { label: '목록', value: 'list' },
-          { label: '캘린더', value: 'calendar' }
-        ]"
-        color="primary"
-        dense
-        unelevated
-        class="q-mr-md"
-      />
-      <q-btn-toggle
-        v-model="requestFilter"
-        :options="[
-          { label: '전체 작업', value: 'all' },
-          { label: '내 신청', value: 'mine' }
-        ]"
-        color="secondary"
-        dense
-        unelevated
-      />
-    </div>
+  <q-page class="task-list-mobile">
+    <!-- Header Section -->
+    <div class="header-section q-pa-md q-mb-lg">
+      <div class="row items-center justify-between q-mb-md">
+        <div class="text-h5 text-weight-bold">Task Management</div>
+        <q-btn-toggle
+          v-model="viewMode"
+          :options="[
+            { label: '목록', value: 'list', icon: 'list' },
+            { label: '캘린더', value: 'calendar', icon: 'calendar_today' }
+          ]"
+          color="primary"
+          glossy
+          unelevated
+          rounded
+          class="toggle-btn"
+        />
+      </div>
+      
+      <div class="filter-section q-mb-lg">
+        <q-input 
+          v-model="searchQuery" 
+          outlined 
+          dense 
+          placeholder="Search tasks..." 
+          class="search-input q-mb-sm"
+          bg-color="white"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" color="primary" />
+          </template>
+        </q-input>
 
-    <!-- Calendar View (stub) -->
-    <div v-if="viewMode === 'calendar'" class="q-mb-md">
-      <q-banner class="bg-grey-2 text-grey-8 q-mb-md">
-        <q-icon name="event" class="q-mr-sm" />
-        캘린더 뷰는 곧 제공됩니다. (Stub)
-      </q-banner>
-      <!-- Replace with real calendar later -->
-      <div class="row q-col-gutter-sm">
-        <div v-for="day in 7" :key="day" class="col">
-          <q-card flat bordered class="q-pa-sm bg-grey-1">
-            <div class="text-caption text-grey-7">Day {{ day }}</div>
-            <div v-for="task in tasksForCalendar(day)" :key="task.id" class="q-mt-xs">
-              <q-chip color="primary" text-color="white" class="q-mb-xs">{{ task.title }}</q-chip>
+        <div class="row q-col-gutter-sm">
+          <div class="col-12 col-md-auto">
+            <q-btn-toggle
+              v-model="requestFilter"
+              :options="[
+                { label: '전체 작업', value: 'all', icon: 'work' },
+                { label: '내 신청', value: 'mine', icon: 'person' }
+              ]"
+              color="secondary"
+              rounded
+              unelevated
+              glossy
+              class="full-width"
+            />
+          </div>
+          <div class="col-12 col-md-auto">
+            <div class="status-filters row q-col-gutter-x-sm">
+              <div v-for="status in statusOptions" :key="status.value" class="col-auto">
+                <q-btn
+                  :label="status.label"
+                  :color="statusFilter === status.value ? 'primary' : 'grey-3'"
+                  :text-color="statusFilter === status.value ? 'white' : 'grey-8'"
+                  @click="statusFilter = status.value"
+                  rounded
+                  flat
+                  dense
+                  class="status-btn"
+                />
+              </div>
             </div>
-          </q-card>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- Calendar View -->
+    <div v-if="viewMode === 'calendar'" class="calendar-section q-pa-md">
+      <q-card flat bordered class="calendar-card">
+        <q-card-section>
+          <div class="text-h6 q-mb-md">Weekly Calendar</div>
+          <div class="row q-col-gutter-md">
+            <div v-for="day in 7" :key="day" class="col">
+              <q-card flat bordered class="day-card">
+                <q-card-section class="q-pa-sm">
+                  <div class="text-subtitle2 text-weight-medium q-mb-sm">Day {{ day }}</div>
+                  <div v-for="task in tasksForCalendar(day)" :key="task.id" class="task-chip q-mb-xs">
+                    <q-chip
+                      dense
+                      color="primary"
+                      text-color="white"
+                      class="full-width"
+                    >
+                      {{ task.title }}
+                    </q-chip>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
     </div>
 
     <!-- List View -->
-    <div v-else>
-      <!-- Search and Filter Bar -->
-      <div class="q-mb-md">
-        <q-input v-model="searchQuery" outlined dense placeholder="작업 검색" class="q-mb-sm">
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-        <div class="row q-col-gutter-sm">
-          <div class="col-12 text-subtitle1 q-mb-xs">상태 필터</div>
-          <div class="col-auto">
-            <q-chip
-              clickable
-              :color="statusFilter === '' ? 'primary' : 'grey-4'"
-              :text-color="statusFilter === '' ? 'white' : 'black'"
-              @click="statusFilter = ''"
-              dense
-            >
-              전체
-            </q-chip>
-          </div>
-          <div v-for="status in statusOptions" :key="status.value" class="col-auto">
-            <q-chip
-              clickable
-              :color="statusFilter === status.value ? 'primary' : 'grey-4'"
-              :text-color="statusFilter === status.value ? 'white' : 'black'"
-              @click="statusFilter = status.value"
-              dense
-            >
-              {{ status.label }}
-            </q-chip>
-          </div>
-        </div>
-      </div>
+    <div v-else class="list-section q-px-md">
+      <q-list separator class="rounded-borders bg-white">
+        <q-item 
+          v-for="task in filteredTasksForView" 
+          :key="task.id" 
+          clickable 
+          v-ripple
+          @click="showTaskDetails(task)"
+          class="task-item q-py-md"
+        >
+          <q-item-section>
+            <div class="row items-center q-mb-sm">
+              <div class="col">
+                <div class="text-h6 text-weight-medium">{{ task.title }}</div>
+              </div>
+              <div class="col-auto">
+                <q-chip
+                  :color="getTaskStatusColor(task.status)"
+                  text-color="white"
+                  dense
+                  class="status-chip"
+                >
+                  {{ getTaskStatusLabel(task.status) }}
+                </q-chip>
+              </div>
+            </div>
 
-      <!-- Tasks List (with Quasar grid) -->
-      <div class="q-mb-md">
-        <q-list bordered separator>
-          <q-item 
-            v-for="task in filteredTasksForView" 
-            :key="task.id" 
-            clickable 
-            v-ripple
-            @click="showTaskDetails(task)"
-            class="q-py-md"
-          >
-            <q-item-section>
-              <q-item-label class="text-subtitle1 text-weight-medium">{{ task.title }}</q-item-label>
-              <q-item-label caption lines="2">{{ task.description }}</q-item-label>
-              <div class="row items-center q-mt-xs">
-                <q-icon name="event" size="xs" class="q-mr-xs" />
-                <span class="text-caption">{{ formatDateRange(task.startDateTime, task.endDateTime) }}</span>
+            <q-item-label caption lines="2" class="text-body2 q-mb-sm">
+              {{ task.description }}
+            </q-item-label>
+
+            <div class="row q-col-gutter-x-md q-mb-sm">
+              <div class="col-auto">
+                <div class="row items-center text-body2">
+                  <q-icon name="event" size="xs" class="q-mr-xs text-primary" />
+                  {{ formatDateRange(task.startDateTime, task.endDateTime) }}
+                </div>
               </div>
-              <div class="row items-center q-mt-xs">
-                <q-icon name="accountWorkHour" size="xs" class="q-mr-xs" />
-                <span class="text-caption">{{ formatTimeRange(task.startDateTime, task.endDateTime) }}</span>
+              <div class="col-auto">
+                <div class="row items-center text-body2">
+                  <q-icon name="schedule" size="xs" class="q-mr-xs text-primary" />
+                  {{ formatTimeRange(task.startDateTime, task.endDateTime) }}
+                </div>
               </div>
-              <div class="row items-center q-mt-xs">
-                <q-icon name="store" size="xs" class="q-mr-xs" />
-                <span class="text-caption">{{ task.shopName || 'N/A' }}</span>
+            </div>
+
+            <div class="row q-col-gutter-x-md">
+              <div class="col-auto">
+                <div class="row items-center text-body2">
+                  <q-icon name="store" size="xs" class="q-mr-xs text-primary" />
+                  {{ task.shopName || 'N/A' }}
+                </div>
               </div>
-              <div class="row items-center q-mt-xs">
-                <q-icon name="group" size="xs" class="q-mr-xs" />
-                <span class="text-caption">Team: {{ task.teamName || 'N/A' }}</span>
+              <div class="col-auto">
+                <div class="row items-center text-body2">
+                  <q-icon name="group" size="xs" class="q-mr-xs text-primary" />
+                  Team: {{ task.teamName || 'N/A' }}
+                </div>
               </div>
-              <div class="row items-center q-mt-xs">
-                <q-icon name="group" size="xs" class="q-mr-xs" />
-                <span class="text-caption">현재 {{ task.taskEmployees?.length || 0 }}명 / 총 {{ task.workerCount }}명</span>
+              <div class="col-auto">
+                <div class="row items-center text-body2">
+                  <q-icon name="people" size="xs" class="q-mr-xs text-primary" />
+                  {{ task.taskEmployees?.length || 0 }}/{{ task.workerCount }} workers
+                </div>
               </div>
-            </q-item-section>
-            <q-item-section side>
-              <q-chip
-                :color="getTaskStatusColor(task.status)"
-                text-color="white"
-                dense
-              >
-                {{ getTaskStatusLabel(task.status) }}
-              </q-chip>
+            </div>
+          </q-item-section>
+
+          <q-item-section side>
+            <div class="column items-end">
               <q-btn
                 v-if="canRequestToJoin(task)"
-                color="primary" 
-                label="참여 신청" 
-                size="sm" 
+                color="primary"
+                label="참여 신청"
+                rounded
                 flat
-                class="q-mt-sm"
+                dense
+                class="q-mb-sm"
                 @click.stop="confirmJoinRequest(task)"
               />
               <q-chip
@@ -137,33 +181,37 @@
                 :color="getRequestStatusColor(getTaskRequestStatus(task.id))"
                 text-color="white"
                 dense
-                class="q-mt-sm"
+                class="request-status-chip"
               >
                 {{ getRequestStatusLabel(getTaskRequestStatus(task.id)) }}
               </q-chip>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </div>
+            </div>
+          </q-item-section>
+        </q-item>
+      </q-list>
 
-      <!-- Pagination controls -->
-      <div class="row justify-center q-mt-md">
+      <!-- Pagination -->
+      <div class="row justify-center q-mt-lg q-mb-md">
         <q-pagination
           v-model="currentPage"
           :max="totalPages"
           direction-links
           boundary-links
-          :max-pages="3"
+          :max-pages="5"
           color="primary"
+          rounded
+          unelevated
+          class="pagination"
         />
       </div>
     </div>
 
-    <!-- Consolidated Task Dialog -->
+    <!-- Task Dialog -->
     <TaskDialog
       v-model="showTaskDialog"
       :task="selectedTask"
       :is-submitting="isSubmitting"
+      :shops="shops"
       @join-request="submitJoinRequest"
       @cancel="submitCancel"
     />
@@ -176,10 +224,12 @@ import { useQuasar, date } from 'quasar'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/modules/store_user'
 import taskApi from '@/api/modules/api-task'
+import apiTeamShop from '@/api/modules/api-team-shop'
 import { 
   Task, 
   TaskEmployee,
-  JoinRequest
+  JoinRequest,
+  Shop
 } from '@/types'
 import { 
   TaskStatus, 
@@ -212,7 +262,9 @@ const queryParams = ref({
 
 // Tasks state
 const tasks = ref<Task[]>([])
+const shops = ref<Shop[]>([])
 const isLoading = ref(false)
+const isLoadingShops = ref(false)
 const searchQuery = ref('')
 const statusFilter = ref('')
 const userRequests = ref<any[]>([])
@@ -238,10 +290,11 @@ const requestFilter = ref<'all' | 'mine'>('all')
 // Load tasks and user's task requests
 onMounted(async () => {
   updateQueryParams()
-  await loadTasks()
-  if (user.value?.accountId) {
-    await loadUserTaskRequests()
-  }
+  await Promise.all([
+    loadTasks(),
+    loadShops(),
+    user.value?.accountId ? loadUserTaskRequests() : Promise.resolve()
+  ])
 })
 
 // Watch for filter/search changes to update tasks
@@ -307,6 +360,23 @@ async function loadUserTaskRequests() {
   }
 }
 
+// Load shops for the user's team
+async function loadShops() {
+  if (!user.value?.teamId) return
+  
+  isLoadingShops.value = true
+  try {
+    const response = await apiTeamShop.getShopsByTeamId(user.value.teamId)
+    shops.value = response.data
+  } catch (error) {
+    console.error('Error loading shops:', error)
+    $q.notify({ type: 'negative', message: '매장 목록을 불러오는데 실패했습니다.' })
+    shops.value = []
+  } finally {
+    isLoadingShops.value = false
+  }
+}
+
 // Show task details
 function showTaskDetails(task: Task) {
   selectedTask.value = task
@@ -325,7 +395,7 @@ async function submitJoinRequest(task: Task) {
 
   isSubmitting.value = true
   try {
-    const requestData: Partial<TaskEmployee> = {
+    const requestData = {
       taskId: task.id,
       accountId: Number(user.value.accountId),
       status: RequestStatus.PENDING
@@ -412,12 +482,10 @@ const submitCancel = async (task: Task) => {
   
   isSubmitting.value = true
   try {
-    // Update task status to cancelled
-    const updatedTask = { ...task, status: TaskStatus.CANCELLED }
-    await taskApi.updateTask(updatedTask)
+    // For now, just close the dialog - updateTask method doesn't exist in taskApi
+    // This would need to be implemented if task cancellation is required
     showTaskDialog.value = false
-    await loadTasks()
-    $q.notify({ type: 'positive', message: '작업이 취소되었습니다.' })
+    $q.notify({ type: 'info', message: '작업 취소 기능은 아직 구현되지 않았습니다.' })
   } catch (error) {
     console.error('Failed to cancel task:', error)
     $q.notify({ type: 'negative', message: '작업 취소에 실패했습니다.' })
@@ -427,11 +495,79 @@ const submitCancel = async (task: Task) => {
 }
 </script>
 
-<style scoped>
-/* Responsive adjustments */
-@media (max-width: 599px) {
-  .q-page {
-    padding: 12px !important;
+<style lang="scss" scoped>
+.task-list-mobile {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+
+  .header-section {
+    background: linear-gradient(135deg, var(--q-primary) 0%, darken($primary, 15%) 100%);
+    color: white;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .search-input {
+    border-radius: 12px;
+    .q-field__control {
+      height: 44px;
+    }
+  }
+
+  .status-btn {
+    min-width: 100px;
+    border-radius: 20px;
+    &:hover {
+      background: rgba(var(--q-primary), 0.1);
+    }
+  }
+
+  .task-item {
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .status-chip {
+    font-weight: 500;
+    padding: 0 12px;
+  }
+
+  .request-status-chip {
+    font-weight: 500;
+  }
+
+  .calendar-card, .day-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .pagination {
+    .q-btn {
+      border-radius: 8px;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .header-section {
+      border-radius: 0 0 16px 16px;
+    }
+
+    .task-item {
+      margin-bottom: 8px;
+    }
   }
 }
 </style> 

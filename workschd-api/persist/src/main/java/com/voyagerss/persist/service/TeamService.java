@@ -136,6 +136,7 @@ public class TeamService {
         dto.setEmail(member.getAccount().getEmail());
         dto.setJoinDate(member.getJoinDate());
         dto.setStatus(member.getStatus());
+        dto.setPriority(member.getPriority());
         return dto;
     }
 }

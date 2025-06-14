@@ -1,3 +1,485 @@
+/* Premium Dialog System - High-Value Website Standards */
+@import './variables.scss';
+
+/* Dialog Overlay & Container */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: $z-modal-backdrop;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-4;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  
+  &--open {
+    opacity: 1;
+  }
+  
+  &--closing {
+    opacity: 0;
+  }
+}
+
+/* Dialog Container */
+.dialog {
+  background: var(--bg-primary);
+  border-radius: $radius-2xl;
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--border-primary);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  transform: scale(0.95) translateY(20px);
+  transition: all var(--transition-base);
+  z-index: $z-modal;
+  
+  &--open {
+    transform: scale(1) translateY(0);
+  }
+  
+  &--sm {
+    max-width: 400px;
+  }
+  
+  &--md {
+    max-width: 500px;
+  }
+  
+  &--lg {
+    max-width: 700px;
+  }
+  
+  &--xl {
+    max-width: 900px;
+  }
+  
+  &--2xl {
+    max-width: 1200px;
+  }
+  
+  &--full {
+    max-width: none;
+    width: calc(100vw - #{$space-8});
+    height: calc(100vh - #{$space-8});
+    max-height: none;
+  }
+  
+  // Mobile responsive
+  @media (max-width: $breakpoint-md) {
+    max-width: none;
+    width: calc(100vw - #{$space-4});
+    margin: $space-2;
+    
+    &--full {
+      width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+  }
+}
+
+/* Dialog Header */
+.dialog__header {
+  padding: $space-8 $space-8 $space-6;
+  border-bottom: 1px solid var(--border-primary);
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  position: relative;
+  
+  &--centered {
+    text-align: center;
+  }
+  
+  &--borderless {
+    border-bottom: none;
+  }
+}
+
+.dialog__title {
+  margin: 0;
+  font-size: $text-2xl;
+  font-weight: $font-weight-bold;
+  color: var(--text-primary);
+  line-height: $leading-tight;
+  padding-right: $space-12; // Space for close button
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: $text-xl;
+  }
+}
+
+.dialog__subtitle {
+  margin: $space-2 0 0;
+  font-size: $text-base;
+  color: var(--text-secondary);
+  line-height: $leading-normal;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: $text-sm;
+  }
+}
+
+.dialog__close {
+  position: absolute;
+  top: $space-6;
+  right: $space-6;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border-radius: $radius-full;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  z-index: 1;
+  
+  &:hover {
+    background: var(--color-error);
+    color: white;
+    transform: scale(1.05);
+  }
+  
+  &:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+  }
+  
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Dialog Body */
+.dialog__body {
+  padding: $space-8;
+  overflow-y: auto;
+  max-height: 60vh;
+  
+  &--no-padding {
+    padding: 0;
+  }
+  
+  &--compact {
+    padding: $space-6;
+  }
+  
+  &--spacious {
+    padding: $space-10;
+  }
+  
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: $radius-full;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: $radius-full;
+    
+    &:hover {
+      background: var(--text-tertiary);
+    }
+  }
+}
+
+/* Dialog Footer */
+.dialog__footer {
+  padding: $space-6 $space-8 $space-8;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  
+  &--centered {
+    justify-content: center;
+  }
+  
+  &--space-between {
+    justify-content: space-between;
+  }
+  
+  &--end {
+    justify-content: flex-end;
+  }
+  
+  &--borderless {
+    border-top: none;
+    background: var(--bg-primary);
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column-reverse;
+    gap: $space-2;
+    
+    .btn {
+      width: 100%;
+    }
+    
+    &--space-between {
+      flex-direction: column;
+      gap: $space-3;
+    }
+  }
+}
+
+/* Special Dialog Variants */
+.dialog--glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  .dialog__header {
+    background: rgba(255, 255, 255, 0.7);
+  }
+  
+  .dialog__footer {
+    background: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.dialog--gradient {
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-brand-primary), var(--color-brand-accent));
+  }
+}
+
+.dialog--centered {
+  text-align: center;
+  
+  .dialog__body {
+    text-align: left;
+  }
+}
+
+.dialog--confirmation {
+  max-width: 400px;
+  
+  .dialog__body {
+    text-align: center;
+    padding: $space-6 $space-8;
+  }
+  
+  .dialog__icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto $space-4;
+    background: var(--bg-tertiary);
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    
+    &--success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--color-success);
+    }
+    
+    &--warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--color-warning);
+    }
+    
+    &--error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--color-error);
+    }
+    
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+  
+  .dialog__title {
+    padding-right: 0;
+    text-align: center;
+    margin-bottom: $space-2;
+  }
+  
+  .dialog__message {
+    color: var(--text-secondary);
+    line-height: $leading-relaxed;
+  }
+}
+
+/* Form Dialog Styles */
+.dialog--form {
+  .dialog__body {
+    padding: $space-6 $space-8 $space-8;
+  }
+  
+  .form-group {
+    margin-bottom: $space-6;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  .form-section {
+    margin-bottom: $space-8;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  .form-section__title {
+    font-size: $text-lg;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+    margin-bottom: $space-4;
+    padding-bottom: $space-2;
+    border-bottom: 1px solid var(--border-primary);
+  }
+}
+
+/* Loading Dialog */
+.dialog--loading {
+  .dialog__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $space-10;
+    text-align: center;
+  }
+  
+  .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--border-primary);
+    border-top: 3px solid var(--color-brand-primary);
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+    margin-bottom: $space-4;
+  }
+  
+  .loading-text {
+    color: var(--text-secondary);
+    font-size: $text-base;
+  }
+}
+
+/* Animation Classes */
+.dialog-enter-active,
+.dialog-leave-active {
+  transition: all var(--transition-base);
+}
+
+.dialog-enter-from {
+  opacity: 0;
+  transform: scale(0.95) translateY(20px);
+}
+
+.dialog-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(-20px);
+}
+
+.dialog-overlay-enter-active,
+.dialog-overlay-leave-active {
+  transition: opacity var(--transition-base);
+}
+
+.dialog-overlay-enter-from,
+.dialog-overlay-leave-to {
+  opacity: 0;
+}
+
+/* Staggered Animation for Multiple Elements */
+.dialog__content > * {
+  animation: slideInUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.dialog__content > *:nth-child(1) { animation-delay: 0.1s; }
+.dialog__content > *:nth-child(2) { animation-delay: 0.2s; }
+.dialog__content > *:nth-child(3) { animation-delay: 0.3s; }
+.dialog__content > *:nth-child(4) { animation-delay: 0.4s; }
+.dialog__content > *:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accessibility Improvements */
+.dialog[aria-hidden="true"] {
+  display: none;
+}
+
+.dialog:focus {
+  outline: none;
+}
+
+/* Print Styles */
+@media print {
+  .dialog-overlay,
+  .dialog {
+    display: none !important;
+  }
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+  .dialog-overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .dialog--glass {
+    background: rgba(30, 41, 59, 0.95);
+    
+    .dialog__header,
+    .dialog__footer {
+      background: rgba(30, 41, 59, 0.7);
+    }
+  }
+}
+
+/* High DPI / Retina Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .dialog {
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+}
+
 // Common dialog component styles
 
 .dialog-card {

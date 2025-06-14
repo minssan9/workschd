@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
  */
 @Data
 @NoArgsConstructor
-public class TaskEmployeeDTO implements Serializable {
+public class TaskEmployeeDTO extends BaseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;

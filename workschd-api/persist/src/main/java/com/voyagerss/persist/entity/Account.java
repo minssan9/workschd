@@ -34,13 +34,13 @@ public class Account extends BaseEntity implements Serializable {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "phone")
-    private String phone; 
+    @Column(name = "phone", nullable = false)
+    private String phone;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "status", nullable = false)
@@ -57,7 +57,13 @@ public class Account extends BaseEntity implements Serializable {
     private String profileImageUrl;
 
     @Column(name = "profile_video_url")
-    private String profileVideoUrl;  
+    private String profileVideoUrl;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "active", nullable = false)
+    private Boolean active;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
@@ -79,14 +85,12 @@ public class Account extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AccountWorkOffDates> accountWorkOffDates = new ArrayList<>();
 
-
-
     public Account(AccountDTO accountDto) {
         BeanUtils.copyProperties(accountDto, this);
         this.username = accountDto.getUsername();
         this.password = accountDto.getPassword();
-        this.email = accountDto.getEmail(); 
-        this.phone = accountDto.getPhone(); 
+        this.email = accountDto.getEmail();
+        this.phone = accountDto.getPhone();
         this.profileVideoUrl = accountDto.getProfileVideoUrl() != null ? accountDto.getProfileVideoUrl() : "";
     }
 
@@ -103,7 +107,7 @@ public class Account extends BaseEntity implements Serializable {
         this.phone = phone;
         this.email = email != null ? email : "NO_EMAIL";
         this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
-        this.profileVideoUrl = ""; 
+        this.profileVideoUrl = "";
     }
 
     public Account(Integer id) {
@@ -115,5 +119,4 @@ public class Account extends BaseEntity implements Serializable {
         BeanUtils.copyProperties(this, bean);
         return bean;
     }
-
 }
