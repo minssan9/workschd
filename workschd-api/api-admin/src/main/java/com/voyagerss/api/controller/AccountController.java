@@ -8,6 +8,8 @@ import com.voyagerss.persist.dto.QueryDTO;
 import com.voyagerss.persist.entity.Account;
 import com.voyagerss.persist.service.AccountInfoService;
 import com.voyagerss.persist.service.AccountService;
+import com.voyagerss.persist.service.TaskEmployeeService;
+import com.voyagerss.persist.dto.TaskEmployeeDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @Validated
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ import java.io.IOException;
 public class AccountController {
     private final AccountService accountService;
     private final AccountInfoService accountInfoService;
+    private final TaskEmployeeService taskEmployeeService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
 
@@ -117,6 +121,23 @@ public class AccountController {
     public ResponseEntity saveAccountInfoById(@RequestBody AccountInfoDTO vO) {
 //        throw new CommonException();
         return ResponseEntity.ok(accountInfoService.save(vO));
+    }
+
+    /**
+     * Get task requests for a specific account
+     * Mapped to: const getUserTaskRequests = (accountId: number): Promise<AxiosResponse<TaskEmployee[]>> => {
+     *   return service.get(`/account/${accountId}/task-requests`)
+     * }
+     */
+    @GetMapping("/{accountId}/task-requests")
+    public ResponseEntity<List<TaskEmployeeDTO>> getUserTaskRequests(
+            @PathVariable("accountId") Integer accountId) {
+        try {
+            List<TaskEmployeeDTO> taskRequests = taskEmployeeService.getTaskRequestsByAccountId(accountId);
+            return ResponseEntity.ok(taskRequests);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

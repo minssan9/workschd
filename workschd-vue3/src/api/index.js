@@ -1,14 +1,14 @@
 /* Api */
 import apiAccount from '@/api/modules/api-account'
-import apiManager from '@/api/modules/api-manager'
-import apiPdf from "@/api/modules/api-pdf";
+import apiTask from '@/api/modules/api-task'
+import apiTeam from '@/api/modules/api-team'
 import apiSys from "@/api/public-modules/api-sys";
 
 const api = {
   accountAPI: apiAccount,
-  sysAPI: apiSys,
-  managerAPI: apiManager,
-  pdfAPI: apiPdf
+  taskAPI: apiTask,
+  teamAPI: apiTeam,
+  sysAPI: apiSys
 }
 
 export default api

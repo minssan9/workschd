@@ -33,22 +33,16 @@ export interface TaskEmployee {
   rejectedAt?: string
   rejectionReason?: string
   joinedAt?: string
-  leftAt?: string,
-
-  content: TaskEmployee[]
-  totalElements: number
-  totalPages: number
-  number: number
-  size: number
+  leftAt?: string
 }
 
 
 // Task APIs
-const fetchTasks = (): Promise<AxiosResponse<PageResponseDTO<Task>>> => {
+const fetchTasks = (): Promise<AxiosResponse<Task[]>> => {
   return service.get('/task')
 }
 // Worker-specific API to fetch available tasks with pagination
-const fetchTasksForWorker = (params?: any): Promise<AxiosResponse<TaskEmployee | Task[]>> => {
+const fetchTasksForWorker = (params?: any): Promise<AxiosResponse<Task[]>> => {
   return service.get('/task', { params })
 }
 // Worker-specific API to get a user's task requests
@@ -72,18 +66,25 @@ const approveJoinRequest = (requestData: Partial<TaskEmployee>): Promise<AxiosRe
   return service.post(`/task-employee/${taskId}/request/${requestId}/approve`)
 }  
 // Updated API to get task employees with pagination and filtering
-const getTaskEmployees = (taskId: number, params?: any): Promise<AxiosResponse<TaskEmployee[]>> => {
+const getTaskEmployees = (taskId: number, params?: any): Promise<AxiosResponse<PageResponseDTO<TaskEmployee>>> => {
   return service.get(`/task-employee/${taskId}/employees`, { params });
 };
 
 
 
 
+// Alternative join request API that matches backend controller
+const createJoinRequestWithParams = (taskId: number, accountId: number): Promise<AxiosResponse<TaskEmployee>> => {
+  return service.post(`/task/${taskId}/request?accountId=${accountId}`)
+}
+
 export default {
   fetchTasks,
   fetchTasksForWorker, 
+  getUserTaskRequests,
   createTaskEmployeeRequest,
   createTask, 
   approveJoinRequest,
-  getTaskEmployees
+  getTaskEmployees,
+  createJoinRequestWithParams
 } 

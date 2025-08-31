@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -123,6 +125,20 @@ public class TaskEmployeeService {
         searchParams.setTaskId(taskId);
         searchParams.setPageable(pageable);
         return taskEmployeeRepositoryCustom.findBySearchParams(searchParams, pageable);
+    }
+    
+    /**
+     * Get all task requests for a specific account
+     * 
+     * @param accountId The account ID
+     * @return List of TaskEmployeeDTO for the account's requests
+     */
+    @Transactional(readOnly = true)
+    public List<TaskEmployeeDTO> getTaskRequestsByAccountId(Integer accountId) {
+        List<TaskEmployee> requests = taskEmployeeRepository.findByAccount_AccountId(accountId);
+        return requests.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     private TaskEmployeeDTO toDTO(TaskEmployee original) {

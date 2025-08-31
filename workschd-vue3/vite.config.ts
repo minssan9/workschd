@@ -96,7 +96,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3003, // 개발 서버 포트 설정
       open: true, // 브라우저 자동 열기
-      host: 'mac.voyagerss.com',
+      // host: 'mac.voyagerss.com',
       // https: false, // HTTPS 사용 여부
       cors: true, // CORS 활성화
       proxy: {
