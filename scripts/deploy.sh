@@ -7,7 +7,8 @@
 # and Docker Compose.
 #
 # Prerequisites:
-#   - SSH access to the droplet
+#   - SSH access to the droplet (password-based)
+#   - sshpass installed (brew install sshpass or apt install sshpass)
 #   - Docker and Docker Compose installed on the droplet
 #   - Environment variables configured (see .env.production)
 #
@@ -40,11 +41,20 @@ fi
 # Source environment variables
 source "$ENV_FILE"
 
+# Check if sshpass is installed
+if ! command -v sshpass &> /dev/null; then
+    echo -e "${RED}Error: sshpass is not installed${NC}"
+    echo "Install it with:"
+    echo "  macOS: brew install hudochenkov/sshpass/sshpass"
+    echo "  Linux: sudo apt-get install sshpass"
+    exit 1
+fi
+
 # Validate required environment variables
 REQUIRED_VARS=(
     "DROPLET_IP"
     "DROPLET_USER"
-    "DROPLET_SSH_KEY"
+    "DROPLET_PASSWORD"
     "DEPLOY_PATH"
 )
 
@@ -91,12 +101,12 @@ tar -czf "/tmp/$DEPLOY_PACKAGE" \
 
 # Step 4: Upload to droplet
 echo -e "${YELLOW}[4/6] Uploading to droplet...${NC}"
-ssh -i "$DROPLET_SSH_KEY" "${DROPLET_USER}@${DROPLET_IP}" "mkdir -p ${DEPLOY_PATH}/releases"
-scp -i "$DROPLET_SSH_KEY" "/tmp/$DEPLOY_PACKAGE" "${DROPLET_USER}@${DROPLET_IP}:${DEPLOY_PATH}/releases/"
+sshpass -p "$DROPLET_PASSWORD" ssh -o StrictHostKeyChecking=no "${DROPLET_USER}@${DROPLET_IP}" "mkdir -p ${DEPLOY_PATH}/releases"
+sshpass -p "$DROPLET_PASSWORD" scp -o StrictHostKeyChecking=no "/tmp/$DEPLOY_PACKAGE" "${DROPLET_USER}@${DROPLET_IP}:${DEPLOY_PATH}/releases/"
 
 # Step 5: Extract and prepare on droplet
 echo -e "${YELLOW}[5/6] Extracting and preparing on droplet...${NC}"
-ssh -i "$DROPLET_SSH_KEY" "${DROPLET_USER}@${DROPLET_IP}" << EOF
+sshpass -p "$DROPLET_PASSWORD" ssh -o StrictHostKeyChecking=no "${DROPLET_USER}@${DROPLET_IP}" << EOF
     set -e
     cd ${DEPLOY_PATH}
 
@@ -126,7 +136,7 @@ EOF
 
 # Step 6: Deploy with Docker Compose
 echo -e "${YELLOW}[6/6] Deploying with Docker Compose...${NC}"
-ssh -i "$DROPLET_SSH_KEY" "${DROPLET_USER}@${DROPLET_IP}" << 'EOF'
+sshpass -p "$DROPLET_PASSWORD" ssh -o StrictHostKeyChecking=no "${DROPLET_USER}@${DROPLET_IP}" << 'EOF'
     set -e
     cd ${DEPLOY_PATH}
 
@@ -172,4 +182,4 @@ echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}Deployment completed successfully!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo -e "Application URL: http://${DROPLET_IP}"
-echo -e "To view logs: ssh -i ${DROPLET_SSH_KEY} ${DROPLET_USER}@${DROPLET_IP} 'cd ${DEPLOY_PATH} && docker-compose logs -f'"
+echo -e "To view logs: sshpass -p '***' ssh ${DROPLET_USER}@${DROPLET_IP} 'cd ${DEPLOY_PATH} && docker-compose logs -f'"

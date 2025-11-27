@@ -26,9 +26,15 @@ fi
 
 source "$ENV_FILE"
 
+# Check if sshpass is installed
+if ! command -v sshpass &> /dev/null; then
+    echo -e "${RED}Error: sshpass is not installed${NC}"
+    exit 1
+fi
+
 echo -e "${YELLOW}Rolling back to previous version...${NC}"
 
-ssh -i "$DROPLET_SSH_KEY" "${DROPLET_USER}@${DROPLET_IP}" << EOF
+sshpass -p "$DROPLET_PASSWORD" ssh -o StrictHostKeyChecking=no "${DROPLET_USER}@${DROPLET_IP}" << EOF
     set -e
     cd ${DEPLOY_PATH}
 

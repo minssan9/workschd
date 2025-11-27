@@ -49,31 +49,19 @@ Internet
    - **이미지**: Ubuntu 22.04 LTS
    - **Plan**: Basic ($12/mo 권장, 2GB RAM)
    - **Region**: 사용자와 가까운 지역 선택
-   - **Authentication**: SSH Key 사용 권장
+   - **Authentication**: Password (root 비밀번호 설정)
 
-3. Droplet IP 주소 확인
+3. Droplet IP 주소와 root 비밀번호 확인
 
-### 2. SSH 키 설정
-
-로컬 머신에서 SSH 키가 없는 경우:
-
-```bash
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-```
-
-생성된 공개 키를 Digital Ocean Droplet에 추가:
-
-```bash
-cat ~/.ssh/id_rsa.pub
-# 출력된 내용을 Digital Ocean Droplet 설정에 추가
-```
-
-### 3. 로컬 환경 요구사항
+### 2. 로컬 환경 요구사항
 
 - Node.js 18+
 - Java 17+
 - Docker (테스트용)
 - Git
+- **sshpass** (SSH 패스워드 인증용)
+  - macOS: `brew install hudochenkov/sshpass/sshpass`
+  - Linux: `sudo apt-get install sshpass`
 
 ---
 
@@ -90,17 +78,19 @@ ssh root@your.droplet.ip.address
 로컬에서 설정 스크립트를 Droplet에 업로드:
 
 ```bash
-scp scripts/setup-droplet.sh root@your.droplet.ip.address:/tmp/
+sshpass -p 'your_password' scp -o StrictHostKeyChecking=no scripts/setup-droplet.sh root@your.droplet.ip.address:/tmp/
 ```
 
 Droplet에서 스크립트 실행:
 
 ```bash
-ssh root@your.droplet.ip.address
+sshpass -p 'your_password' ssh -o StrictHostKeyChecking=no root@your.droplet.ip.address
 cd /tmp
 chmod +x setup-droplet.sh
-./setup-droplet.sh deploy  # deploy 사용자로 설정
+./setup-droplet.sh
 ```
+
+> **참고**: root 사용자로 직접 배포하므로 별도 deploy 사용자 생성은 불필요합니다.
 
 ### 3. 수동 설정 (선택사항)
 
@@ -159,9 +149,9 @@ cp .env.production.example .env.production
 ```bash
 # Digital Ocean Droplet Configuration
 DROPLET_IP=123.456.789.012          # Droplet IP 주소
-DROPLET_USER=deploy
-DROPLET_SSH_KEY=~/.ssh/id_rsa       # SSH 키 경로
-DEPLOY_PATH=/home/deploy/workschd
+DROPLET_USER=root
+DROPLET_PASSWORD=your_droplet_password  # Droplet root 비밀번호
+DEPLOY_PATH=/root/workschd
 
 # Database Configuration
 DB_ROOT_PASSWORD=strong_root_password_here
@@ -173,6 +163,11 @@ SPRING_PROFILES_ACTIVE=prod
 # Domain (선택사항)
 DOMAIN=your-domain.com
 ```
+
+**⚠️ 보안 주의사항**:
+- `.env.production` 파일은 절대 Git에 커밋하지 마세요
+- 비밀번호는 강력하게 설정하세요 (최소 16자, 영문+숫자+특수문자)
+- 배포 후 Droplet의 SSH 포트를 변경하는 것을 권장합니다
 
 ### 2. 애플리케이션 환경 변수 설정
 
@@ -246,8 +241,8 @@ curl http://your.droplet.ip.address/api/health
 Droplet에서:
 
 ```bash
-ssh deploy@your.droplet.ip.address
-cd /home/deploy/workschd
+sshpass -p 'your_password' ssh root@your.droplet.ip.address
+cd /root/workschd
 docker-compose ps
 ```
 
@@ -273,9 +268,8 @@ Droplet에서:
 sudo certbot certonly --standalone -d your-domain.com -d www.your-domain.com
 
 # 인증서 파일 복사
-sudo cp /etc/letsencrypt/live/your-domain.com/fullchain.pem /home/deploy/workschd/nginx/ssl/
-sudo cp /etc/letsencrypt/live/your-domain.com/privkey.pem /home/deploy/workschd/nginx/ssl/
-sudo chown -R deploy:deploy /home/deploy/workschd/nginx/ssl/
+sudo cp /etc/letsencrypt/live/your-domain.com/fullchain.pem /root/workschd/nginx/ssl/
+sudo cp /etc/letsencrypt/live/your-domain.com/privkey.pem /root/workschd/nginx/ssl/
 ```
 
 ### 3. Nginx 설정 업데이트
@@ -297,7 +291,7 @@ server {
 ### 4. 컨테이너 재시작
 
 ```bash
-cd /home/deploy/workschd
+cd /root/workschd
 docker-compose restart nginx
 ```
 
@@ -308,7 +302,7 @@ docker-compose restart nginx
 sudo crontab -e
 
 # 매월 1일 새벽 3시에 갱신
-0 3 1 * * certbot renew --quiet && cp /etc/letsencrypt/live/your-domain.com/*.pem /home/deploy/workschd/nginx/ssl/ && cd /home/deploy/workschd && docker-compose restart nginx
+0 3 1 * * certbot renew --quiet && cp /etc/letsencrypt/live/your-domain.com/*.pem /root/workschd/nginx/ssl/ && cd /root/workschd && docker-compose restart nginx
 ```
 
 ---
@@ -387,8 +381,8 @@ git pull origin main
 ### 3. 특정 컨테이너만 재시작
 
 ```bash
-ssh deploy@your.droplet.ip.address
-cd /home/deploy/workschd
+sshpass -p 'your_password' ssh root@your.droplet.ip.address
+cd /root/workschd
 
 # 백엔드만 재시작
 docker-compose restart backend
@@ -406,11 +400,17 @@ docker-compose restart frontend
 **문제**: SSH 연결 실패
 
 ```bash
-# SSH 키 권한 확인
-chmod 600 ~/.ssh/id_rsa
+# sshpass 설치 확인
+which sshpass
+
+# sshpass 설치 (macOS)
+brew install hudochenkov/sshpass/sshpass
+
+# sshpass 설치 (Linux)
+sudo apt-get install sshpass
 
 # SSH 연결 테스트
-ssh -i ~/.ssh/id_rsa deploy@your.droplet.ip.address
+sshpass -p 'your_password' ssh -o StrictHostKeyChecking=no root@your.droplet.ip.address
 ```
 
 **문제**: 빌드 실패
@@ -485,7 +485,7 @@ df -h
 docker system prune -a
 
 # 오래된 로그 삭제
-find /home/deploy/workschd/logs -name "*.log" -mtime +30 -delete
+find /root/workschd/logs -name "*.log" -mtime +30 -delete
 ```
 
 ---
@@ -506,7 +506,7 @@ docker exec workschd-db mysqldump -u workschd_user -p workschd > backup_$(date +
 crontab -e
 
 # 매일 새벽 2시에 백업
-0 2 * * * cd /home/deploy/workschd && docker exec workschd-db mysqldump -u workschd_user -pYOUR_PASSWORD workschd > backup_$(date +\%Y\%m\%d).sql
+0 2 * * * cd /root/workschd && docker exec workschd-db mysqldump -u workschd_user -pYOUR_PASSWORD workschd > backup_$(date +\%Y\%m\%d).sql
 ```
 
 ### 3. 복구
@@ -560,13 +560,15 @@ vi /etc/mysql/my.cnf
    sudo ufw status
    ```
 
-2. **SSH 포트 변경** (선택사항)
+2. **SSH 보안 강화**
    ```bash
-   # /etc/ssh/sshd_config
-   Port 2222
+   # /etc/ssh/sshd_config 편집
+   PermitRootLogin yes  # 필요시 no로 변경하고 일반 사용자 사용
+   PasswordAuthentication yes  # SSH 키로 전환 시 no
    ```
 
 3. **비밀번호 정기 변경**
+   - Droplet root 비밀번호
    - DB 비밀번호
    - 환경 변수 비밀번호
 
@@ -574,6 +576,11 @@ vi /etc/mysql/my.cnf
    ```bash
    sudo apt update && sudo apt upgrade -y
    ```
+
+5. **sshpass 대안 (더 안전)**
+   - SSH 키 방식으로 전환 권장
+   - `expect` 스크립트 사용
+   - Ansible 등 배포 자동화 도구 사용
 
 ---
 
