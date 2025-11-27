@@ -67,3 +67,9 @@ gradle.properties
 actions-runner
 workschd-api/persist/src/main/generated
 
+# Digital Ocean deployment
+nginx/ssl/*.pem
+nginx/ssl/*.key
+logs/
+backup_*.sql
+docker-compose.override.yml
