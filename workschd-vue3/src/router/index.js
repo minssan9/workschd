@@ -34,11 +34,13 @@ const router = createRouter({
     },
 
     // Job
-    { 
+    {
       path: '/task',                   name: 'Task',                    meta: { roles: ['WORKER','MANAGER', 'SCHEDULER'], requiresAuth: true, icon: 'event' },
       children: [
-        { path: '/task/manage',          name: 'TaskManage (Manager)',                component: () => import('@/views/task/TaskManage.vue'),            meta: { icon: 'list' } },        
-        { path: '/task/list-mobile',   name: 'TaskListMobile (Worker)',          component: () => import('@/views/task/TaskListMobile.vue'),      meta: { icon: 'work', roles: ['WORKER'] } }      ]
+        { path: '/task/manage',          name: 'TaskManage (Manager)',                component: () => import('@/views/task/TaskManage.vue'),            meta: { icon: 'list' } },
+        { path: '/task/manage-mobile',   name: 'TaskManageMobile (Manager)',          component: () => import('@/views/task/TaskManageMobile.vue'),      meta: { icon: 'assignment', roles: ['MANAGER', 'SCHEDULER'] } },
+        { path: '/task/list-mobile',     name: 'TaskListMobile (Worker)',             component: () => import('@/views/task/TaskListMobile.vue'),        meta: { icon: 'work', roles: ['WORKER'] } }
+      ]
     },
     
     // Error pages

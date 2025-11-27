@@ -123,15 +123,41 @@
               >
                 {{ getTaskStatusLabel(task.status) }}
               </q-chip>
+              <!-- Attendance buttons for approved tasks -->
+              <div v-if="canCheckIn(task)" class="q-mt-sm">
+                <q-btn
+                  color="positive"
+                  label="출근"
+                  icon="login"
+                  size="sm"
+                  unelevated
+                  @click.stop="handleCheckIn(task)"
+                />
+              </div>
+              <div v-else-if="canCheckOut(task)" class="q-mt-sm">
+                <q-btn
+                  color="negative"
+                  label="퇴근"
+                  icon="logout"
+                  size="sm"
+                  unelevated
+                  @click.stop="handleCheckOut(task)"
+                />
+                <div class="text-caption text-grey-7 q-mt-xs">
+                  출근: {{ formatDateTime(getMyTaskEmployee(task)?.joinedAt) }}
+                </div>
+              </div>
+              <!-- Join request button -->
               <q-btn
-                v-if="canRequestToJoin(task)"
-                color="primary" 
-                label="참여 신청" 
-                size="sm" 
+                v-else-if="canRequestToJoin(task)"
+                color="primary"
+                label="참여 신청"
+                size="sm"
                 flat
                 class="q-mt-sm"
                 @click.stop="confirmJoinRequest(task)"
               />
+              <!-- Status chip for existing requests -->
               <q-chip
                 v-else-if="getTaskRequestStatus(task.id)"
                 :color="getRequestStatusColor(getTaskRequestStatus(task.id))"
@@ -409,7 +435,7 @@ function tasksForCalendar(day: number) {
 // Handle task cancellation
 const submitCancel = async (task: Task) => {
   if (!task || !task.id) return
-  
+
   isSubmitting.value = true
   try {
     // Update task status to cancelled
@@ -424,6 +450,76 @@ const submitCancel = async (task: Task) => {
   } finally {
     isSubmitting.value = false
   }
+}
+
+// Get current user's task employee record for a task
+function getMyTaskEmployee(task: Task): TaskEmployee | null {
+  if (!task.taskEmployees || !user.value?.accountId) return null
+  return task.taskEmployees.find(te => te.accountId === Number(user.value.accountId)) || null
+}
+
+// Check if user can check in
+function canCheckIn(task: Task): boolean {
+  if (!task || !user.value?.accountId) return false
+  const myTaskEmployee = getMyTaskEmployee(task)
+  if (!myTaskEmployee) return false
+
+  // Can check in if status is APPROVED or INACTIVE (previous check-out)
+  return myTaskEmployee.status === RequestStatus.APPROVED || myTaskEmployee.status === 'INACTIVE'
+}
+
+// Check if user can check out
+function canCheckOut(task: Task): boolean {
+  if (!task || !user.value?.accountId) return false
+  const myTaskEmployee = getMyTaskEmployee(task)
+  if (!myTaskEmployee) return false
+
+  // Can check out if status is ACTIVE
+  return myTaskEmployee.status === 'ACTIVE'
+}
+
+// Handle check in
+async function handleCheckIn(task: Task) {
+  const myTaskEmployee = getMyTaskEmployee(task)
+  if (!myTaskEmployee || !myTaskEmployee.id) return
+
+  try {
+    await taskApi.checkIn(myTaskEmployee.id)
+    $q.notify({ type: 'positive', message: '출근 처리되었습니다.' })
+    await loadTasks()
+    await loadUserTaskRequests()
+  } catch (error: any) {
+    console.error('Check-in failed:', error)
+    $q.notify({
+      type: 'negative',
+      message: error.response?.data?.message || '출근 처리에 실패했습니다.'
+    })
+  }
+}
+
+// Handle check out
+async function handleCheckOut(task: Task) {
+  const myTaskEmployee = getMyTaskEmployee(task)
+  if (!myTaskEmployee || !myTaskEmployee.id) return
+
+  try {
+    await taskApi.checkOut(myTaskEmployee.id)
+    $q.notify({ type: 'positive', message: '퇴근 처리되었습니다.' })
+    await loadTasks()
+    await loadUserTaskRequests()
+  } catch (error: any) {
+    console.error('Check-out failed:', error)
+    $q.notify({
+      type: 'negative',
+      message: error.response?.data?.message || '퇴근 처리에 실패했습니다.'
+    })
+  }
+}
+
+// Format date time for display
+function formatDateTime(dateTime?: string): string {
+  if (!dateTime) return '-'
+  return date.formatDate(dateTime, 'HH:mm')
 }
 </script>
 

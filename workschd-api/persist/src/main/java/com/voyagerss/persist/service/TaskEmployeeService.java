@@ -146,6 +146,62 @@ public class TaskEmployeeService {
         return bean;
     }
 
+    /**
+     * Check in (출근) - Set joinedAt to current time and status to ACTIVE
+     *
+     * @param taskEmployeeId The task employee ID
+     * @return The updated task employee
+     */
+    @Transactional
+    public TaskEmployeeDTO checkIn(Long taskEmployeeId) {
+        TaskEmployee taskEmployee = requireOne(taskEmployeeId);
+
+        // Verify status is APPROVED before check-in
+        if (taskEmployee.getStatus() != EnumMaster.TaskEmployeeStatus.APPROVED
+                && taskEmployee.getStatus() != EnumMaster.TaskEmployeeStatus.INACTIVE) {
+            throw new IllegalStateException("Task employee must be approved before check-in");
+        }
+
+        // Check if already checked in
+        if (taskEmployee.getJoinedAt() != null && taskEmployee.getLeftAt() == null) {
+            throw new IllegalStateException("Already checked in");
+        }
+
+        taskEmployee.setJoinedAt(LocalDateTime.now());
+        taskEmployee.setLeftAt(null); // Clear previous check-out if re-checking in
+        taskEmployee.setStatus(EnumMaster.TaskEmployeeStatus.ACTIVE);
+
+        taskEmployee = taskEmployeeRepository.save(taskEmployee);
+        return toDTO(taskEmployee);
+    }
+
+    /**
+     * Check out (퇴근) - Set leftAt to current time and status to INACTIVE
+     *
+     * @param taskEmployeeId The task employee ID
+     * @return The updated task employee
+     */
+    @Transactional
+    public TaskEmployeeDTO checkOut(Long taskEmployeeId) {
+        TaskEmployee taskEmployee = requireOne(taskEmployeeId);
+
+        // Verify status is ACTIVE before check-out
+        if (taskEmployee.getStatus() != EnumMaster.TaskEmployeeStatus.ACTIVE) {
+            throw new IllegalStateException("Task employee must be active (checked in) before check-out");
+        }
+
+        // Verify joinedAt is set
+        if (taskEmployee.getJoinedAt() == null) {
+            throw new IllegalStateException("Cannot check out without checking in first");
+        }
+
+        taskEmployee.setLeftAt(LocalDateTime.now());
+        taskEmployee.setStatus(EnumMaster.TaskEmployeeStatus.INACTIVE);
+
+        taskEmployee = taskEmployeeRepository.save(taskEmployee);
+        return toDTO(taskEmployee);
+    }
+
     private TaskEmployee requireOne(Long id) {
         return taskEmployeeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Resource not found: " + id));

@@ -85,7 +85,7 @@ public class TaskEmployeeController {
     
     /**
      * Get all task employees for a task with pagination
-     * 
+     *
      * @param taskId The task ID
      * @param pageable Pagination information
      * @return Page of TaskEmployeeDTO
@@ -95,5 +95,31 @@ public class TaskEmployeeController {
             @PathVariable("taskId") Long taskId,
             @PageableDefault(page = 0, size = 10, direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(taskEmployeeService.getTaskEmployees(taskId, pageable));
+    }
+
+    /**
+     * Check in (출근) - Sets joinedAt to current time and status to ACTIVE
+     *
+     * @param taskEmployeeId The task employee ID
+     * @return The updated task employee
+     */
+    @PostMapping("/{taskEmployeeId}/check-in")
+    public ResponseEntity<TaskEmployeeDTO> checkIn(
+            @PathVariable("taskEmployeeId") Long taskEmployeeId) {
+        TaskEmployeeDTO result = taskEmployeeService.checkIn(taskEmployeeId);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Check out (퇴근) - Sets leftAt to current time and status to INACTIVE
+     *
+     * @param taskEmployeeId The task employee ID
+     * @return The updated task employee
+     */
+    @PostMapping("/{taskEmployeeId}/check-out")
+    public ResponseEntity<TaskEmployeeDTO> checkOut(
+            @PathVariable("taskEmployeeId") Long taskEmployeeId) {
+        TaskEmployeeDTO result = taskEmployeeService.checkOut(taskEmployeeId);
+        return ResponseEntity.ok(result);
     }
 }

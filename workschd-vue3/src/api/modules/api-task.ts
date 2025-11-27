@@ -57,6 +57,14 @@ const getUserTaskRequests = (accountId: number): Promise<AxiosResponse<TaskEmplo
 }
 const createTask = (task: Task): Promise<AxiosResponse<Task>> => {
   return service.post('/task', task)
+}
+
+const updateTask = (task: Task): Promise<AxiosResponse<Task>> => {
+  return service.put(`/task/${task.id}`, task)
+}
+
+const deleteTask = (taskId: number): Promise<AxiosResponse<void>> => {
+  return service.delete(`/task/${taskId}`)
 } 
 
 
@@ -76,14 +84,25 @@ const getTaskEmployees = (taskId: number, params?: any): Promise<AxiosResponse<T
   return service.get(`/task-employee/${taskId}/employees`, { params });
 };
 
+// Check in (출근) - Sets joinedAt to current time and status to ACTIVE
+const checkIn = (taskEmployeeId: number): Promise<AxiosResponse<TaskEmployee>> => {
+  return service.post(`/task-employee/${taskEmployeeId}/check-in`);
+};
 
-
+// Check out (퇴근) - Sets leftAt to current time and status to INACTIVE
+const checkOut = (taskEmployeeId: number): Promise<AxiosResponse<TaskEmployee>> => {
+  return service.post(`/task-employee/${taskEmployeeId}/check-out`);
+};
 
 export default {
   fetchTasks,
-  fetchTasksForWorker, 
+  fetchTasksForWorker,
   createTaskEmployeeRequest,
-  createTask, 
+  createTask,
+  updateTask,
+  deleteTask,
   approveJoinRequest,
-  getTaskEmployees
+  getTaskEmployees,
+  checkIn,
+  checkOut
 } 
