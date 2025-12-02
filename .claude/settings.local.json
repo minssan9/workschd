@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(chmod:*)",
+      "Bash(./test-api-connectivity.sh:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

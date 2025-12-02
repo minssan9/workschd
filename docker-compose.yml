@@ -5,7 +5,8 @@ services:
   backend:
     build:
       context: ./workschd-api
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
+    image: ghcr.io/voyagerss/workschd-api:latest
     container_name: workschd-backend
     restart: unless-stopped
     environment:
@@ -45,6 +46,7 @@ services:
     build:
       context: .
       dockerfile: workschd-vue3/Dockerfile
+    image: ghcr.io/voyagerss/workschd-frontend:latest
     container_name: workschd-frontend
     restart: unless-stopped
     depends_on:
