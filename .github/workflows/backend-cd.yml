@@ -6,6 +6,7 @@ on:
     paths:
       - 'workschd-api/**'
       - '.github/workflows/backend-cd.yml'
+      - 'docker-compose.yml'
   workflow_dispatch:
 
 env:

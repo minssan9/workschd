@@ -6,6 +6,7 @@ on:
     paths:
       - 'workschd-vue3/**'
       - '.github/workflows/frontend-cd.yml'
+      - 'docker-compose.yml'
   workflow_dispatch:
 
 env:
